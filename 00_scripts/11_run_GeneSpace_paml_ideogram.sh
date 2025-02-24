@@ -22,7 +22,7 @@ Help()
    echo " -s1|--haplo1: the name of the first  focal haplotype "
    echo " -s2|--haplo2: the name of the second focal haplotype "
    echo " -a|--ancestral_genome: the name of the ancestral haplo to infer orthology and plot gene order"
-   echo " -g|--ancestral_gff: the name of the ancestral gff associated with the ancestral genome"
+   echo " -g|--ancestral_gtf: the name of the ancestral gtf associated with the ancestral genome"
    echo " -f|--folderpath: the path to the global folder containing haplo1 and haplo 2"
    echo " -c|--chromosome: a tab separated txt file listing the name of the reference species (e.g sp1), the corresponding set of chromosomes (e.g.: chrX , supergene, etc) and the orientation of the chromosome (N: Normal, R: Reverse) if their is more than one"
    echo " -o|--options : the type of analysis to be performed: either 'synteny_and_Ds' (GeneSpace+Minimap2+Ds+changepoint), 'synteny_only' (GeneSpace+Minimap2), 'Ds_only' (paml and changepoint)"
@@ -40,8 +40,8 @@ while [ $# -gt 0 ] ; do
     -s2 | --haplo2) haplo2="$2" ; echo -e "haplotype 2 Name is ***${haplo2}*** \n" >&2;;
     -a  | --ancestral_genome) ancestral_genome="$2" ; 
         echo -e "ancestral haplo  Name is ***${ancestral_genome}*** \n" >&2;;
-    -g  | --ancestral_gff) ancestral_gff="$2" ; 
-        echo -e "ancestral gff  Name is ***${ancestral_gff}*** \n" >&2;;
+    -g  | --ancestral_gtf) ancestral_gtf="$2" ; 
+        echo -e "ancestral gtf  Name is ***${ancestral_gtf}*** \n" >&2;;
     -f  | --folderpath  ) folderpath="$2"   ; 
         echo -e "global folder is  ${folderpath} \n" >&2;;
     -c  | --chromosome )  chromosome="$2"   ; 
@@ -80,14 +80,14 @@ if [ -n "${ancestral_genome}" ] ; then
 
     fi
    
-    if file --mime-type "$ancestral_gff" | grep -q gzip$; then
-       echo "$ancestral_gff is gzipped"
-       gunzip "$ancestral_gff"
-       ancestral_gff="${ancestral_gff%.gz}"
+    if file --mime-type "$ancestral_gtf" | grep -q gzip$; then
+       echo "$ancestral_gtf is gzipped"
+       gunzip "$ancestral_gtf"
+       ancestral_gtf="${ancestral_gtf%.gz}"
     else
-       echo "$ancestral_gff is not gzipped"
+       echo "$ancestral_gtf is not gzipped"
        #trim any eventual .gz extension from file
-       ancestral_gff="${ancestral_gff%.gz}"
+       ancestral_gtf="${ancestral_gtf%.gz}"
 
     fi
 
@@ -97,10 +97,10 @@ if [ -n "${ancestral_genome}" ] ; then
     fi
 
     ln -s "${ancestral_genome}" ancestral_sp.fa ; samtools faidx ancestral_sp.fa ; cd ../
-    gffread -g "${ancestral_genome}" -w ancestral_sp/ancestral_sp.spliced_cds.fa  "${ancestral_gff}" 
+    gffread -g "${ancestral_genome}" -w ancestral_sp/ancestral_sp.spliced_cds.fa  "${ancestral_gtf}" 
     transeq -sequence ancestral_sp/ancestral_sp.spliced_cds.fa \
         -outseq ancestral_sp/ancestral_sp_prot.fa
-    awk '$3=="transcript" {print $1"\t"$4"\t"$5"\t"$10}' "$ancestral_gff" |\
+    awk '$3=="transcript" {print $1"\t"$4"\t"$5"\t"$10}' "$ancestral_gtf" |\
         sed 's/"//g' > ancestral_sp/ancestral_sp.bed
     sed -i 's/_1 CDS=.*$//g'  ancestral_sp/ancestral_sp_prot.fa
 

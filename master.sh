@@ -113,7 +113,7 @@ fi
 
 # if no TE database then exit
 # if no lineage for busco then exit and ask for it 
-if [ -z "$TEdatabase" ] && [[ "$annotate" = YES ]] ;
+if [ -z "$TEdatabase" ] && [[ "$annotateTE" = YES ]] ;
 then
     echo "Error NO Database for TE is provided "
     echo "I will not be able to identify and mask TEs prior to the genome annotation step "
@@ -140,7 +140,7 @@ fi
 echo "------------------------------------------------------------"
 echo "-----check all variables from the configuration file  ------"
 echo "  ancestral genome ${ancestral_genome}  "
-echo "  ancestral gff is ${ancestral_gff} "
+echo "  ancestral gtf is ${ancestral_gtf} "
 echo "*** fasta for genome1 is ${genome1} **** "
 echo "*** fasta for genome2 is ${genome2} **** "
 echo "*** haplotype1 is ${haplotype1} ***"
@@ -225,7 +225,7 @@ fi
 if [[ -n "${ancestral_genome}" ]] ; then 
     mkdir ancestral_sp  2>/dev/null
     #test if ancestral gtf is also provided in the config file:
-    if [ -z "${ancestral_gff}" ] ; then 
+    if [ -z "${ancestral_gtf}" ] ; then 
         echo "error ! you provided an ancestral genome but no corresponding annotation (gff file)"
         echo "please correct that"
     fi
@@ -646,7 +646,7 @@ if [ "$option" == 1 ]; then
             -s1 "$haplotype1" \
             -s2 "$haplotype2" \
             -a "$ancestral_genome" \
-            -g "$ancestral_gff" \
+            -g "$ancestral_gtf" \
             -c "$scaffold" \
             -o "$opt"  2>&1 |\
             tee LOGS/log_GeneSpace_and_Co
@@ -738,7 +738,7 @@ if [ "$option" == 1 ]; then
             -s1 "$haplotype1" \
             -s2 "$haplotype2" \
             -a "$ancestral_genome" \
-            -g "$ancestral_gff" \
+            -g "$ancestral_gtf" \
             -c "$scaffold" \
             -o "$opt" 2>&1 |\
             tee LOGS/log_GeneSpace_and_Co
@@ -859,7 +859,7 @@ if [ "$option" == 1 ]; then
             -s1 "$haplotype1" \
             -s2 "$haplotype2" \
             -a "$ancestral_genome" \
-            -g "$ancestral_gff" \
+            -g "$ancestral_gtf" \
             -c "$scaffold" \
             -o "$opt" 2>&1 |\
             tee LOGS/log_GeneSpace_and_Co
@@ -1384,7 +1384,7 @@ if [ "$option" == 1 ]; then
             -s1 "$haplotype1" \
             -s2 "$haplotype2" \
             -a "$ancestral_genome" \
-            -g "$ancestral_gff" \
+            -g "$ancestral_gtf" \
             -c "$scaffold" \
             -o "$opt"  2>&1 |\
             tee LOGS/log_GeneSpace_and_Co
@@ -1516,7 +1516,7 @@ if [ "$option" == 1 ]; then
             -s1 "$haplotype1" \
             -s2 "$haplotype2" \
             -a "$ancestral_genome" \
-            -g "$ancestral_gff" \
+            -g "$ancestral_gtf" \
             -c "$scaffold" \
             -o "$opt" 2>&1 |\
             tee LOGS/log_GeneSpace_and_Co
@@ -1667,7 +1667,7 @@ if [ "$option" == 1 ]; then
             -s1 "$haplotype1" \
             -s2 "$haplotype2" \
             -a "$ancestral_genome" \
-            -g "$ancestral_gff" \
+            -g "$ancestral_gtf" \
             -c "$scaffold" \
             -o "$opt" 2>&1 |\
             tee LOGS/log_GeneSpace_and_Co
@@ -2074,7 +2074,7 @@ then
             -s1 "$haplotype1" \
             -s2 "$haplotype2" \
             -a "$ancestral_genome" \
-            -g "$ancestral_gff" \
+            -g "$ancestral_gtf" \
             -c "$scaffold" \
             -o "$opt"  2>&1 |\
             tee LOGS/log_GeneSpace_and_Co
@@ -2166,7 +2166,7 @@ then
             -s1 "$haplotype1" \
             -s2 "$haplotype2" \
             -a "$ancestral_genome" \
-            -g "$ancestral_gff" \
+            -g "$ancestral_gtf" \
             -c "$scaffold" \
             -o "$opt"  2>&1 |\
             tee LOGS/log_GeneSpace_and_Co
@@ -2286,7 +2286,7 @@ then
             -s1 "$haplotype1" \
             -s2 "$haplotype2" \
             -a "$ancestral_genome" \
-            -g "$ancestral_gff" \
+            -g "$ancestral_gtf" \
             -c "$scaffold" \
             -o "$opt"  2>&1 |\
             tee LOGS/log_GeneSpace_and_Co
@@ -2409,7 +2409,7 @@ if [ "$option" == 3 ] ; then
         -s1 "$haplotype1" \
         -s2 "$haplotype2" \
         -a "$ancestral_genome" \
-        -g "$ancestral_gff" \
+        -g "$ancestral_gtf" \
         -c "$scaffold" \
         -o "$opt" 2>&1 |\
         tee LOGS/log_GeneSpace_and_Co
@@ -2434,7 +2434,7 @@ elif [ "$option" == 4 ] ; then
         -s1 "$haplotype1" \
         -s2 "$haplotype2" \
         -a "$ancestral_genome" \
-        -g "$ancestral_gff" \
+        -g "$ancestral_gtf" \
         -c "$scaffold" \
         -o "$opt" 2>&1 |\
         tee LOGS/log_GeneSpace_and_Co
@@ -2460,7 +2460,7 @@ elif [ "$option" == 5 ] ; then
         -s1 "$haplotype1" \
         -s2 "$haplotype2" \
         -a "$ancestral_genome" \
-        -g "$ancestral_gff" \
+        -g "$ancestral_gtf" \
         -c "$scaffold"  \
         -o "$opt" 2>&1 |\
         tee LOGS/log_GeneSpace_and_Co
@@ -2486,7 +2486,7 @@ elif [ "$option" == 7 ] ; then
         -s1 "$haplotype1" \
         -s2 "$haplotype2" \
         -a "$ancestral_genome" \
-        -g "$ancestral_gff" \
+        -g "$ancestral_gtf" \
         -c "$scaffold" \
         -o "$opt" 2>&1 |\
         tee LOGS/log_GeneSpace_and_Co
@@ -2511,7 +2511,7 @@ elif [ "$option" == 8 ] ; then
         -s1 "$haplotype1" \
         -s2 "$haplotype2" \
         -a "$ancestral_genome" \
-        -g "$ancestral_gff" \
+        -g "$ancestral_gtf" \
         -c "$scaffold" \
         -o "$opt" 2>&1 |\
         tee LOGS/log_GeneSpace_and_Co

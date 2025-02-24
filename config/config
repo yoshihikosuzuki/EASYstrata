@@ -9,7 +9,7 @@ haplotype2=""  #name2 [name of haplotype2 - will be used to rename the genome an
 
 # ----- Ancestral reference (optional) -----
 ancestral_genome="" #full path to the ancestral genome to be used whenever possible
-ancestral_gff=""   #full path to the associated gff to be used whehever possible
+ancestral_gtf=""   #full path to the associated gtf to be used whehever possible
 
 # ----- Identification of the region of interest -----
 scaffold="" #full path to a 3 columns tab separated file containing information on scaffolds of interest (sex chromosomes or mating-type chromosomes) for plotting.
@@ -28,7 +28,7 @@ gtf2="" #full path to gtf for genome2
 #_________________
 # INPUT FOR STEP I: Gene annotation and TE prediction
 # ----- TE prediction -----
-#annotateTE="" #a string (YES/NO) stating whether TE prediction should be performed
+annotateTE="" #a string (YES/NO) stating whether TE prediction should be performed
 
 # if annotateTE="YES" then the following options are required
 ncbi_species="" #NCBI species name
