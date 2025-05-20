@@ -395,7 +395,7 @@ if(!(is.null(opt$ds))){
 
   syn_ds$quantile <- factor(findInterval(
     syn_ds$Ds, 
-    quantile(syn_ds$Ds[syn_ds$Ds>0], na.rm = T, prob=c(0.25, 0.5, 0.75, 0.8, 0.9 0.99))))
+    quantile(syn_ds$Ds[syn_ds$Ds>0], na.rm = T, prob=c(0.3, 0.6, 0.7, 0.8, 0.9 0.95))))
 
   list_cont <- unique(syn_ds$quantile)
   for(i in 1:length(list_cont)) {
@@ -423,9 +423,13 @@ if(!(is.null(opt$ds))){
       annotate("text", x=all$x[2]+0.12, y = all$y[1:6], label=all$ds[1:6], size = 4) +
       coord_cartesian(xlim = c(0, 2), clip='off') + 
       theme(plot.margin = unit(c(1,3,1,1), "lines")) + 
-      annotate("text", x=all$x[2]+0.05,y=6.3, label = expression(d[S]),size = 5)
+      annotate("text", x=all$x[2]+0.05,y=6.3, label = expression(italic(d[S])*" values:"), size = 5)
   dev.off()
 
+    df2 <- data.frame(quantile(syn_ds$Ds[syn_ds$Ds>0],
+                                        na.rm = T,
+                                        prob=c(0.3, 0.6, 0.7, 0.8, 0.9, 0.95))) %>% set_colnames(.,c("ds"))
+    write.table(df2, '02_results/circos/quantile_of_ds.txt', quote = F)
 
   #prepare filtered genedensity:
     if(exists('genedensity')){

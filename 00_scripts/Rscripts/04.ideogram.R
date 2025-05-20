@@ -287,12 +287,16 @@ if ("geneX" %in%  colnames(dsfile)) {
       geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[5], ymax = all$y[6],   fill = all$cols[6]) + 
       geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[6], ymax = all$y[7],   fill = all$cols[7]) + 
       theme_void() +
-      annotate("text", x=all$x[2]+0.12, y = all$y[1:6], label=all$ds[1:6], size = 4) +
+      annotate("text", x=df1$x[2]+0.12, y = df1$y[1:ncol], label=df1$ds[1:ncol], size = 4) +
       coord_cartesian(xlim = c(0, 2), clip='off') + 
       theme(plot.margin = unit(c(1,3,1,1), "lines")) + 
-      annotate("text", x=all$x[2]+0.05,y=7.1, label = expression(d[S]),size = 5)
+      annotate("text", x=df$x[2]+0.05,y=7.1, label = expression(italic(d[S])*" values:"),size = 5)
     dev.off()
 
+    df2 <- data.frame(quantile(dsfile1$Ds[dsfile1$Ds>0],
+                                        na.rm = T,
+                                        prob=c(0.3, 0.6, 0.7, 0.8, 0.9, 0.95))) %>% set_colnames(.,c("ds"))
+    write.table(df2, '02_results/ideogram/quantile_of_ds.txt', quote = F)
 }
     
 #-------------- merging bed1 and bed2 - fill colors - create rank to match RIdeogram weird requirement 

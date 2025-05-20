@@ -277,10 +277,10 @@ do
         print $(NF-2), $(NF), $(NF-5), $(NF-3),"'${line[0]}'","'${line[1]}'"}'  \
             sequence_files/tmp."${line[0]}".vs."${line[1]}"/out_yn00_orthogp \
             >  sequence_files/tmp."${line[0]}".vs."${line[1]}"/resultat_Yang_Nielsen_2000_method.orthogp.txt 
-
+    
+    sed -E '/dS =/ s/dS =/dS = /' sequence_files/tmp."${line[0]}".vs."${line[1]}"/mlc |
     awk '/dS =/ {split(FILENAME, a, "."); 
         print $(NF), $(NF-3), $(NF-6),"'${line[0]}'","'${line[1]}'"}'  \
-            sequence_files/tmp."${line[0]}".vs."${line[1]}"/mlc \
             >  sequence_files/tmp."${line[0]}".vs."${line[1]}"/resultat_codeml.txt
 
 done < wanted_sequence 2>&1 |tee log.paml
