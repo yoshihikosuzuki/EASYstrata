@@ -376,6 +376,11 @@ if (argv[1]=="-h" || length(argv)==0){
       hyp3[2,] <-  hypothesis(fitcp[[i]],  c("int_2 < int_3"))
       hyp3[3,] <-  hypothesis(fitcp[[i]],  c("int_1 > int_2"))
       hyp3[4,] <-  hypothesis(fitcp[[i]],  c("int_2 > int_3"))
+      
+      write.table(hyp3, paste0(path, "hypothesis3strata"), quote= F)
+      ds3.1 <- dplot(df, nstrata=3, "three_strata")
+      ds3.2 <- dplot2(df, nstrata=3, "three_strata")
+
         
       } else if (i == 4){
         hyp4 <- data.frame(matrix(ncol = 6, nrow = 6))%>%
@@ -388,6 +393,10 @@ if (argv[1]=="-h" || length(argv)==0){
         hyp4[5,] <-  hypothesis(fitcp[[i]],  c("int_2 > int_3"))
         hyp4[6,] <-  hypothesis(fitcp[[i]],  c("int_3 > int_4"))
         
+        write.table(hyp4, paste0(path,  "hypothesis4strata.txt"), quote= F)
+        ds4.1 <- dplot(df, nstrata=4, "four_strata")
+        ds4.2 <- dplot2(df, nstrata=4, "four_strata")
+    
       } else if (i == 5){
         hyp5 <- data.frame(matrix(ncol = 6, nrow = 8))%>%
           set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
@@ -401,6 +410,10 @@ if (argv[1]=="-h" || length(argv)==0){
         hyp5[7,] <-  hypothesis(fitcp[[i]],  c("int_3 > int_4"))
         hyp5[8,] <-  hypothesis(fitcp[[i]],  c("int_4 > int_5"))
     
+        write.table(hyp5, paste0(path, "hypothesis5strata.txt"), quote= F)
+        ds5 <- dplot(df, nstrata=5, "five_strata")
+        ds5.2 <- dplot2(df, nstrata=5, "five_strata")
+
      } else if (i == 6){
         hyp6 <- data.frame(matrix(ncol = 6, nrow = 10))%>%
           set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
@@ -415,11 +428,16 @@ if (argv[1]=="-h" || length(argv)==0){
         hyp6[8,] <-  hypothesis(fitcp[[i]],  c("int_3 > int_4"))
         hyp6[9,] <-  hypothesis(fitcp[[i]],  c("int_4 > int_5"))
         hyp6[10,] <-  hypothesis(fitcp[[i]],  c("int_5 > int_6"))
-        
+
+        write.table(hyp6, paste0(path, "hypothesis6strata.txt"), quote= F)
+        ds6 <- dplot(df, nstrata=6, "six_strata")
+        ds6.2 <- dplot2(df, nstrata=6, "six_strata")
+
+
      } else if (i == 7){
       
        hyp7 <- data.frame(matrix(ncol = 6, nrow = 12))%>%
-         set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
+       set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
        
        hyp7[1,] <-  hypothesis(fitcp[[i]],  c("int_1 < int_2"))
        hyp7[2,] <-  hypothesis(fitcp[[i]],  c("int_2 < int_3"))
@@ -433,7 +451,12 @@ if (argv[1]=="-h" || length(argv)==0){
        hyp7[10,] <-  hypothesis(fitcp[[i]],  c("int_4 > int_5"))
        hyp7[11,] <-  hypothesis(fitcp[[i]],  c("int_5 > int_6"))
        hyp7[12,] <-  hypothesis(fitcp[[i]],  c("int_6 > int_7"))
-    
+
+       write.table(hyp7, paste0(path, "hypothesis7strata.txt"), quote= F)
+       ds7 <- dplot(df, nstrata=7, "seven_strata")
+       ds7.2 <- dplot2(df, nstrata=7, "seven_strata")
+
+
      } else if (i == 8){
        
        hyp8 <- data.frame(matrix(ncol = 6, nrow = 14))%>%
@@ -453,34 +476,26 @@ if (argv[1]=="-h" || length(argv)==0){
        hyp8[12,] <-  hypothesis(fitcp[[i]],  c("int_5 > int_6"))
        hyp8[13,] <-  hypothesis(fitcp[[i]],  c("int_6 > int_7"))
        hyp8[14,] <-  hypothesis(fitcp[[i]],  c("int_7 > int_8"))
-       
-       
+    
+     write.table(hyp8, paste0(path, "hypothesis8strata.txt"), quote= F)
+     ds8 <- dplot(df, nstrata=8, "eight_strata")
+     ds8.2 <- dplot2(df, nstrata=8, "eight_strata")
+
      }
     }
-    
-    #hypothesis testing attempt: 
-    write.table(hyp3, paste0(path, "hypothesis3strata"), quote= F)
-    write.table(hyp4, paste0(path,  "hypothesis4strata.txt"), quote= F)
-    write.table(hyp5, paste0(path, "hypothesis5strata.txt"), quote= F)
-    write.table(hyp6, paste0(path, "hypothesis6strata.txt"), quote= F)
-    write.table(hyp7, paste0(path, "hypothesis7strata.txt"), quote= F)
-    write.table(hyp8, paste0(path, "hypothesis8strata.txt"), quote= F)
     
     writeLines("\nn~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     writeLines("\n\n exporting some more plots \n\n")
     writeLines("\nn~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     
     
+    ##TO DO: generalise the code below 
+    
     #other plots: 
-    ds3 <- dplot(df, nstrata=3, "three_strata")
-    ds4 <- dplot(df, nstrata=4, "four_strata")
-    ds5 <- dplot(df, nstrata=5, "five_strata")
-    ds6 <- dplot(df, nstrata=6, "six_strata")
-    ds7 <- dplot(df, nstrata=7, "seven_strata")
-    ds8 <- dplot(df, nstrata=8, "eight_strata")
+    if(i=8){
     
     pdf(file=paste0(path,"plot_dS_all_position.pdf"),8,12)
-    print(plot_grid(ds3, ds4, ds5, ds6, ds7, ds8, 
+    print(plot_grid(ds3.1, ds4.1, ds5.1, ds6.1, ds7.1, ds8.1, 
               labels = c("A - three changepoint",
                          "B - four changepoint" ,
                          "C - five changepoint" ,
@@ -491,16 +506,9 @@ if (argv[1]=="-h" || length(argv)==0){
              hjust = -0.5, vjust = -0.5,
              ncol = 1))
     dev.off()
-    
-    ds3 <- dplot2(df, nstrata=3, "three_strata")
-    ds4 <- dplot2(df, nstrata=4, "four_strata")
-    ds5 <- dplot2(df, nstrata=5, "five_strata")
-    ds6 <- dplot2(df, nstrata=6, "six_strata")
-    ds7 <- dplot2(df, nstrata=7, "seven_strata")
-    ds8 <- dplot2(df, nstrata=8, "eight_strata")
     
     pdf(file=paste0(path,"plot_Ds_along_order.pdf"),8,12)
-    print(plot_grid(ds3, ds4, ds5, ds6, ds7, ds8, 
+    print(plot_grid(ds3.2, ds4.2, ds5.2, ds6.2, ds7.2, ds8.2, 
               labels = c("A - three changepoint",
                          "B - four changepoint" ,
                          "C - five changepoint" ,
@@ -512,7 +520,8 @@ if (argv[1]=="-h" || length(argv)==0){
              ncol = 1))
     dev.off()
     
-    
+    }   
+
     #finally: 
     if(is_anc=="YES"){ 
     s3.anc.h1 <- select(df, gene, geneX, three_strata)
