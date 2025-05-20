@@ -140,10 +140,10 @@ fi
 #    sed 's/"//g' |sed 's/;//g'  > genespace/bed/"$haplo2".bed
 
 gffread --bed -E haplo1/08_best_run/"$haplo1".final.gtf -o haplo1/08_best_run/"$haplo1".bed 
-cut -f 1-4   > genespace/bed/"$haplo1".bed
+cut -f 1-4  haplo1/08_best_run/"$haplo1".bed  > genespace/bed/"$haplo1".bed
 
-gffread --bed -E haplo2/08_best_run/"$haplo2".final.gtf -o haplo1/08_best_run/"$haplo2".bed 
-cut -f 1-4   > genespace/bed/"$haplo2".bed
+gffread --bed -E haplo2/08_best_run/"$haplo2".final.gtf -o haplo2/08_best_run/"$haplo2".bed 
+cut -f 1-4 haplo2/08_best_run/"$haplo2".bed  > genespace/bed/"$haplo2".bed
 
 
 # simplify the protein file to match the bed (i.e. remove the _1 inserted by transeq and the CDS length info):
@@ -944,7 +944,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
             case $yn in
                 Yes ) rm -rf 02_results/modelcomp/ ; if [ -n "$ancestral_genome" ] ; then Rscript 00_scripts/Rscripts/06.MCP_model_comp.R YES else Rscript 00_scripts/Rscripts/06.MCP_model_comp.R NO ; fi  || \
             { echo -e "${RED} ERROR! changepoint failed - check your data\n${NC} " ; exit 1 ; } ;
-                break;;
+                exit;;
                 No ) break ;; #exit;;
             esac
         done
@@ -975,7 +975,7 @@ then
             case $yn in
                 Yes ) rm -rf 02_results/modelcomp/ ; if [ -n "$ancestral_genome" ] ; then Rscript 00_scripts/Rscripts/06.MCP_model_comp.R YES else Rscript 00_scripts/Rscripts/06.MCP_model_comp.R NO ; fi  || \
             { echo -e "${RED} ERROR! changepoint failed - check your data\n${NC} " ; exit 1 ; } ;
-                break;;
+                exit;;
                 No ) break ;; #exit;;
             esac
         done
