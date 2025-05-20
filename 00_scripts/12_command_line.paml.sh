@@ -247,22 +247,30 @@ do
     grep -w -A1 "${line[1]}"  "$newf2" >> sequence_files/tmp."${line[0]}".vs."${line[1]}"/sequence.fasta
     
     #run muscle from within translatorX, so we also have gblocks output and the html files:
-    translatorx_vLocal.pl -i sequence_files/tmp."${line[0]}".vs."${line[1]}"/sequence.fasta \
-        -o sequence_files/tmp."${line[0]}".vs."${line[1]}"/results 2>&1 |tee log.translator
+    #translatorx_vLocal.pl -i sequence_files/tmp."${line[0]}".vs."${line[1]}"/sequence.fasta \
+    #    -o sequence_files/tmp."${line[0]}".vs."${line[1]}"/results 2>&1 |tee log.translator
+    
+    cmd=$(command -v macse_v2.07.jar )
+
+    java -jar $cmd -prog alignSequences -seq sequence_files/tmp."${line[0]}".vs."${line[1]}"/sequence.fasta
     
     cp ../../config/yn00_template.ctl sequence_files/tmp."${line[0]}".vs."${line[1]}"/
+    cp ../../config/codeml.ctl sequence_files/tmp."${line[0]}".vs."${line[1]}"/
     
     cd sequence_files/tmp."${line[0]}".vs."${line[1]}"/ || exit 1
     
     #configure paml:
     path=$(pwd)
     #echo "$path"
-    sed -i "s|PATH|$path|g" yn00_template.ctl #"
+    #sed -i "s|PATH|$path|g" yn00_template.ctl #"
+    sed -i 's/!/-/g' sequence_NT.fasta
     
     #run paml :
     yn00 yn00_template.ctl
-    
-        cd ../../
+    echo -ne | codeml codeml.ctl
+
+        
+    cd ../../
     
     #extract the dS, dN and SE from the output: 
     awk '/\+\-/ && !/(dS|SE)/ {split(FILENAME, a, "."); 
@@ -270,31 +278,49 @@ do
             sequence_files/tmp."${line[0]}".vs."${line[1]}"/out_yn00_orthogp \
             >  sequence_files/tmp."${line[0]}".vs."${line[1]}"/resultat_Yang_Nielsen_2000_method.orthogp.txt 
 
+    awk '/dS =/ {split(FILENAME, a, "."); 
+        print $(NF), $(NF-3), $(NF-6),"'${line[0]}'","'${line[1]}'"}'  \
+            sequence_files/tmp."${line[0]}".vs."${line[1]}"/mlc \
+            >  sequence_files/tmp."${line[0]}".vs."${line[1]}"/resultat_codeml.txt
 
-done < wanted_sequence 2>&1 |tee log.paml 
+done < wanted_sequence 2>&1 |tee log.paml
 
 #we concatenate everyone to work with them in the next scripts:
-rm results_YN.txt 2>/dev/null   
+rm results_YN.txt 2>/dev/null
 cat sequence_files/tmp.*/resultat_Yang_Nielsen_2000_method.orthogp.txt >> results_YN.txt
 cp results_YN.txt results_YN.txt.bkp
+
+rm results_codeml.txt 2>/dev/null
+
+cat sequence_files/tmp.*/resultat_codeml.txt >> results_codeml.txt
+cp results_codeml.txt results_codeml.txt.bkp
 
 
 if [ -e correspondance.table.hap1.txt ] && [ ! -e correspondance.table.hap2.txt ] ; then
    sed -i 's/>//g' correspondance.table.hap1.txt
    awk 'NR==FNR{a[$2]=$1;next}$5 in a{$5=a[$5]}1' correspondance.table.hap1.txt results_YN.txt > tmp
+   awk 'NR==FNR{a[$2]=$1;next}$4 in a{$4=a[$4]}1' correspondance.table.hap1.txt results_codeml.txt > tmp_cdml
    mv tmp results_YN.txt
+   mv tmp_cdml results_codeml.txt
 fi
 
 if [ -e correspondance.table.hap2.txt ] && [ -e correspondance.table.hap1.txt ] ; then
    sed -i 's/>//g' correspondance.table.hap1.txt
    awk 'NR==FNR{a[$2]=$1;next}$5 in a{$5=a[$5]}1' correspondance.table.hap1.txt results_YN.txt > tmp
+   awk 'NR==FNR{a[$2]=$1;next}$4 in a{$4=a[$4]}1' correspondance.table.hap1.txt results_codeml.txt > tmp_cdml
 
-   sed -i 's/>//g' correspondance.table.hap2.txt
-   awk 'NR==FNR{a[$2]=$1;next}$6 in a{$6=a[$6]}1' correspondance.table.hap2.txt tmp > results_YN.txt
+    sed -i 's/>//g' correspondance.table.hap2.txt
+    awk 'NR==FNR{a[$2]=$1;next}$6 in a{$6=a[$6]}1' correspondance.table.hap2.txt tmp > results_YN.txt
+    awk 'NR==FNR{a[$2]=$1;next}$5 in a{$5=a[$5]}1' correspondance.table.hap2.txt tmp_cdml > results_codeml.txt
+
 fi
 
 if [ -e correspondance.table.hap2.txt ] && [ ! -e correspondance.table.hap1.txt ]  ; then
    sed -i 's/>//g' correspondance.table.hap2.txt
    awk 'NR==FNR{a[$2]=$1;next}$6 in a{$6=a[$6]}1' correspondance.table.hap2.txt results_YN.txt > tmp
+   awk 'NR==FNR{a[$2]=$1;next}$5 in a{$6=a[$5]}1' correspondance.table.hap2.txt results_codeml.txt > tmp_cdml
    mv tmp results_YN.txt
+   mv tmp_cdml results_codeml.txt
 fi
+
+

@@ -125,16 +125,16 @@ sco <- read.table(single_copy_ortho, sep = "\t") %>% select(-V1)
 writeLines("sco ok")
 
 if(!is.null(opt$links)) {
-	writeLines("links provided in the links file will be displayed in colors\n")
-	writeLines("link file must contain name of gene for species1, name of ortholog for species2 and a status that will be used for coloring the gene\n")
-	#to do: add option to provide a coordinate file with status instead of gene file 
+    writeLines("links provided in the links file will be displayed in colors\n")
+    writeLines("link file must contain name of gene for species1, name of ortholog for species2 and a status that will be used for coloring the gene\n")
+    #to do: add option to provide a coordinate file with status instead of gene file 
 
     link <- opt$links  
 
     baselink <-basename(link)
-	links <- read.table(link, stringsAsFactors = T) %>%
+    links <- read.table(link, stringsAsFactors = T) %>%
         set_colnames(.,c("gene1", "gene2","status"))	
-	#we will create a vector of color according to the number of status
+    #we will create a vector of color according to the number of status
 }
 if(!is.null(opt$scaffold_orientation)) {
     scaforder <- read.table(opt$scaffold_orientation, sep="\t") %>% set_colnames(., c("haplo","chr","order"))
@@ -200,6 +200,12 @@ if(identical(n1,n2)=="FALSE"){
     quit("no")
 }
 
+#create dir if not present:
+if (!dir.exists("02_results/ideogram")){
+  dir.create("02_results/ideogram")
+}
+
+
 #create a pseudo-link file based on dS values:
 if (exists("dsfile")){
 print("dsfile loaded")
@@ -215,6 +221,10 @@ if ("geneX" %in%  colnames(dsfile)) {
 } else {
   dsfile0 <- select(dsfile, gene, geneY.x, Ds) %>% 
     set_colnames(., c("gene1", "gene2","Ds"))
+
+  dsfile1 <- select(dsfile, gene, geneY.y, Ds) %>%
+    set_colnames(., c("gene1", "gene2","Ds"))
+
 }
     #print(head(dsfile0))
     writeLines(paste0("ds file size is :", nrow(dsfile0)))
@@ -222,13 +232,14 @@ if ("geneX" %in%  colnames(dsfile)) {
     #create quantile for link:
     dsfile0$quantile <- factor(findInterval(
       dsfile0$Ds, 
-      quantile(dsfile0$Ds, na.rm = T, prob=c(0.33, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95))))
-    # quantile(syn_ds$Ds, na.rm = T, prob=c(0.33, 0.5, 0.66, 0.75, 0.9,0.95))))
+      quantile(dsfile0$Ds[dsfile0$Ds>0], na.rm = T, prob=c(0.3, 0.6, 0.7, 0.8, 0.9, 0.95))))
+      # quantile(syn_ds$Ds, na.rm = T, prob=c(0.33, 0.5, 0.66, 0.75, 0.9,0.95))))
 
      dsfile1$quantile <- factor(findInterval(
       dsfile1$Ds, 
-      quantile(dsfile1$Ds, na.rm = T, prob=c(0.33, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95))))
-   
+      quantile(dsfile1$Ds[dsfile1$Ds>0], na.rm = T, prob=c(0.3, 0.6, 0.7, 0.8, 0.9, 0.95))))
+
+
     colnames(sco) <- c("gene1","gene2")
     links <-  merge(dsfile0, sco) %>% 
       select(gene1, gene2, quantile) %>% 
@@ -237,8 +248,51 @@ if ("geneX" %in%  colnames(dsfile)) {
       links <-  merge(dsfile1, sco) %>% 
       select(gene1, gene2, quantile) %>% 
       set_colnames(.,c("gene1","gene2","status"))
-    
+
     }
+    colS <- data.frame(c("f1bb7b", "fd6467","5b1a18","5b1a88","4575b4",
+              "d67236", "fee0d2" , "edf8b1" ,"636363","fc9272", "d73027"),
+              as.factor(seq(0,10))) %>% 
+              set_colnames(., c("fill", "status"))
+
+    colS2 <- data.frame(c("#f1bb7b", "#fd6467","#5b1a18","#5b1a88","#4575b4",
+              "#d67236", "#fee0d2" , "#edf8b1" ,"#636363","#fc9272", "#d73027"),
+              as.factor(seq(0,10))) %>% 
+              set_colnames(., c("fill", "status"))
+
+
+    links <- left_join(links, colS)
+        
+    ncol <-length(unique(links$fill))
+    
+    #links$fill <- rep(colS[1:length(levels(links$status))], c(data.frame(table(links$status))[,2]))
+    print("cols ok")
+
+    df1 <- cbind(rbind(0,  
+                    data.frame(unname(quantile(dsfile1$Ds[dsfile1$Ds>0], 
+                                        na.rm = T, 
+                                        prob=c(0.3, 0.6, 0.7, 0.8, 0.9, 0.95))))) , 
+        data.frame(colS2[1:ncol,1]),
+        data.frame(x = c(rep(1,ncol)),  y = seq(1,ncol) )) %>% 
+        set_colnames(.,c("ds","cols","x","y"))
+
+
+    pdf(file = "02_results/ideogram/ds_keychart_ideogram.pdf", 5,5)  
+    ggplot(df1, aes(x=x,y=y)) +
+      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = -Inf, ymax = all$y[1],       fill = all$cols[1]) +
+      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[1], ymax = all$y[2],   fill = all$cols[2]) +
+      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[2], ymax = all$y[3],   fill = all$cols[3]) +
+      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[3], ymax = all$y[4],   fill = all$cols[4]) +
+      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[4], ymax = all$y[5],   fill = all$cols[5]) +
+      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[5], ymax = all$y[6],   fill = all$cols[6]) + 
+      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[6], ymax = all$y[7],   fill = all$cols[7]) + 
+      theme_void() +
+      annotate("text", x=all$x[2]+0.12, y = all$y[1:6], label=all$ds[1:6], size = 4) +
+      coord_cartesian(xlim = c(0, 2), clip='off') + 
+      theme(plot.margin = unit(c(1,3,1,1), "lines")) + 
+      annotate("text", x=all$x[2]+0.05,y=7.1, label = expression(d[S]),size = 5)
+    dev.off()
+
 }
     
 #-------------- merging bed1 and bed2 - fill colors - create rank to match RIdeogram weird requirement 
@@ -263,9 +317,19 @@ if(!exists("links")) {
     #assuming we have a link file that is provided
     print("creating cols")
     #some cols:
-    colS <- c("f1bb7b", "fd6467","5b1a18","5b1a88","4575b4",
-              "d67236", "fee0d2" , "edf8b1" ,"636363","fc9272", "d73027")
-    links$fill <- rep(colS[1:length(levels(links$status))], c(data.frame(table(links$status))[,2]))
+    #colS <- c("f1bb7b", "fd6467","5b1a18","5b1a88","4575b4",
+    #          "d67236", "fee0d2" , "edf8b1" ,"636363","fc9272", "d73027")
+    
+        colS <- data.frame(c("f1bb7b", "fd6467","5b1a18","5b1a88","4575b4",
+              "d67236", "fee0d2" , "edf8b1" ,"636363","fc9272", "d73027"),
+              as.factor(seq(0,10))) %>% 
+              set_colnames(., c("fill", "status"))
+    
+    links <- left_join(links, colS)
+        
+    ncol <-length(unique(links$fill))
+
+    #links$fill <- rep(colS[1:length(levels(links$status))], c(data.frame(table(links$status))[,2]))
     print("cols ok")
 
     #now merge:
@@ -282,11 +346,6 @@ if(!exists("links")) {
    
     all <- na.omit(all)
 
-}
-
-#create dir if not present:
-if (!dir.exists("02_results/ideogram")){
-  dir.create("02_results/ideogram")
 }
 
 
@@ -369,8 +428,8 @@ all %<>% select(Species_1,Start_1,End_1,Species_2,Start_2,End_2,fill)
     #assumming links were provided
     ideogram(karyotype = karyo, 
          synteny = all, 
-         output=paste0('02_results/ideogram/', sp1,sp2,'_quantile.svg'))
+         output=paste0('02_results/ideogram/', sp1,sp2,'_dS_quantile.svg'))
 
-    convertSVG(paste0('02_results/ideogram/', sp1,sp2,'_quantile.svg', sep=''), 
-           file = paste0('02_results/ideogram/', sp1,sp2,'_quantile.pdf'), device = "pdf")
+    convertSVG(paste0('02_results/ideogram/', sp1,sp2,'_dS_quantile.svg', sep=''), 
+           file = paste0('02_results/ideogram/', sp1,sp2,'_dS_quantile.pdf'), device = "pdf")
 }

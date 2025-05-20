@@ -365,14 +365,27 @@ then
    cd ../
 fi
 
+command='macse_v2.07.jar'
+if ! command -v $command &> /dev/null
+then
+   #direct install: 
+   mkdir macse ; cd macse
+   wget https://www.agap-ge2pop.org/wp-content/uploads/macse/releases/macse_v2.07.jar
+   chmod +x macse*jar
+   path=$(pwd)
+   echo -e "\n#Path to $command\n export PATH=\$PATH:$path" >> ~/.bashrc 
+   source ~/.bashrc  
+   cd ../
+fi
+
 #**yn00/paml:** 
 command='yn00'
 if ! command -v $command &> /dev/null
 then
    #direct install: 
-   wget https://github.com/abacus-gene/paml/releases/download/4.10.7/paml-4.10.7-linux-X86_64.tgz
-   tar zxvf paml-4.10.7-linux-X86_64.tgz
-   cd paml-4.10.7/bin
+   wget https://github.com/abacus-gene/paml/releases/download/v4.10.9/paml-4.10.9-linux-x86_64.tar.gz
+   tar zxf paml-4.10.9-linux-x86_64.tar.gz
+   cd paml-4.10.9/bin
    path=$(pwd)
    echo -e "\n#Path to $command\n export PATH=\$PATH:$path" >> ~/.bashrc 
    source ~/.bashrc  

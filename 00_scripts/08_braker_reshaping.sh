@@ -185,7 +185,8 @@ cd 08_best_run/
 gtf=${haplo}.renamed.fixed.gtf #current gtf
 
 #2 - renaming with a simple command: 
-../../00_scripts/utility_scripts/01.recode_braker_output.py "${gtf}" "${haplo}"
+#../../00_scripts/utility_scripts/01.recode_braker_output.py "${gtf}" "${haplo}"
+awk '{gsub("_id \"", "_id \"" $1 "_", $0); print }' "$gtf" > "${haplo}".IDchecked.gtf
 cd ../
 
 gtf=${haplo}.IDchecked.gtf
@@ -249,7 +250,7 @@ grep -A1 -Ff all.transcripts "$haplo".prot.lin.fasta |\
 source ../../../config/config
 
 eval "$(conda shell.bash hook)"
-conda activate busco571
+conda activate busco582
 busco -c8 -o busco_check -i "$haplo".longest_transcript.fa -l "$busco_lineage" -m protein -f  || \
           { echo -e "${RED} ERROR! busco failed - check your data\n${NC} " ; exit 1 ; }
 
@@ -380,7 +381,7 @@ rm ./*IDchecked.gtf
 source ../../config/config
 
 eval "$(conda shell.bash hook)"
-conda activate busco571
+conda activate busco582
 busco -c8 -o busco_final -i "$haplo"_prot.final.fa -l "$busco_lineage" -m protein -f   || \
           { echo -e "${RED} ERROR! busco failed - check your data\n${NC} " ; exit 1 ; }
 

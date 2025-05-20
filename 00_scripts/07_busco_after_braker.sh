@@ -35,7 +35,7 @@ echo braker input is $input_fa
 
 #activate busco
 eval "$(conda shell.bash hook)"
-conda activate busco571
+conda activate busco582
 
 run_busco=$(echo -e "busco -c8 -o busco_augustus -i "$input_fa" -l "$lineage" -m protein" -f)
 

@@ -88,8 +88,8 @@ if (argv[1]=="-h" || length(argv)==0){
         facet_wrap(~scaff, scale="free_x") +
         theme_classic() +
         ylim(c(0,0.3)) +
-        xlab("position along chr (bp)") +
-        ylab(expression(italic(d[s]))) +
+        xlab("Position along chromosome (bp)") +
+        ylab(expression(italic(d[S]))) +
         th_plot2 + 
         theme(legend.position = "none") + 
         scale_colour_manual(values=mycolor[1:nstrata])  
@@ -103,8 +103,8 @@ if (argv[1]=="-h" || length(argv)==0){
         geom_point( size = .5) + 
         theme_classic() +
         ylim(c(0,0.4)) +
-        xlab("position along gene order") +
-        ylab(expression(italic(d[s]))) +
+        xlab("Position along inferred gene rank") +
+        ylab(expression(italic(d[S]))) +
         th_plot2 + 
         theme(legend.position = "none") + 
         scale_colour_manual(values=mycolor[1:nstrata])  
@@ -119,20 +119,20 @@ if (argv[1]=="-h" || length(argv)==0){
         geom_jitter(shape=16, position=position_jitter(0.2)) +
         theme_classic() + 
         th_plot  + 
-        ylab(expression(italic(d[s]))) +
+        ylab(expression(italic(d[S]))) +
         scale_fill_manual(values=mycolor[1:nstrata])  + 
         theme(legend.position="none")
     }
     
     
-    xl <- expression(paste("order along ", italic("ancestral species"), " mating chromsome"))
+    xl <- expression(paste("Order along  mating chromsome"))
     plotcp <- function(cpmodel, title) {
      plot(cpmodel, q_fit = TRUE) + ggplot2::ggtitle(title) + 
          theme_classic() + 
          th_plot +
          geom_point(color = "darkblue", size = 0.1) +
          xlab(xl) +
-         ylab(expression(italic(d[s])))
+         ylab(expression(italic(d[S])))
     }
     
     ################################################################################
@@ -177,7 +177,7 @@ if (argv[1]=="-h" || length(argv)==0){
     
         figcp[[i]] <- plotcp(fitcp[[i]], paste0("Posterior fit ", i ,"  changepoint")) 
         
-        pdf(file = paste0(path,"/Strata_comparison_", i , "chpt.pdf"), 10,6)
+        pdf(file = paste0(path,"/Strata_comparison_", i , "chpt.pdf"), 10,5)
         plot_grid(print(figcp[[i]]), labels = "AUTO", ncol = 1)
         dev.off()
     
@@ -480,7 +480,7 @@ if (argv[1]=="-h" || length(argv)==0){
     ds8 <- dplot(df, nstrata=8, "eight_strata")
     
     pdf(file=paste0(path,"plot_dS_all_position.pdf"),8,12)
-    plot_grid(ds3, ds4, ds5, ds6, ds7, ds8, 
+    print(plot_grid(ds3, ds4, ds5, ds6, ds7, ds8, 
               labels = c("A - three changepoint",
                          "B - four changepoint" ,
                          "C - five changepoint" ,
@@ -489,7 +489,7 @@ if (argv[1]=="-h" || length(argv)==0){
                          "F - eight changepoint") , 
              label_size = 7,
              hjust = -0.5, vjust = -0.5,
-             ncol = 1)
+             ncol = 1))
     dev.off()
     
     ds3 <- dplot2(df, nstrata=3, "three_strata")
@@ -500,7 +500,7 @@ if (argv[1]=="-h" || length(argv)==0){
     ds8 <- dplot2(df, nstrata=8, "eight_strata")
     
     pdf(file=paste0(path,"plot_Ds_along_order.pdf"),8,12)
-    plot_grid(ds3, ds4, ds5, ds6, ds7, ds8, 
+    print(plot_grid(ds3, ds4, ds5, ds6, ds7, ds8, 
               labels = c("A - three changepoint",
                          "B - four changepoint" ,
                          "C - five changepoint" ,
@@ -509,7 +509,7 @@ if (argv[1]=="-h" || length(argv)==0){
                          "F - eight changepoint") , 
              label_size = 7,
              hjust = -0.5, vjust = -0.5,
-             ncol = 1)
+             ncol = 1))
     dev.off()
     
     
@@ -573,18 +573,18 @@ if (argv[1]=="-h" || length(argv)==0){
     #finally construct some combined plot:
     plot <- list()
     for (i in 1:maxchgp) {
-    plot[[i]] <- plot_grid(print(figcp[[i]]) + th_plot3, labels = "AUTO", ncol = 1)
+    plot[[i]] <- plot_grid(print(figcp[[i]]) + th_plot3, ncol = 1)
     }
     
     writeLines("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     writeLines("\n\n comparing models with gstatsplot\n\n")
     writeLines("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     
-    vp3s <- ggbetweenstats(df, three_strata, Ds)  + th_plot3
-    vp4s <- ggbetweenstats(df, four_strata, Ds)   + th_plot3
-    vp5s <- ggbetweenstats(df, five_strata, Ds)   + th_plot3
-    vp6s <- ggbetweenstats(df, six_strata, Ds)    + th_plot3
-    vp7s <- ggbetweenstats(df, seven_strata, Ds)  + th_plot3
+    vp3s <- ggbetweenstats(df, three_strata, Ds)  + ylab(expression(italic(d[s]))) + th_plot3
+    vp4s <- ggbetweenstats(df, four_strata, Ds)   + ylab(expression(italic(d[s]))) + th_plot3
+    vp5s <- ggbetweenstats(df, five_strata, Ds)   + ylab(expression(italic(d[s]))) + th_plot3
+    vp6s <- ggbetweenstats(df, six_strata, Ds)    + ylab(expression(italic(d[s]))) +th_plot3
+    vp7s <- ggbetweenstats(df, seven_strata, Ds)  + ylab(expression(italic(d[s]))) + th_plot3
     #this is probably too much: 
     vp8s <- ggbetweenstats(df, eight_strata, Ds, palette = "Paired")  + th_plot3
     vp9s <- ggbetweenstats(df, nine_strata, Ds, palette = "Paired")  + th_plot3
@@ -593,40 +593,41 @@ if (argv[1]=="-h" || length(argv)==0){
     #TO DO: modify to plot each separately and to remove boxplot when n is low 
     
     pdf(file = paste0(path, "viobox_ds_strata_distribution_priors.pdf"), 10,28)
-    plot_grid(
-        #vp3s, 
+    print(plot_grid(
+        vp3s, 
         vp4s,
         vp5s,
         vp6s,
         vp7s,
-        vp8s, 
-        vp9s,
-        labels = "AUTO", ncol = 1)
+        #vp8s, 
+        #vp9s,
+        labels = "AUTO", ncol = 1))
     dev.off()
     
     pdf(file = paste0(path, "all_comp.pdf"), 10,20)
-    plot_grid(
-      #plot[[3]],
+    print(plot_grid(
+      plot[[2]],
+      plot[[3]],
       plot[[4]],
       plot[[5]],
       plot[[6]],
       plot[[7]],
       plot[[8]],
-      labels = "AUTO", ncol = 1)
+      labels = "AUTO", ncol = 1))
     dev.off()
     
     
     #comment those that are not wanted:
     pdf(file = paste0(path, "strata_and_viobox_ds_strata_distribution_priors.pdf"), 20,20)
-    plot_grid(
-      #plot[[2]],vp3s,
-      #plot[[3]],vp4s,
+    print(plot_grid(
+      plot[[2]],vp3s,
+      plot[[3]],vp4s,
       plot[[4]],vp5s,
       plot[[5]],vp6s,
-      plot[[6]],vp6s,
-      plot[[7]],vp8s,
-      plot[[8]],vp9s,
-      labels = "AUTO", ncol = 2, rel_heights = c(.4,1,.4,1,.4,1))
+      #plot[[6]],vp6s,
+      #plot[[7]],vp8s,
+      #plot[[8]],vp9s,
+      labels = "AUTO", ncol = 2, rel_heights = c(.4,1,.4,1,.4,1)))
     dev.off()
     
     writeLines("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")

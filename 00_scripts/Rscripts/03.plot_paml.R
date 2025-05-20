@@ -63,10 +63,15 @@ if (argv[1]=="-h" || length(argv)==0){
     #--------------- load the data ----------------------------------------------#
     
     #- common results
+    #TO DO: insert an option for the user to choose whether using yn00 or codeml
     # yn00 results:
     dat <- read.table("02_results/paml/results_YN.txt") %>% 
     	set_colnames(., c("Ds","SEDs","Dn","SEDn", "geneX", "geneY"))
     
+    # codeml results: 
+    dat <- read.table("02_results/paml/results_codeml.txt") %>%
+        set_colnames(., c("Ds","Dn","dNdS", "geneX", "geneY"))
+
     if (length(argv)<3) {
     	  stop("At least the name of 2 species to compare and a txt file containing the name and order of scaffold must be supplied.n", call.=FALSE)
     } else if (length(argv)==3) {
@@ -164,33 +169,35 @@ if (argv[1]=="-h" || length(argv)==0){
     
     writeLines("making some plots.....\n")
     all$scaff<- factor(all$scaff, levels = c(sort(unique(all$scaff), decreasing=T)))
-
+    ncolors <- length(unique(all$scaff))
     print(summary(all$Ds))
 
     Fig1A <- all  %>%   #we plot the D dataframe to obtain the Ds along the order
       ggplot(., aes(x = St, y = Ds )) +
-      geom_errorbar(aes(ymin = Ds-SEDs, ymax = Ds + SEDs), width = .1) +
+      #yn00:
+      #geom_errorbar(aes(ymin = Ds-SEDs, ymax = Ds + SEDs), width = .1) +
       facet_wrap(~scaff, scale="free_x") +
       geom_point( size = 1) + 
       theme_classic() +
       scale_y_break(c(1,max(all$Ds, na.rm = T)-0.1)) +
       ylim(c(0,max(all$Ds, na.rm=T)+.1)) +
       xlab("position along chr") +
-      ylab( expression(italic("Ds"))) +
+      ylab( expression(italic(d[S]))) +
       th_plot + theme(legend.position = "none") +
       ggtitle("A") 
     
     Fig1B <- all %>%   #we plot the D dataframe to obtain the Ds along the order
       filter(Ds < 1) %>%
       ggplot(., aes(x = orderchp, y = Ds, colour = scaff)) +
-      geom_errorbar(aes(ymin = Ds-SEDs, ymax = Ds + SEDs), width = .1) +
+      #yn00
+      #geom_errorbar(aes(ymin = Ds-SEDs, ymax = Ds + SEDs), width = .1) +
       geom_point( size = 1) + 
       theme_classic() +
       ylim(c(0,0.4)) +
       xlab("order along reference") +
-      ylab( expression(italic("Ds"))) +
+      ylab( expression(italic(d[S]))) +
       th_plot + theme(legend.position = "none") +
-      scale_color_manual(values=wes_palette(n=2, name="GrandBudapest1")) +
+      scale_color_manual(values=wes_palette(n=ncolors, name="GrandBudapest1")) +
       ggtitle("B") 
     
     #create dir if not present:
@@ -200,7 +207,7 @@ if (argv[1]=="-h" || length(argv)==0){
     
     patch <- Fig1A / Fig1B 
     
-    pdf(file = "02_results/dsplots/Ds.pdf",14,8)
+    pdf(file = "02_results/dsplots/dS.pdf",14,8)
     print(patch)
     dev.off()
     

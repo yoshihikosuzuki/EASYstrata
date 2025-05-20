@@ -275,6 +275,12 @@ print(paste0("there is ",  nrow(data_genes), " links"))
 } else {
     pdffile <- paste0('02_results/circos/circos_',haplo,'_on_',reference,'.pdf')
 }
+
+#create dir if not present:
+if (!dir.exists("02_results/circos")){
+  dir.create("02_results/circos")
+}
+
 ####------------------------ LAUNCH CIRCOS ---------------------------------####
 #------------- Define plotting parameters -------------------------------------#
 
@@ -309,6 +315,8 @@ if(!(is.null(opt$ds))){
   }
 
   writeLines(paste0("ds file size is :", dim(dsfile)))
+
+  pdffile <- paste0('02_results/circos/circos_',haplo,'_on_',reference,'dS_quantile_colors.pdf')
 
   syn_ds <- merge(syn,dsfile, by.x ="Gene1", by.y = "gene") #%>% na.omit()
   if(nrow(syn_ds) == 0){ 
@@ -376,16 +384,49 @@ if(!(is.null(opt$ds))){
   
   writeLines("creating quantiles for coloring link by dS values")
   
+  #syn_ds$quantile <- factor(findInterval(
+  #   syn_ds$Ds, 
+  #   quantile(syn_ds$Ds, na.rm = T, prob=c(0.25, 0.5, 0.75, 0.8, 0.9, 0.99))))
+  #   quantile(syn_ds$Ds, na.rm = T, prob=c(0.33, 0.5, 0.66, 0.75, 0.9,0.95))))
+  
+  #syn_ds$quantile <- factor(findInterval(
+  #  syn_ds$Ds, 
+  #  quantile(syn_ds$Ds[syn_ds$Ds>0], na.rm = T)))
+
   syn_ds$quantile <- factor(findInterval(
     syn_ds$Ds, 
-    quantile(syn_ds$Ds, na.rm = T, prob=c(0.33, 0.5, 0.66, 0.75, 0.9))))
-    # quantile(syn_ds$Ds, na.rm = T, prob=c(0.33, 0.5, 0.66, 0.75, 0.9,0.95))))
-  
+    quantile(syn_ds$Ds[syn_ds$Ds>0], na.rm = T, prob=c(0.25, 0.5, 0.75, 0.8, 0.9 0.99))))
+
   list_cont <- unique(syn_ds$quantile)
   for(i in 1:length(list_cont)) {
     c=list_cont[i]
     rcols2[which(syn_ds$quantile==c)]=wes_palette("Zissou1", length(list_cont), type = c("continuous"))[i]
   }
+  
+  
+  z <- cbind(rbind(0, data.frame(unname(quantile(syn_ds$Ds[syn_ds$Ds>0])))) , 
+    data.frame(table((rcols2)))) %>% 
+    set_colnames(.,c("ds","cols","Freq"))
+
+  df <- data.frame(x = c(0,rep(2,5)),  y = seq(1,6) )
+
+  all <- cbind(df,z)
+
+  pdf(file = "02_results/circos/ds_keychart_circos.pdf", 5,5)  
+  ggplot(df, aes(x=x,y=y)) +
+      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = -Inf, ymax = all$y[1],       fill = all$cols[1]) +
+      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[1], ymax = all$y[2],   fill = all$cols[2]) +
+      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[2], ymax = all$y[3],   fill = all$cols[3]) +
+      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[3], ymax = all$y[4],   fill = all$cols[4]) +
+      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[4], ymax = all$y[5],   fill = all$cols[5]) +
+      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[5], ymax = all$y[6],   fill = all$cols[6]) + theme_void() +
+      annotate("text", x=all$x[2]+0.12, y = all$y[1:6], label=all$ds[1:6], size = 4) +
+      coord_cartesian(xlim = c(0, 2), clip='off') + 
+      theme(plot.margin = unit(c(1,3,1,1), "lines")) + 
+      annotate("text", x=all$x[2]+0.05,y=6.3, label = expression(d[S]),size = 5)
+  dev.off()
+
+
   #prepare filtered genedensity:
     if(exists('genedensity')){
     genedensity <- genedensity %>% 
@@ -399,11 +440,6 @@ if(!(is.null(opt$ds))){
       }
 }
 
-
-#create dir if not present:
-if (!dir.exists("02_results/circos")){
-  dir.create("02_results/circos")
-}
 
 
 # Output in pdf
