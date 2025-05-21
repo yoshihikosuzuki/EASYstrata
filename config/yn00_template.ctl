@@ -1,5 +1,5 @@
-      seqfile = PATH/results.nt_ali.fasta   * sequence data file name
-      outfile = PATH/out_yn00_orthogp            * main result file
+      seqfile = sequence_NT.fasta   * sequence data file name
+      outfile = out_yn00_orthogp            * main result file
       verbose = 0  * 1: detailed output (list sequences), 0: concise output
 
         icode = 0  * 0:universal code; 1:mammalian mt; 2-10:see below

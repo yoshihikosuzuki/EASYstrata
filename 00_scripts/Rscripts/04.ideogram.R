@@ -115,7 +115,7 @@ writeLines("\n~~~~~~ compulsory data loaded ~~~~~~~\n")
 #        \n")
 
 #--------------- check if library are installed -------------------------------#
-packages <- c('RIdeogram','dplyr','magrittr','data.table','magrittr')
+packages <- c('RIdeogram','dplyr','magrittr','data.table','magrittr','ggplot2')
 install.packages(setdiff(packages, rownames(installed.packages())), repos="https://cloud.r-project.org" )
 
 #---------------- load libraries ---------------------------------------------#
@@ -133,7 +133,7 @@ if(!is.null(opt$links)) {
 
     baselink <-basename(link)
     links <- read.table(link, stringsAsFactors = T) %>%
-        set_colnames(.,c("gene1", "gene2","status"))	
+        set_colnames(.,c("gene1", "gene2","status"))
     #we will create a vector of color according to the number of status
 }
 if(!is.null(opt$scaffold_orientation)) {
@@ -164,7 +164,6 @@ if(exists("scaforder")){
 
      bed2 <- read.table(bedB) %>%
         merge(.,scaforder, by.x="V1", by.y="chr", sort = F) %>%
-        select(-haplo) %>%
         merge(sco, ., by.x="V3", by.y = "V4", sort = F ) %>% 
         select(-V2.x) %>%
         set_colnames(., c("gene2", "contig2", "Start_2", "End_2","order") ) %>%
@@ -317,18 +316,32 @@ if(!exists("links")) {
     mutate(Species_2 = dense_rank(contig2)) %>% 
     #select(Species_1,Start_1,End_1,Species_2,Start_2,End_2,fill) %>%
     as.data.frame(.)
-} else {
+} else if (exists('dsfile') & exists('links')) {
     #assuming we have a link file that is provided
+    print('color already created')
+    #now merge:
+    all <- cbind(bed1, bed2) %>%
+        group_by(contig1) %>%
+        left_join(links, .,  by = join_by(gene1 == gene1, gene2 == gene2) ) %>%
+        filter(n()>4) %>%
+        group_by(contig2) %>%
+        filter(n()>4) %>%
+        as.data.frame() %>%
+        mutate(Species_1 = dense_rank(contig1)) %>%
+        mutate(Species_2 = dense_rank(contig2)) %>%
+        as.data.frame(.)
+    all <- na.omit(all)
+
+} else if(exists('links') & !exists('dsfile')) {
     print("creating cols")
     #some cols:
     #colS <- c("f1bb7b", "fd6467","5b1a18","5b1a88","4575b4",
     #          "d67236", "fee0d2" , "edf8b1" ,"636363","fc9272", "d73027")
-    
-        colS <- data.frame(c("f1bb7b", "fd6467","5b1a18","5b1a88","4575b4",
+    colS <- data.frame(c("f1bb7b", "fd6467","5b1a18","5b1a88","4575b4",
               "d67236", "fee0d2" , "edf8b1" ,"636363","fc9272", "d73027"),
-              as.factor(seq(0,10))) %>% 
+              as.factor(paste0("strata", seq(1,11)))) %>%
               set_colnames(., c("fill", "status"))
-    
+
     links <- left_join(links, colS)
         
     ncol <-length(unique(links$fill))
@@ -347,7 +360,6 @@ if(!exists("links")) {
         mutate(Species_1 = dense_rank(contig1)) %>%
         mutate(Species_2 = dense_rank(contig2)) %>% 
         as.data.frame(.) 
-   
     all <- na.omit(all)
 
 }

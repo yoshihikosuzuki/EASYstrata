@@ -578,23 +578,27 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
         awk -F '[\t_]' '{print $2"_"$3"\t"$5"_"$6"\t"$8"_"$9 }' $file \
            |sort \
            |uniq -c\
-           |awk -v var1="$ancestral" -v var2="$haplo1" -v var3="$haplo2" '$1>5 {print var1"\t"$2"\n"var2"\t"$3"\n"var3"\t"$4}' \
+           |awk -v var1="$ancestral" -v var2="$haplo1" -v var3="$haplo2" '$1>0 {print var1"\t"$2"\n"var2"\t"$3"\n"var3"\t"$4}' \
            |sort \
            |uniq  \
             > 02_results/chromosomes.txt
-    awk '{print $1"\t"$3"\t"$4}' 02_results/paml/single.copy.orthologs > 02_results/sco
+    #awk '{print $1"\t"$3"\t"$4}' 02_results/paml/single.copy.orthologs > 02_results/sco
+    awk '{print $1"\t"$5"\t"$9}' 02_results/synteny_ancestral_sp_"$haplo1".txt |sed 1d > 02_results/sco_anc
+    awk '{print $1"\t"$5"\t"$9}' 02_results/synteny_"$haplo1"_"$haplo2".txt |sed 1d > 02_results/sco
 
     else
         #awk '{gsub("_g[0-9]*.t[1-9]","\t",$0); print $2"\t"$3"\t"$4}' $file #
         awk -F '[\t_]' '{print $2"_"$3"\t"$5"_"$6}' $file \
             |sort \
             |uniq -c\
-            |awk -v var1="$haplo1" -v var2="$haplo2" '$1>5 {print var1"\t"$2"\n"var2"\t"$3}' \
+            |awk -v var1="$haplo1" -v var2="$haplo2" '$1>0 {print var1"\t"$2"\n"var2"\t"$3}' \
             |sort \
             |uniq  \
             > 02_results/chromosomes.txt
 
-    awk '{print $1"\t"$2"\t"$3}' 02_results/paml/single.copy.orthologs > 02_results/sco
+    #awk '{print $1"\t"$2"\t"$3}' 02_results/paml/single.copy.orthologs > 02_results/sco
+    awk '{print $1"\t"$5"\t"$9}' 02_results/synteny_"$haplo1"_"$haplo2".txt |sed 1d > 02_results/sco
+
 
     fi
     chromosomes="02_results/chromosomes.txt"
@@ -646,7 +650,9 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
     if [  -n "${ancestral_genome}" ] ; then
         echo -e "ancestral genome was provided for inference" 
         #we will make an ideogram with it 
-        awk '{print $1"\t"$2"\t"$3}' 02_results/paml/single.copy.orthologs > 02_results/sco_anc	
+        #awk '{print $1"\t"$2"\t"$3}' 02_results/paml/single.copy.orthologs > 02_results/sco_anc	
+        awk '{print $1"\t"$5"\t"$9}' 02_results/synteny_ancestral_sp_"$haplo1".txt |sed 1d > 02_results/sco_anc
+
         if [  -n "${links}" ] ; then    
             if ! Rscript ./00_scripts/Rscripts/04.ideogram.R \
                 -c 02_results/sco_anc \

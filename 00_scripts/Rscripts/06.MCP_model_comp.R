@@ -595,8 +595,8 @@ if (argv[1]=="-h" || length(argv)==0){
     vp6s <- ggbetweenstats(df, six_strata, Ds)    + ylab(expression(italic(d[s]))) +th_plot3
     vp7s <- ggbetweenstats(df, seven_strata, Ds)  + ylab(expression(italic(d[s]))) + th_plot3
     #this is probably too much: 
-    vp8s <- ggbetweenstats(df, eight_strata, Ds, palette = "Paired")  + th_plot3
-    vp9s <- ggbetweenstats(df, nine_strata, Ds, palette = "Paired")  + th_plot3
+    #vp8s <- ggbetweenstats(df, eight_strata, Ds, palette = "Paired")  + th_plot3
+    #vp9s <- ggbetweenstats(df, nine_strata, Ds, palette = "Paired")  + th_plot3
     
     #comment if you don't want some:
     #TO DO: modify to plot each separately and to remove boxplot when n is low 
@@ -624,7 +624,6 @@ if (argv[1]=="-h" || length(argv)==0){
       plot[[8]],
       labels = "AUTO", ncol = 1))
     dev.off()
-    
     
     #comment those that are not wanted:
     pdf(file = paste0(path, "strata_and_viobox_ds_strata_distribution_priors.pdf"), 20,20)

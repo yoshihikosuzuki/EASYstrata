@@ -116,7 +116,7 @@ writeLines(paste0("haplo is ", haplo, "\n"))
 writeLines("~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
 
 #------------- check that libraries are installed and load them ---------------#
-packages <- c('magrittr')
+packages <- c('magrittr','dplyr','ggplot2')
 #---------------- load libraries ---------------------------------------------#
 install.packages(setdiff(packages, rownames(installed.packages())), repos="https://cloud.r-project.org" )
 invisible(lapply(packages, suppressMessages(suppressWarnings(suppressPackageStartupMessages(library))), character.only = TRUE))
@@ -395,7 +395,7 @@ if(!(is.null(opt$ds))){
 
   syn_ds$quantile <- factor(findInterval(
     syn_ds$Ds, 
-    quantile(syn_ds$Ds[syn_ds$Ds>0], na.rm = T, prob=c(0.3, 0.6, 0.7, 0.8, 0.9 0.95))))
+    quantile(syn_ds$Ds[syn_ds$Ds>0], na.rm = T, prob=c(0.3, 0.6, 0.7, 0.8, 0.9, 0.95))))
 
   list_cont <- unique(syn_ds$quantile)
   for(i in 1:length(list_cont)) {
@@ -404,11 +404,13 @@ if(!(is.null(opt$ds))){
   }
   
   
-  z <- cbind(rbind(0, data.frame(unname(quantile(syn_ds$Ds[syn_ds$Ds>0])))) , 
+  z <- cbind(rbind(0, data.frame(unname(quantile(syn_ds$Ds[syn_ds$Ds>0], 
+                                                 na.rm = T, 
+                                                 prob=c(0.3, 0.6, 0.7, 0.8, 0.9, 0.95 )))) , 
     data.frame(table((rcols2)))) %>% 
     set_colnames(.,c("ds","cols","Freq"))
 
-  df <- data.frame(x = c(0,rep(2,5)),  y = seq(1,6) )
+  df <- data.frame(x = c(0,rep(2,6)),  y = seq(1,7) )
 
   all <- cbind(df,z)
 
@@ -428,7 +430,9 @@ if(!(is.null(opt$ds))){
 
     df2 <- data.frame(quantile(syn_ds$Ds[syn_ds$Ds>0],
                                         na.rm = T,
-                                        prob=c(0.3, 0.6, 0.7, 0.8, 0.9, 0.95))) %>% set_colnames(.,c("ds"))
+                                        prob=c(0.3, 0.6, 0.7, 0.8, 0.9, 0.95))) %>% 
+            set_colnames(.,c("ds"))
+
     write.table(df2, '02_results/circos/quantile_of_ds.txt', quote = F)
 
   #prepare filtered genedensity:
