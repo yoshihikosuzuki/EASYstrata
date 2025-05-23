@@ -1,0 +1,53 @@
+# config file
+#_________________
+# INPUT FOR ALL STEPS
+# ----- Genome information -----
+genome1="/home/quentin/04.pipelinevalidate/stickleback/V5/on_miniprot/X_Yonly/stickleback.fa"     #full path to either an assembly containing both haplotypes, or an assembly containing one of two haplotypes. Assemblies can be compressed (.gz) or not.
+genome2=""     #full path to the second haplotypes (optional)
+haplotype1="stickleback"  #name1 [name of haplotype1 - will be used to rename the genome and the contigs inside the genome]
+haplotype2="stickleback_chrY"  #name2 [name of haplotype2 - will be used to rename the genome and the contigs inside the genome] (optional)
+
+# ----- Ancestral reference (optional) -----
+ancestral_genome="" #full path to the ancestral genome to be used whenever possible
+ancestral_gtf=""   #full path to the associated gtf to be used whehever possible
+
+# ----- Identification of the region of interest -----
+scaffold="/home/quentin/04.pipelinevalidate/stickleback/V5/EASYstrata/scaffold" #full path to a 3 columns tab separated file containing information on scaffolds of interest (sex chromosomes or mating-type chromosomes) for plotting.
+# from first to last column: genome name, scaffold name, a string ("normal" or "reversed") stating wether the scaffold orientation should be reversed
+
+# ----- Already produced TE and gene annotation -----
+# if step I is not performed or annotateTE is set to "NO", then TE can be provided in fasta format (optional):
+#TEgenome1="" #full path to the bed of TE for genome1
+#TEgenome2="" #full path to the bed of TE for genome2
+#TEancestral="" #full path to the bed of TE for the ancestral genome
+
+# if step I is not performed or annotate is set to "NO", then gtf must be provided: 
+gtf1="/home/quentin/04.pipelinevalidate/stickleback/V5/on_miniprot/X_Yonly/stickleback.gtf" #full path to gtf for genome1
+gtf2="" #full path to gtf for genome2
+
+#_________________
+# INPUT FOR STEP I: Gene annotation and TE prediction
+# ----- TE prediction -----
+annotateTE="NO" #a string (YES/NO) stating whether TE prediction should be performed
+
+# if annotateTE="YES" then the following options are required
+ncbi_species="" #NCBI species name
+TEdatabase="" #a full path to a custom database of TE from related species (optional)
+removeTE="NO" #a string (YES/NO) stating wether gene covered at >99% by TE should be removed
+
+# ----- Gene annotation -----
+annotate="NO" #a string (YES/NO) stating whether annotation of the genomes should be performed
+
+# if annotate="YES" then the following options are required
+fungus="NO" #a string (YES/NO) stating whether species is a fungus
+orthoDBspecies="" #one of : "Metazoa" "Vertebrata" "Viridiplantae" "Arthropoda" "Eukaryota" "Fungi" "Alveolata"
+RelatedProt="" #full path to custom database of protein data from related species in fasta format (optional)
+rnaseq="" #a string (YES/NO) stating whether RNAseq data is available for use in annotation
+busco_lineage="" #name of the busco lineage corresponding to your genome, available lineages are available with 'busco --list-dataset'
+interpro="NO" #a string (YES/NO) stating whether interproscan should be ran for quality check, WARNING: it can take several days for big dataset
+
+# if rnaseq="YES", path to RNAseq data must be provided in a text file: 
+RNAseqlist="" #full path to a list of raw rnaseq data 
+# In case RNAseq data is already aligned, bam file can be provided instead:
+bamlist1="" #full path to a list of bam on genome1
+bamlist2="" #full path to a list of bam on genome2

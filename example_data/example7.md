@@ -192,30 +192,3 @@ note : this can run on a laptop in less than an hour, depending on the MCMC size
 
 
 
- 
-
-
-
-
-
-
-
-
-
-#### varanus:
-https://ngdc.cncb.ac.cn/gwh/Assembly/reviewer/FEwDjeeBfCJBRWmjKmltbTByfgnYNzdbUPMYDAdsouQsSXwAfYrRVofsBnyhPNnF
-wget https://download.cncb.ac.cn/gwh/Animals/Varanus_acanthurus_vac_zju1.0_GWHBDNK00000000/GWHBDNK00000000.genome.fasta.gz
-wget https://download.cncb.ac.cn/gwh/Animals/Varanus_acanthurus_vac_zju1.0_GWHBDNK00000000/GWHBDNK00000000.gff.gz
-wget https://download.cncb.ac.cn/gwh/Animals/Varanus_acanthurus_vac_zju1.0_GWHBDNK00000000/GWHBDNK00000000.RNA.fasta.gz
-wget https://download.cncb.ac.cn/gwh/Animals/Varanus_acanthurus_vac_zju1.0_GWHBDNK00000000/GWHBDNK00000000.CDS.fasta.gz
-wget https://download.cncb.ac.cn/gwh/Animals/Varanus_acanthurus_vac_zju1.0_GWHBDNK00000000/GWHBDNK00000000.Protein.faa.gz
-
-
-##### Dans master.sh :
-==> remplacer gffread -w par gffread -x ==> a valider aussi sur microbotryum 
-==> inserer le code complet pour les cas ou on 1 seul genome commle épinoche.
-==> remplacer dans code 11:
-sed 's/_1.*$//g' haplo1/08_best_run/"$haplo1"_prot.final.clean.fa \
-    > genespace/peptide/"$haplo1".fa
-sed 's/_1.*$//g' haplo2/08_best_run/"$haplo2"_prot.final.clean.fa \
-    > genespace/peptide/"$haplo2".fa
