@@ -251,7 +251,6 @@ do
     #    -o sequence_files/tmp."${line[0]}".vs."${line[1]}"/results 2>&1 |tee log.translator
     
     cmd=$(command -v macse_v2.07.jar )
-
     java -jar $cmd -prog alignSequences -seq sequence_files/tmp."${line[0]}".vs."${line[1]}"/sequence.fasta
     
     cp ../../config/yn00_template.ctl sequence_files/tmp."${line[0]}".vs."${line[1]}"/
@@ -260,7 +259,7 @@ do
     cd sequence_files/tmp."${line[0]}".vs."${line[1]}"/ || exit 1
     
     #configure paml:
-    path=$(pwd)
+    #path=$(pwd)
     #echo "$path"
     #sed -i "s|PATH|$path|g" yn00_template.ctl #"
     sed -i 's/!/-/g' sequence_NT.fasta
