@@ -21,9 +21,13 @@ sed 's/^>/>stickleback_/g' ../stickleback_v5.0.1_assembly.fa > stickleback.fa
 zcat stickleback_v5_ensembl_genes.gff3.gz stickleback_v5_maker_genes_chrY.gff3.gz |sed 's/^chr/stickleback_chr/' > stickleback.gff3
 ```
 
-#run busco on the genome and on the protein prediction:
-busco_lineage="actinopterygii_odb10"
+#run busco on the genome and on the protein prediction:  
+
+busco_lineage="actinopterygii_odb10"  
+
 busco -c24 -o busco_genome -i stickleback_v4_assembly.fa -l "$busco_lineage" -m genome -f 
+
+
 
  ***** Results: *****
 
@@ -137,7 +141,7 @@ cd EASYstrata
 ```
 
 edit the config file with vim, so it looks like this:
-
+```
 # config file
 #_________________
 # INPUT FOR ALL STEPS
@@ -165,6 +169,7 @@ scaffold="/home/quentin/04.pipelinevalidate/stickleback/V5/EASYstrata/scaffold" 
 gtf1="/home/quentin/04.pipelinevalidate/stickleback/V5/on_miniprot/X_Yonly/stickleback.gtf" #full path to gtf for genome1
 gtf2="" #full path to gtf for genome2
 
+```
 
 
 
