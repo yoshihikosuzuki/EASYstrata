@@ -8,14 +8,18 @@ let's see if can find them in a first pass analysis.'
 
 ## 1 download published data
 
-get the genome including the Y chromosome + gff :
-wget https://stickleback.genetics.uga.edu/downloadData/v5.0.1_assembly/stickleback_v5.0.1_assembly.fa.gz
-wget https://stickleback.genetics.uga.edu/downloadData/v5_assembly/stickleback_v5_maker_genes_chrY.gff3.gz
-wget https://stickleback.genetics.uga.edu/downloadData/v5_assembly/stickleback_v5_maker_genes_nath2020.gff3.gz
+get the genome including the Y chromosome + gff :  
 
+wget https://stickleback.genetics.uga.edu/downloadData/v5.0.1_assembly/stickleback_v5.0.1_assembly.fa.gz  
+
+wget https://stickleback.genetics.uga.edu/downloadData/v5_assembly/stickleback_v5_maker_genes_chrY.gff3.gz  
+
+wget https://stickleback.genetics.uga.edu/downloadData/v5_assembly/stickleback_v5_maker_genes_nath2020.gff3.gz  
+
+```
 sed 's/^>/>stickleback_/g' ../stickleback_v5.0.1_assembly.fa > stickleback.fa
 zcat stickleback_v5_ensembl_genes.gff3.gz stickleback_v5_maker_genes_chrY.gff3.gz |sed 's/^chr/stickleback_chr/' > stickleback.gff3
-
+```
 
 #run busco on the genome and on the protein prediction:
 busco_lineage="actinopterygii_odb10"
@@ -55,7 +59,8 @@ gffread -g stickleback_v5_assembly.fa -y prot.fa full.gff3
 
 
 
-``` 
+```
+ 
 
 we see a lot of duplication so this needs cleaning because there is multiple isoform
 
@@ -90,13 +95,14 @@ sed 's/^chr/stickleback_chr/g' ../test.agat.gtf > tmp.gtf
 awk '{gsub("_id \"", "_id \"" $1 "_", $0); print }' tmp.gtf > stickleback.gtf 
 ```
 
+
 **Important note:** actually, the Y gff comes from another annotation tool (maker) and seem not
 really compatible with the rest of the annotation.
 Therefore we will use miniprot to transfer the stickleback X based gene to the Y chromosome.
 This approach is similar to the one in Peichel et al. except that miniprot is surely faster than exonerate (and perhaps more accurate?)
 
 
-#preparaing data for miniprot:
+## 2 - preparaing data for miniprot:
 ```
 1. extracting prot without the Y:
 gffread -g stickleback.fa  -y revalid.prot stickleback.gtf 
@@ -132,21 +138,42 @@ cd EASYstrata
 
 edit the config file with vim, so it looks like this:
 
+# config file
+#_________________
+# INPUT FOR ALL STEPS
+# ----- Genome information -----
+genome1="/home/quentin/04.pipelinevalidate/stickleback/V5/on_miniprot/X_Yonly/stickleback.fa"     #full path to either an assembly containing both haplotypes, or an assembly containing one of two haplotypes. Assemblies can be compressed (.gz) or not.
+genome2=""     #full path to the second haplotypes (optional)
+haplotype1="stickleback"  #name1 [name of haplotype1 - will be used to rename the genome and the contigs inside the genome]
+haplotype2="stickleback_chrY"  #name2 [name of haplotype2 - will be used to rename the genome and the contigs inside the genome] (optional)
+
+# ----- Ancestral reference (optional) -----
+ancestral_genome="" #full path to the ancestral genome to be used whenever possible
+ancestral_gtf=""   #full path to the associated gtf to be used whehever possible
+
+# ----- Identification of the region of interest -----
+scaffold="/home/quentin/04.pipelinevalidate/stickleback/V5/EASYstrata/scaffold" #full path to a 3 columns tab separated file containing information on scaffolds of interest (sex chromosomes or mating-type chromosomes) for plotting.
+# from first to last column: genome name, scaffold name, a string ("normal" or "reversed") stating wether the scaffold orientation should be reversed
+
+# ----- Already produced TE and gene annotation -----
+# if step I is not performed or annotateTE is set to "NO", then TE can be provided in fasta format (optional):
+#TEgenome1="" #full path to the bed of TE for genome1
+#TEgenome2="" #full path to the bed of TE for genome2
+#TEancestral="" #full path to the bed of TE for the ancestral genome
+
+# if step I is not performed or annotate is set to "NO", then gtf must be provided: 
+gtf1="/home/quentin/04.pipelinevalidate/stickleback/V5/on_miniprot/X_Yonly/stickleback.gtf" #full path to gtf for genome1
+gtf2="" #full path to gtf for genome2
 
 
 
-INSERT config file here
 
 
 
 
 
 
-
-
-
-
-# now run EASYstrata with option 3 
+## now run EASYstrata with option 3 
 note : this can run on a laptop in less than an hour, depending on the MCMC size in MCP
 
 ```
