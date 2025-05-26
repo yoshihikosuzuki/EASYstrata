@@ -228,38 +228,42 @@ we can see that both codeml and yn00 produce highly similar values except for th
 - the plots of dS values along the whole X chromosome lookis like this: 
 
 ![Fig2.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/Fig2.stickleback.png)
+<img src=".pictures/Fig2.stickleback.png" />
 
 
 - now we can run the MCP analysis (ideally we should remove the firt 2.5 mb representing the PAR):
 
-![Fig3.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/Fig3.stickleback.png)
+<img src=".pictures/Fig3.stickleback.png" />
 
 
-we see that the model 3 (i.e. 3 changepoints) largely outcompete the others :
-
-
-models:        weights:
-model1 0.0911057475461517
-model2 0.000305299921774604
-model3 0.563440683690209
-model4 0.0479403651137486
-model5 0.0967823603569527
-model6 0.0240738298925681
-model7 0.106958118183263
-model8 0.0693935952953322
+we see that the model 3 (i.e. 3 changepoints) largely outcompete the others :  
 
 
 
+|models:  |      weights: |
+|:----:| ---|
+| model1 | 0.09110 |
+| model2 | 0.00030 |
+| model3 | 0.56344 |
+| model4 | 0.04794 |
+| model5 | 0.09678 |
+| model6 | 0.02407 |
+| model7 | 0.10695 |
+| model8 | 0.06939 |
 
-![Fig4.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/Fig4.stickleback.png)
+
+
+
 <img src=".pictures/Fig4.stickleback.png" width = "800" heigth = "1000">
 
 - here are the dS values with gene colored according to the position of all possible strata:
 
 ![Fig5.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/Fig5.stickleback.svg)
+<img src=".pictures/Fig5.stickleback.svg" />
+
 
 - and finally a last plot exploring the difference among the strata:
 
-![Fig5.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/Fig5.stickleback.svg)
+<img src=".pictures/Fig6.stickleback.svg" />
 
 
