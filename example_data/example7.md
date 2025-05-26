@@ -206,7 +206,7 @@ note : this can run on a laptop in less than an hour, depending on the MCMC size
 
 - the first tool run was Genespace. Here is the riparian plot combined with a circos plots of all single copy orthologs:
 
-![Fig1.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/Fig1.stickleback.png)
+<img src=".pictures/Fig1.stickleback.png" width = "800" heigth = "800">
 
 
 
@@ -222,7 +222,7 @@ note : this can run on a laptop in less than an hour, depending on the MCMC size
 we can see that both codeml and yn00 produce highly similar values except for the most degenerated genes:
 
 
-![Fig30.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/FigS30_test.png)
+<img src=".pictures/FigS30_test.png" width = "800" heigth = "800">
 
 
 - the plots of dS values along the whole X chromosome lookis like this: 
@@ -252,13 +252,14 @@ model8 0.0693935952953322
 
 
 ![Fig4.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/Fig4.stickleback.png)
+<img src=".pictures/Fig4.stickleback.png" width = "800" heigth = "1000">
 
 - here are the dS values with gene colored according to the position of all possible strata:
 
-![Fig5.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/Fig5.stickleback.png)
+![Fig5.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/Fig5.stickleback.svg)
 
 - and finally a last plot exploring the difference among the strata:
 
-![Fig5.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/Fig5.stickleback.png)
+![Fig5.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/Fig5.stickleback.svg)
 
 
