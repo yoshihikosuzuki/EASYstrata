@@ -206,7 +206,7 @@ note : this can run on a laptop in less than an hour, depending on the MCMC size
 
 - the first tool run was Genespace. Here is the riparian plot combined with a circos plots of all single copy orthologs:
 
-<img src=".pictures/Fig1.stickleback.png" width = "800" heigth = "800">
+<img src=".pictures/Fig1.stickleback.png" width = "600" heigth = "600">
 
 
 
@@ -222,12 +222,11 @@ note : this can run on a laptop in less than an hour, depending on the MCMC size
 we can see that both codeml and yn00 produce highly similar values except for the most degenerated genes:
 
 
-<img src=".pictures/FigS30_test.png" width = "800" heigth = "800">
+<img src=".pictures/FigS30_test.png" width = "800" heigth = "600">
 
 
 - the plots of dS values along the whole X chromosome lookis like this: 
 
-![Fig2.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/Fig2.stickleback.png)
 <img src=".pictures/Fig2.stickleback.png" />
 
 
@@ -253,12 +252,10 @@ we see that the model 3 (i.e. 3 changepoints) largely outcompete the others :
 
 
 
-
-<img src=".pictures/Fig4.stickleback.png" width = "800" heigth = "1000">
+<img src=".pictures/Fig4.stickleback.png" width = "800" heigth = "800">
 
 - here are the dS values with gene colored according to the position of all possible strata:
 
-![Fig5.stickleback.png](https://github.com/QuentinRougemont/EASYstrata/blob/main/.pictures/Fig5.stickleback.svg)
 <img src=".pictures/Fig5.stickleback.svg" />
 
 
