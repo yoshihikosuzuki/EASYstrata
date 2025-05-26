@@ -51,3 +51,7 @@ RNAseqlist="" #full path to a list of raw rnaseq data
 # In case RNAseq data is already aligned, bam file can be provided instead:
 bamlist1="" #full path to a list of bam on genome1
 bamlist2="" #full path to a list of bam on genome2
+
+
+#ds method (choose between "yn00" or "codeml", default: codeml)
+ds_method="codeml"

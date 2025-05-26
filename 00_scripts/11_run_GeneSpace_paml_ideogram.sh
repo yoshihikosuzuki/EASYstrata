@@ -407,17 +407,18 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
     #sed -i 's/  */\t/g' paml/single.copy.orthologs
     
     #----------------------------------- step4 -- plot paml results  -----------------------------------------#
-    
+    #ds_method="codeml" #choose between codeml (default or yn00) 
+    source config/config
     if [ -n "${ancestral_genome}" ]; then
         echo "using ancestral genome"
-        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$haplo1" "$haplo2" "$scaffold" ancestral_sp 
+        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$ds_method" "$haplo1" "$haplo2" "$scaffold" ancestral_sp 
         then
             echo -e "\nERROR plotting paml results failed\n"
             echo -e "\nplease check input files and logs!!\n\n"
             exit 1
         fi
     else
-        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$haplo1" "$haplo2" "$scaffold"
+        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$ds_method" "$haplo1" "$haplo2" "$scaffold"
         then
             echo -e "\nERROR plotting paml results failed\n"
             echo -e "\nplease check input files and logs!!\n\n"
@@ -571,32 +572,27 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
     fi
 
     #/!\ chromosomes should be reconstructed on the fly from the N0.tsv file
-    file="02_results/paml/single.copy.orthologs"
+    file="orthologs"
     if [ -n "${ancestral_genome}" ]
     then
-        #awk '{gsub("_g[0-9]*.t[1-9]","\t",$0); print $2"\t"$3"\t"$4}' $file 
-        awk -F '[\t_]' '{print $2"_"$3"\t"$5"_"$6"\t"$8"_"$9 }' $file \
-           |sort \
-           |uniq -c\
-           |awk -v var1="$ancestral" -v var2="$haplo1" -v var3="$haplo2" '$1>0 {print var1"\t"$2"\n"var2"\t"$3"\n"var3"\t"$4}' \
-           |sort \
-           |uniq  \
-            > 02_results/chromosomes.txt
+        cat <(sed 1d 02_results/synteny_"$haplo1"_"$haplo2".txt \
+             |awk -v var1="$haplo1" -v var2="$haplo2"  '{print var1"\t"$4"\n"var2"\t"$8}' \
+             |sort |uniq -c |awk '$1>0 {print $2"\t"$3}'  ) \
+             <(sed 1d 02_results/synteny_ancestral_sp_"$haplo1".txt \
+             |awk -v var1="$ancestral" -v var2="$haplo1"  '{print var1"\t"$4"\n"var2"\t"$8}' \
+             |sort |uniq -c |awk '$1>0 {print $2"\t"$3}' ) \
+             |sort |uniq > 02_results/chromosomes.txt
+
     #awk '{print $1"\t"$3"\t"$4}' 02_results/paml/single.copy.orthologs > 02_results/sco
     awk '{print $1"\t"$5"\t"$9}' 02_results/synteny_ancestral_sp_"$haplo1".txt |sed 1d > 02_results/sco_anc
     awk '{print $1"\t"$5"\t"$9}' 02_results/synteny_"$haplo1"_"$haplo2".txt |sed 1d > 02_results/sco
 
     else
-        #awk '{gsub("_g[0-9]*.t[1-9]","\t",$0); print $2"\t"$3"\t"$4}' $file #
-        awk -F '[\t_]' '{print $2"_"$3"\t"$5"_"$6}' $file \
-            |sort \
-            |uniq -c\
-            |awk -v var1="$haplo1" -v var2="$haplo2" '$1>0 {print var1"\t"$2"\n"var2"\t"$3}' \
-            |sort \
-            |uniq  \
-            > 02_results/chromosomes.txt
+           sed 1d 02_results/synteny_"$haplo1"_"$haplo2".txt \
+             |awk -v var1="$haplo1" -v var2="$haplo2"  '{print var1"\t"$4"\n"var2"\t"$8}' \
+             |sort |uniq -c |awk '$1>0 {print $2"\t"$3}' \
+             |sort |uniq > 02_results/chromosomes.txt
 
-    #awk '{print $1"\t"$2"\t"$3}' 02_results/paml/single.copy.orthologs > 02_results/sco
     awk '{print $1"\t"$5"\t"$9}' 02_results/synteny_"$haplo1"_"$haplo2".txt |sed 1d > 02_results/sco
 
 

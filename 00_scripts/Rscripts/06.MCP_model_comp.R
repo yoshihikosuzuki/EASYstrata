@@ -641,5 +641,9 @@ if (argv[1]=="-h" || length(argv)==0){
     writeLines("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     writeLines("\n analyses finished !! \n\n")
     writeLines("\nn~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
-    
+
+    writeLines("\n exporting Rsession !! \n\n")
+
+save.image( file = "modelcomp/changepoint_analysis.RData")
+
 }

@@ -65,20 +65,26 @@ if (argv[1]=="-h" || length(argv)==0){
     #- common results
     #TO DO: insert an option for the user to choose whether using yn00 or codeml
     # yn00 results:
-    dat <- read.table("02_results/paml/results_YN.txt") %>% 
-    	set_colnames(., c("Ds","SEDs","Dn","SEDn", "geneX", "geneY"))
-    
-    # codeml results: 
-    dat <- read.table("02_results/paml/results_codeml.txt") %>%
-        set_colnames(., c("Ds","Dn","dNdS", "geneX", "geneY"))
+    ds_method <- argv[1] #default if unset : codeml
+    if(!exists("ds_method")){ds_method="codeml"}
+    if(ds_method=='yn') {
+        print(paste0("ds_method is", ds_method))
+        dat <- read.table("02_results/paml/results_YN.txt") %>% 
+    	   set_colnames(., c("Ds","SEDs","Dn","SEDn", "geneX", "geneY"))
+    } else if(ds_method=='codeml') {
+        print(paste0("ds_method is", ds_method))
+        # codeml results: 
+        dat <- read.table("02_results/paml/results_codeml.txt") %>%
+           set_colnames(., c("Ds","Dn","dNdS", "geneX", "geneY"))
+    }
 
-    if (length(argv)<3) {
+    if (length(argv)<1) {
     	  stop("At least the name of 2 species to compare and a txt file containing the name and order of scaffold must be supplied.n", call.=FALSE)
-    } else if (length(argv)==3) {
+    } else if (length(argv)==4) {
     	writeLines("assuming no ancestral species was used\n")
-    	sp1 <- argv[1]     # only the basename is needed !
-    	sp2 <- argv[2]     # only the basename is needed !
-    	chr <- argv[3]     # table with chr\tstatus [Reversed or Not]
+    	sp1 <- argv[2]     # only the basename is needed !
+    	sp2 <- argv[3]     # only the basename is needed !
+    	chr <- argv[4]     # table with chr\tstatus [Reversed or Not]
     
     	scaf <- read.table(chr, sep="\t") %>% set_colnames(., c("haplo","chr","order"))
     
@@ -88,11 +94,11 @@ if (argv[1]=="-h" || length(argv)==0){
     
     } else {
     	writeLines("assuming an ancestral species exist\n")
-    	sp1 <- argv[1]     #only the basename is needed !
-    	sp2 <- argv[2]     #only the basename is needed !
-    	chr <- argv[3]     # table with chr\tstatus [Reversed or Not]
+    	sp1 <- argv[2]     #only the basename is needed !
+    	sp2 <- argv[3]     #only the basename is needed !
+    	chr <- argv[4]     # table with chr\tstatus [Reversed or Not]
     	#optional 
-    	sp3 <- argv[4]     #the basename of the ancestral species !
+    	sp3 <- argv[5]     #the basename of the ancestral species !
     	
     	writeLines("load scaffold info\n")
     	scaf <- read.table(chr, sep ="\t") %>% set_colnames(., c("haplo","chr","order"))
@@ -212,7 +218,7 @@ if (argv[1]=="-h" || length(argv)==0){
     dev.off()
     
     
-    if(length(argv)==4){
+    if(length(argv)==5){
         writeLines("-------------------------------------------------------")
         writeLines("------- constructing graph with gene order-------------\n")
         writeLines("-------------------------------------------------------")
