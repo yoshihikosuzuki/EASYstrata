@@ -443,22 +443,22 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
         then
             echo " " ;
             awk -v var1="$haplo1" -v var2="$haplo2" -v var3="$ancestral" 'NF==6 && $4 ~ var1 && $5 ~ var2 && $6 ~ var3 ' $pathN0 \
-                   | grep -Ff <(awk '{print $2}' "$scaffold") - > orthologues
-            sed -i -e "s/\r//g" orthologues
+                   | grep -Ff <(awk '{print $2}' "$scaffold") - > 02_results/orthologues
+            sed -i -e "s/\r//g" 02_results/orthologues
          elif [[ $haplo2 == $haplo ]] ;
          then
              echo "not egal - reversing haplotype names to match columns"
              echo "first column is $haplo"
              awk -v var1="$haplo2" -v var2="$haplo1" -v var3="$ancestral" 'NF==6 && $4 ~ var1 && $5 ~ var2 && $6 ~ var3 ' $pathN0 \
-                | grep -Ff <(awk '{print $2}' "$scaffold") - |awk '{print $1"\t"$2"\t"$3"\t"$5"\t"$4"\t"$6}' > orthologues
-             sed -i -e "s/\r//g" orthologues
+                | grep -Ff <(awk '{print $2}' "$scaffold") - |awk '{print $1"\t"$2"\t"$3"\t"$5"\t"$4"\t"$6}' > 02_results/orthologues
+             sed -i -e "s/\r//g" 02_results/orthologues
          elif [[ ancestral_sp == $haplo ]] ;
          then
              echo "not egal - reversing haplotype names to match columns"
              echo "first column is $haplo"
              awk -v var1="$ancestral" -v var2="$haplo1" -v var3="$haplo2" 'NF==6 && $4 ~ var1 && $5 ~ var2 && $6 ~ var3 ' $pathN0 \
-                  | grep -Ff <(awk '{print $2}' "$scaffold") - |awk '{print $1"\t"$2"\t"$3"\t"$5"\t"$6"\t"$4}' > orthologues
-             sed -i -e "s/\r//g" orthologues
+                  | grep -Ff <(awk '{print $2}' "$scaffold") - |awk '{print $1"\t"$2"\t"$3"\t"$5"\t"$6"\t"$4}' > 02_results/orthologues
+             sed -i -e "s/\r//g" 02_results/orthologues
     
         fi
 
@@ -468,13 +468,13 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
        then
            echo " " ;
            awk -v var1="$haplo1" -v var2="$haplo2" 'NF==5 && $4 ~ var1 && $5 ~ var2 ' $pathN0 \
-           | grep -Ff <(awk '{print $2}' "$scaffold") - > orthologues
-           sed -i -e "s/\r//g" orthologues
+           | grep -Ff <(awk '{print $2}' "$scaffold") - > 02_results/orthologues
+           sed -i -e "s/\r//g" 02_results/orthologues
        else
            echo "not egal - reversing haplotype names to match columns"
            awk -v var1="$haplo2" -v var2="$haplo1" 'NF==5 && $4 ~ var1 && $5 ~ var2 ' $pathN0 \
-           | grep -Ff <(awk '{print $2}' "$scaffold") - |awk '{print $1"\t"$2"\t"$3"\t"$5"\t"$4}' > orthologues
-           sed -i -e "s/\r//g" orthologues
+           | grep -Ff <(awk '{print $2}' "$scaffold") - |awk '{print $1"\t"$2"\t"$3"\t"$5"\t"$4}' > 02_results/orthologues
+           sed -i -e "s/\r//g" 02_results/orthologues
        fi
     fi
 
@@ -485,7 +485,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
     if [ -n "${ancestral_genome}" ]
     then
         echo "inferring synteny with ancestral species: "
-        join  -1 6 -2 4 <(sort -k6,6 orthologues)  \
+        join  -1 6 -2 4 <(sort -k6,6 02_results/orthologues)  \
                         <(sort -k4,4 genespace/bed/ancestral_sp.bed ) \
             | sed 's/ /\t/g' \
             | join -1 5 -2 4 <(sort -k5,5 -) \
@@ -503,7 +503,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
             exit 1
         fi
     
-        join  -1 6 -2 4 <(sort -k6,6 orthologues)  \
+        join  -1 6 -2 4 <(sort -k6,6 02_results/orthologues)  \
                 <(sort -k4,4 genespace/bed/ancestral_sp.bed ) \
                 | sed 's/ /\t/g' \
                 |join -1 6 -2 4 <(sort -k6,6 -) \
@@ -524,7 +524,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
            echo -e "number of lines in synteny file ancestral_sp vs $haplo1 is $size1"
            echo -e "number of lines in synteny file ancestral_sp vs $haplo2 is $size2"
      
-        join  -1 4 -2 4 <(sort -k4,4 orthologues)  \
+        join  -1 4 -2 4 <(sort -k4,4 02_results/orthologues)  \
                         <(sort -k4,4 genespace/bed/"$haplo1".bed ) \
             | sed 's/ /\t/g' \
             | join -1 5 -2 4 <(sort -k5,5 -) \
@@ -549,7 +549,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
         echo "inferring synteny between $haplo1 and $haplo2"
 
 
-       join  -1 4 -2 4 <(sort -k4,4 orthologues)  \
+       join  -1 4 -2 4 <(sort -k4,4 02_results/orthologues)  \
                        <(sort -k4,4 genespace/bed/"$haplo1".bed ) \
             | sed 's/ /\t/g' \
             | join -1 5 -2 4 <(sort -k5,5 -) \
@@ -572,7 +572,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
     fi
 
     #/!\ chromosomes should be reconstructed on the fly from the N0.tsv file
-    file="orthologs"
+    #file="02_results/orthologs"
     if [ -n "${ancestral_genome}" ]
     then
         cat <(sed 1d 02_results/synteny_"$haplo1"_"$haplo2".txt \

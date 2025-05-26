@@ -384,8 +384,14 @@ each point is a gene d<sub>S</sub> value colored according to the strata of assi
 
 ## 5: other use cases 
 
-describe here all possibles combinations 
+- [see exemple 5](example_data/example5.md)
 
 ## 6: changepoint with priors
 
 - [see example 6](example_data/example6.md)
+
+
+## 7: example from stickleback data 
+
+- [see example 7](example_data/example7.md)
+

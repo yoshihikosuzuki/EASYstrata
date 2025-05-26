@@ -492,7 +492,7 @@ if (argv[1]=="-h" || length(argv)==0){
     ##TO DO: generalise the code below 
     
     #other plots: 
-    if(i=8){
+    if (i == 8) {
     
     pdf(file=paste0(path,"plot_dS_all_position.pdf"),8,12)
     print(plot_grid(ds3.1, ds4.1, ds5.1, ds6.1, ds7.1, ds8.1, 

@@ -164,6 +164,7 @@ if(exists("scaforder")){
 
      bed2 <- read.table(bedB) %>%
         merge(.,scaforder, by.x="V1", by.y="chr", sort = F) %>%
+        select(-haplo) %>%
         merge(sco, ., by.x="V3", by.y = "V4", sort = F ) %>% 
         select(-V2.x) %>%
         set_colnames(., c("gene2", "contig2", "Start_2", "End_2","order") ) %>%
