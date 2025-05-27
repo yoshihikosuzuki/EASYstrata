@@ -411,7 +411,7 @@ if (argv[1]=="-h" || length(argv)==0){
         hyp5[8,] <-  hypothesis(fitcp[[i]],  c("int_4 > int_5"))
     
         write.table(hyp5, paste0(path, "hypothesis5strata.txt"), quote= F)
-        ds5 <- dplot(df, nstrata=5, "five_strata")
+        ds5.1 <- dplot(df, nstrata=5, "five_strata")
         ds5.2 <- dplot2(df, nstrata=5, "five_strata")
 
      } else if (i == 6){

@@ -22,7 +22,7 @@ This software is suitable only in linux-like systems (Unfortunately not Windows 
         * [Operations of step III: Plot d<sub>S</sub> along the genome](#operations-of-step-iii-plot-ds-along-the-genome)
         * [Operations of step IV: Perform changepoint analysis to identify evolutionary strata](#operations-of-step-iv-perform-changepoint-analysis-to-identify-evolutionary-strata)
    * [Working examples](#working-examples)
-
+   * [CPU and memory requirements](#CPU-and-memory-requirements)
 
 # Purpose:
 ##  sets of scripts to : 
@@ -395,3 +395,31 @@ each point is a gene d<sub>S</sub> value colored according to the strata of assi
 
 - [see example 7](example_data/example7.md)
 
+
+
+# CPU and memory requirements
+
+this workflows requires very different CPU and memory settings depending along the way.  
+
+**Limits:** 
+unfortunately EASYstrata was not developped on a cluster implementing a scheduler like slurm so memory and CPU usage is not always optimized. For instance
+job array could be used for efficient and faster RNAseq mapping in a multisample cases. 
+
+Similarly job array could be used to parallelise gene alignment along with dS computation.
+
+
+with this limit in mind some hidden variable enable the control of memory and cpu number in a non-slurm cluster:
+
+in the *config/cpu_mem* file you'll find the following parameters:
+
+```
+NCPUS_TRIMMO=8
+NCPUS_GSNAP=24
+NCPUS_BRAKER=24
+NCPUS_REPEATEMODELER=20
+
+MEM_TRIMMO=XX
+MEM_GSNAP=XX
+MEM_BRAKER=XX
+MEM_REPEATMODELER=XX
+```

@@ -81,8 +81,9 @@ then
     
     samtools depth "$base".sorted.bam |gzip > "$base".dp.gz  
     
+    mkdir Rlogs 2>/dev/null    
     #plot depth along the genome:
-    Rscript ../../00_scripts/Rscripts/plot_dp.R "$base".dp.gz
+    Rscript ../../00_scripts/Rscripts/plot_dp.R "$base".dp.gz 2> Rlogs/Rlogs_gsnap_SE."$base"
     
 else 
     echo "BAM file already present" 

@@ -90,8 +90,9 @@ then
      samtools view "$base".sorted.bam |cut -f 3-5|uniq |awk -v var="$base" '{print var"\t"$0}' |gzip > mapq."${base}".txt.gz
      samtools depth "$base".sorted.bam |gzip > "$base".dp.gz  
      
+     mkdir Rlogs 2>/dev/null
      #plot depth along the genome:
-     Rscript ../../00_scripts/Rscripts/plot_dp.R "$base".dp.gz
+     Rscript ../../00_scripts/Rscripts/plot_dp.R "$base".dp.gz 2> Rlogs/Rlogs_gsnap_PE_depth_"$base"
      
      #plot mapq along the genome: 
      Rscript  ../../00_scripts/Rscripts/plot_mapq.R mapq."$base".txt.gz
