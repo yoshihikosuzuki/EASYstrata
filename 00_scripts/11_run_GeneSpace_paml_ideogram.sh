@@ -234,10 +234,11 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
     echo -e "\n--------------------\n \tperform whole genome synteny \n------------------------\n" 
     echo -e "\n-------------------- running minimap  ------------------------\n\n" 
     
+    mkdir 02_results/minimap_alns/ 2>/dev/null 
     minimap2 -cx asm5 \
         haplo1/03_genome/"$haplo1".fa \
         haplo2/03_genome/"$haplo2".fa \
-        > 02_results/aln."$haplo1"_"$haplo2".paf || \
+        > 02_results/minimap_alns/aln."$haplo1"_"$haplo2".paf || \
         { echo -e "${RED} ERROR! minimap2 failed - check your data\n${NC} " ; exit 1 ; }
 
     
@@ -258,27 +259,27 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
         minimap2 -cx asm5 \
             ancestral_sp/ancestral_sp.fa \
             haplo2/03_genome/"$haplo2".fa \
-            > 02_results/aln.ancestral_sp_"$haplo2".paf || \
+            > 02_results/minimap_alns/aln.ancestral_sp_"$haplo2".paf || \
         { echo -e "${RED} ERROR! minimap2 faield - check your data\n${NC} " ; exit 1 ; }
  
         minimap2 -cx asm5 \
             ancestral_sp/ancestral_sp.fa \
             haplo1/03_genome/"$haplo1".fa \
-            > 02_results/aln.ancestral_sp_"$haplo1".paf  || \
+            > 02_results/minimap_alns/aln.ancestral_sp_"$haplo1".paf  || \
         { echo -e "${RED} ERROR! minimap2 faield - check your data\n${NC} " ; exit 1 ; }
 
     
     
         #preparing scaffold to highlight in dotplot:
-        awk '{gsub("_","\t",$0) ; print $2"_"$3"_"$4"\t"$6"_"$7}' 02_results/paml/single.copy.orthologs|\
+        awk '{gsub("_","\t",$0) ; print $2"_"$3"\t"$5"_"$6}' 02_results/paml/single.copy.orthologs|\
             sort |\
             uniq -c|\
             awk '$1>10 '  > 02_results/scaff.anc.haplo1.txt
-        awk '{gsub("_","\t",$0) ; print $2"_"$3"_"$4"\t"$9"_"$10}' 02_results/paml/single.copy.orthologs|\
+        awk '{gsub("_","\t",$0) ; print $2"_"$3""\t"$8"_"$9}' 02_results/paml/single.copy.orthologs|\
             sort |\
             uniq -c\
             |awk '$1>10 ' > 02_results/scaff.anc.haplo2.txt
-        awk '{gsub("_","\t",$0) ; print $6"_"$7"\t"$9"_"$10}' 02_results/paml/single.copy.orthologs|\
+        awk '{gsub("_","\t",$0) ; print $5"_"$6"\t"$8"_"$9}' 02_results/paml/single.copy.orthologs|\
             sort |\
             uniq -c|\
             awk '$1>10 ' \
@@ -289,16 +290,16 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
             |grep -Ff <(cut -f3 02_results/scaff.haplo1.haplo2.txt ) - > 02_results/paml/single.copy.orthologs_cleaned 
 
 
-        Rscript 00_scripts/Rscripts/dotplot_paf.R  02_results/aln."$haplo1"_"$haplo2".paf 
-        Rscript 00_scripts/Rscripts/dotplot_paf.R  02_results/aln.ancestral_sp_"$haplo1".paf 
-        Rscript 00_scripts/Rscripts/dotplot_paf.R  02_results/aln.ancestral_sp_"$haplo2".paf 
-    
-        Rscript 00_scripts/Rscripts/synteny_plot.R 02_results/aln.ancestral_sp_"$haplo1".paf \
-             02_results/scaff.anc.haplo1.txt 
-        Rscript 00_scripts/Rscripts/synteny_plot.R 02_results/aln.ancestral_sp_"$haplo2".paf \
-            02_results/scaff.anc.haplo2.txt 
-        Rscript 00_scripts/Rscripts/synteny_plot.R 02_results/aln."$haplo1"_"$haplo2".paf \
-            02_results/scaff.haplo1.haplo2.txt 
+        Rscript 00_scripts/Rscripts/dotplot_paf.R  02_results/minimap_alns/aln."$haplo1"_"$haplo2".paf  2> Rlogs_minimap1 
+        Rscript 00_scripts/Rscripts/dotplot_paf.R  02_results/minimap_alns/aln.ancestral_sp_"$haplo1".paf  2> Rlogs_minimap2 
+        Rscript 00_scripts/Rscripts/dotplot_paf.R  02_results/minimap_alns/aln.ancestral_sp_"$haplo2".paf  2> Rlogs_minimap3 
+
+        Rscript 00_scripts/Rscripts/synteny_plot.R 02_results/minimap_alns/aln.ancestral_sp_"$haplo1".paf \
+             02_results/minimap_alns/scaff.anc.haplo1.txt  2> Rlogs_minimap4 
+        Rscript 00_scripts/Rscripts/synteny_plot.R 02_results/minimap_alns/aln.ancestral_sp_"$haplo2".paf \
+            02_results/minimap_alns/scaff.anc.haplo2.txt  2> Rlogs_minimap5 
+        Rscript 00_scripts/Rscripts/synteny_plot.R 02_results/minimap_alns/aln."$haplo1"_"$haplo2".paf \
+            02_results/minimap_alns/scaff.haplo1.haplo2.txt  2> Rlogs_minimap6 
     
     else 
         awk '{gsub("_","\t",$0) ; print $2"_"$3"\t"$5"_"$6}' 02_results/paml/single.copy.orthologs|\
@@ -312,9 +313,10 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
             |grep -Ff <(cut -f3 02_results/scaff.haplo1.haplo2.txt ) - > 02_results/paml/single.copy.orthologs_cleaned 
 
         #then run pafr to generate a whole genome dotplot and eventually dotplot for some target scaffold:
-        Rscript 00_scripts/Rscripts/dotplot_paf.R  02_results/aln."$haplo1"_"$haplo2".paf 
-        Rscript 00_scripts/Rscripts/synteny_plot.R 02_results/aln."$haplo1"_"$haplo2".paf \
-            02_results/scaff.haplo1.haplo2.txt 
+        Rscript 00_scripts/Rscripts/dotplot_paf.R  02_results/minimap_alns/aln."$haplo1"_"$haplo2".paf 2> Rlogs_minimap1 
+        Rscript 00_scripts/Rscripts/synteny_plot.R 02_results/minimap_alns/aln."$haplo1"_"$haplo2".paf \
+            02_results/scaff.haplo1.haplo2.txt  2> Rlogs_minimap2 
+
     fi
 fi
 
@@ -411,14 +413,14 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
     source config/config
     if [ -n "${ancestral_genome}" ]; then
         echo "using ancestral genome"
-        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$ds_method" "$haplo1" "$haplo2" "$scaffold" ancestral_sp 
+        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$ds_method" "$haplo1" "$haplo2" "$scaffold" ancestral_sp 2> Rlogs_plot_paml 
         then
             echo -e "\nERROR plotting paml results failed\n"
             echo -e "\nplease check input files and logs!!\n\n"
             exit 1
         fi
     else
-        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$ds_method" "$haplo1" "$haplo2" "$scaffold"
+        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$ds_method" "$haplo1" "$haplo2" "$scaffold" 2> Rlogs_plot_paml 
         then
             echo -e "\nERROR plotting paml results failed\n"
             echo -e "\nplease check input files and logs!!\n\n"
@@ -621,7 +623,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
             -f haplo1/03_genome/"$haplo1".fa.fai \
             -g haplo2/03_genome/"$haplo2".fa.fai \
             -l "$links" \
-            -s "$scafforientation"
+            -s "$scafforientation" 2> Rlogs_plot_ideogram_with_links
         then
                 echo -e "\nERROR: ideograms failed /!\ \n
                 please check logs and input data\n" 
@@ -635,7 +637,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
             -j genespace/bed/"$haplo2".bed  \
             -f haplo1/03_genome/"$haplo1".fa.fai \
             -g haplo2/03_genome/"$haplo2".fa.fai \
-            -s "$scafforientation"
+            -s "$scafforientation" 2> Rlogs_plot_ideogram_no_links
         then
                 echo -e "\nERROR: ideograms failed /!\ \n
                 please check logs and input data\n" 
@@ -657,7 +659,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -f "${ancestral_genome}".fai \
                 -g haplo1/03_genome/"$haplo1".fa.fai \
                 -l "$links" \
-                -s "$scafforientation"
+                -s "$scafforientation" 2> Rlogs_plot_ideogram_ancestral_sp_with_links
             then
                     echo -e "\nERROR: ideograms failed /!\ \n
                     please check logs and input data\n" 
@@ -671,7 +673,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -j genespace/bed/"$haplo1".bed \
                 -f "${ancestral_genome}".fai \
                 -g haplo1/03_genome/"$haplo1".fa.fai \
-                -s "$scafforientation"
+                -s "$scafforientation" 2> Rlogs_plot_ideogram_ancestral_sp_no_links
             then
                 echo -e "\nERROR: ideograms failed /!\ \n
                 please check logs and input data\n" 
@@ -725,7 +727,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -g haplo1/03_genome/"$haplo1".fa.fai \
                 -i genespace/bed/ancestral_sp.bed  \
                 -j genespace/bed/"$haplo1".bed  \
-                -l "$links"
+                -l "$links" 2> Rlogs_plot_ideogram_ancestral_sp
             then
                 echo -e "\nERROR: circos plots failed /!\ \n
                 please check logs and input data\n" 
@@ -738,7 +740,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -g haplo2/03_genome/"$haplo2".fa.fai \
                 -i genespace/bed/ancestral_sp.bed  \
                 -j genespace/bed/"$haplo2".bed  \
-                -l "$links"
+                -l "$links" 2> Rlogs_plot_circos_ancestral_sp_haplo2
             then
                 echo -e "\nERROR: circos plots failed /!\ \n
                 please check logs and input data\n" 
@@ -757,7 +759,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                     -j genespace/bed/"$haplo2".bed  \
                     -t "$genome1TE" \
                     -u "$genome2TE" \
-                    -l "$links"
+                    -l "$links" 2> Rlogs_plot_circos_TE
                 then
                     echo -e "\nERROR: circos plots failed /!\ \n
                     please check logs and input data\n" 
@@ -773,7 +775,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                     -g haplo2/03_genome/"$haplo2".fa.fai \
                     -i genespace/bed/"$haplo1".bed  \
                     -j genespace/bed/"$haplo2".bed  \
-                    -l "$links"
+                    -l "$links" 2> Rlogs_plot_circos_noTE
                 then
                     echo -e "\nERROR: circos plots failed /!\ \n
                     please check logs and input data\n" 
@@ -791,7 +793,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -f ancestral_sp/ancestral_sp.fa.fai \
                 -g haplo1/03_genome/"$haplo1".fa.fai \
                 -i genespace/bed/ancestral_sp.bed  \
-                -j genespace/bed/"$haplo1".bed  
+                -j genespace/bed/"$haplo1".bed  2> Rlogs_plot_circos_ancestral_sp
             then
                 echo -e "\nERROR: circos plots failed /!\ \n
                 please check logs and input data\n" 
@@ -807,7 +809,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -f ancestral_sp/ancestral_sp.fa.fai \
                 -g haplo2/03_genome/"$haplo2".fa.fai \
                 -i genespace/bed/ancestral_sp.bed  \
-                -j genespace/bed/"$haplo2".bed  
+                -j genespace/bed/"$haplo2".bed 2> Rlogs_plot_circos_ancestral_sp_haplo2 
             then
                 echo -e "\nERROR: circos plots failed /!\ \n
                 please check logs and input data\n" 
@@ -827,7 +829,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                    -i genespace/bed/"$haplo1".bed  \
                    -j genespace/bed/"$haplo2".bed  \
                    -t "$genome1TE" \
-                   -u "$genome2TE"
+                   -u "$genome2TE" 2> Rlogs_plot_circos_TE
                then
                    echo -e "\nERROR: circos plots failed /!\ \n
                    please check logs and input data\n" 
@@ -840,7 +842,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                    -f haplo1/03_genome/"$haplo1".fa.fai \
                    -g haplo2/03_genome/"$haplo2".fa.fai \
                    -i genespace/bed/"$haplo1".bed  \
-                   -j genespace/bed/"$haplo2".bed  
+                   -j genespace/bed/"$haplo2".bed   2> Rlogs_plot_circos_noTE
                then
                    echo -e "\nERROR: circos plots failed /!\ \n
                    please check logs and input data\n" 
@@ -864,7 +866,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                     -j genespace/bed/"$haplo2".bed  \
                     -t "$genome1TE" \
                     -u "$genome2TE" \
-                    -l "$links"
+                    -l "$links" 2> Rlogs_plot_circos_TE_links
                 then
                     echo -e "\nERROR: circos plots failed /!\ \n
                     please check logs and input data\n" 
@@ -879,7 +881,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                     -g haplo2/03_genome/"$haplo2".fa.fai \
                     -i genespace/bed/"$haplo1".bed  \
                     -j genespace/bed/"$haplo2".bed  \
-                    -l "$links"
+                    -l "$links" 2> Rlogs_plot_circos_noTE_links
                 then
                     echo -e "\nERROR: circos plots failed /!\ \n
                     please check logs and input data\n" 
@@ -898,7 +900,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                     -i genespace/bed/"$haplo1".bed  \
                     -j genespace/bed/"$haplo2".bed  \
                     -t "$genome1TE" \
-                    -u "$genome2TE" 
+                    -u "$genome2TE" 2> Rlogs_plot_circos_TE_noLinks 
                 then
                     echo -e "\nERROR: circos plots failed /!\ \n
                     please check logs and input data\n" 
@@ -912,7 +914,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                     -f  haplo1/03_genome/"$haplo1".fa.fai \
                     -g haplo2/03_genome/"$haplo2".fa.fai \
                     -i genespace/bed/"$haplo1".bed  \
-                    -j genespace/bed/"$haplo2".bed  
+                    -j genespace/bed/"$haplo2".bed 2> Rlogs_plot_circos 
                 then
                     echo -e "\nERROR: circos plots failed /!\ \n
                     please check logs and input data\n" 
@@ -1009,7 +1011,7 @@ do
                 -f haplo1/03_genome/"$haplo1".fa.fai \
                 -g haplo2/03_genome/"$haplo2".fa.fai \
                 -l "$links" \
-                -s "$scafforientation" 
+                -s "$scafforientation" 2> Rlogs_plot_ideogram_colored_"$(basename "$links")".txt 
     else
         Rscript ./00_scripts/Rscripts/04.ideogram.R \
                 -c 02_results/sco \
@@ -1017,7 +1019,7 @@ do
                 -j genespace/bed/"$haplo2".bed \
                 -f haplo1/03_genome/"$haplo1".fa.fai \
                 -g haplo2/03_genome/"$haplo2".fa.fai \
-                -l "$links" 
+                -l "$links" 2> Rlogs_plot_ideogram_colored_"$(basename "$links")".txt 
     fi
 done
 
@@ -1033,7 +1035,7 @@ if [ -n "${ancestral_genome}" ] ; then
                 -f "$ancestral_genome".fai \
                 -g haplo1/03_genome/"$haplo1".fa.fai \
                 -l "$links" \
-                -s "$scafforientation" 
+                -s "$scafforientation"  2> Rlogs_plot_ideogram_colored_"$(basename "$links")"_ancestral.txt
      else
          Rscript ./00_scripts/Rscripts/04.ideogram.R \
                 -c 02_results/sco_anc \
@@ -1041,7 +1043,7 @@ if [ -n "${ancestral_genome}" ] ; then
                 -j genespace/bed/"$haplo1".bed  \
                 -f "$ancestral_genome".fai \
                 -g haplo1/03_genome/"$haplo1".fa.fai \
-                -l "$links" 
+                -l "$links" 2> Rlogs_plot_ideogram_colored_"$(basename "$links")".txt 
      fi
    done
 fi
@@ -1183,7 +1185,7 @@ if [ -n "${ancestral_genome}" ] ; then
                -j genespace/bed/"$haplo1".bed  \
                -t "$genome1TE" \
                -u "$genome2TE" \
-               -l "$links"
+               -l "$links" 2> Rlogs_plot_circos_TE_ancestral_sp_colored_"$(basename "$links")".txt
         else 
             echo -e "\nassuming noTE\n"
             Rscript 00_scripts/Rscripts/05_plot_circos.R -s "$ancestral" -p "$haplo1" \
@@ -1195,7 +1197,7 @@ if [ -n "${ancestral_genome}" ] ; then
                -j genespace/bed/"$haplo1".bed  \
                -t "$genome1TE" \
                -u "$genome2TE" \
-               -l "$links"
+               -l "$links" 2> Rlogs_plot_circos_noTE_colored_"$(basename "$links")".txt
         fi
     done
 else
@@ -1215,7 +1217,7 @@ for links in 02_results/bed/"$haplo1"."$haplo2".*strata.bed ; do
            -j genespace/bed/"$haplo2".bed  \
            -t "$genome1TE" \
            -u "$genome2TE" \
-           -l "$links"
+           -l "$links" 2> Rlogs_plot_circos_TE_colored_"$(basename "$links")".txt
     else 
         echo assuming noTE
         Rscript 00_scripts/Rscripts/05_plot_circos.R \
@@ -1227,7 +1229,7 @@ for links in 02_results/bed/"$haplo1"."$haplo2".*strata.bed ; do
            -g haplo2/03_genome/"$haplo2".fa.fai \
            -i genespace/bed/"$haplo1".bed  \
            -j genespace/bed/"$haplo2".bed  \
-           -l "$links"
+           -l "$links" 2> Rlogs_plot_ciros_noTE_colored_"$(basename "$links")".txt
     fi
 done
 
@@ -1249,7 +1251,7 @@ if [  -n "${ancestral_genome}" ] ; then
                 -d 02_results/dS.values.forchangepoint.txt \
                 -f "$ancestral_genome".fai \
                 -g haplo1/03_genome/"$haplo1".fa.fai \
-                -s "$scafforientation" 
+                -s "$scafforientation" 2> Rlogs_plot_ideogram_colored_by_dsquantile.txt 
         then
              echo -e "\nERROR: ideograms failed /!\ \n
              please check logs and input data\n" 
@@ -1263,7 +1265,7 @@ if [  -n "${ancestral_genome}" ] ; then
                 -d 02_results/dS.values.forchangepoint.txt \
                 -f "$ancestral_genome".fai \
                 -g haplo1/03_genome/"$haplo1".fa.fai \
-                -s "$scafforientation" 
+                -s "$scafforientation" 2> Rlogs_plot_ideogram_colored_by_dsquantile.txt 
         then
              echo -e "\nERROR: ideograms failed /!\ \n
              please check logs and input data\n" 
@@ -1282,7 +1284,7 @@ if [ -n "$scafforientation" ] ; then
         -d 02_results/dS.values.forchangepoint.txt \
         -f haplo1/03_genome/"$haplo1".fa.fai \
         -g haplo2/03_genome/"$haplo2".fa.fai \
-        -s "$scafforientation" 
+        -s "$scafforientation" 2> Rlogs_plot_ideogram_colored_by_dsquantile.txt 
     then
         echo -e "\nERROR: ideograms failed /!\ \n
         please check logs and input data\n" 
@@ -1295,7 +1297,7 @@ else
         -j genespace/bed/"$haplo2".bed  \
         -d 02_results/dS.values.forchangepoint.txt \
         -f haplo1/03_genome/"$haplo1".fa.fai \
-        -g haplo2/03_genome/"$haplo2".fa.fai 
+        -g haplo2/03_genome/"$haplo2".fa.fai 2> Rlogs_plot_ideogram_colored_by_dsquantile.txt
     then
         echo -e "\nERROR: ideograms failed /!\ \n
         please check logs and input data\n" 
@@ -1319,7 +1321,7 @@ if [[ $annotateTE = "YES" ]] ; then
                     -j genespace/bed/"$haplo2".bed  \
                     -t "$genome1TE" \
                     -u "$genome2TE" \
-                    -d 02_results/dS.values.forchangepoint.txt
+                    -d 02_results/dS.values.forchangepoint.txt 2> Rlogs_plot_circos_color_by_dsquantile.txt
                 then
                     echo -e "\nERROR: circos plots failed /!\ \n
                     please check logs and input data\n" 
@@ -1335,7 +1337,7 @@ else #assume no TE:
                     -g haplo2/03_genome/"$haplo2".fa.fai \
                     -i genespace/bed/"$haplo1".bed  \
                     -j genespace/bed/"$haplo2".bed  \
-                    -d 02_results/dS.values.forchangepoint.txt
+                    -d 02_results/dS.values.forchangepoint.txt 2> Rlogs_plot_circos_colored_by_dsquantile.txt
                 then
                     echo -e "\nERROR: circos plots failed /!\ \n
                     please check logs and input data\n" 
