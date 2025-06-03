@@ -412,6 +412,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
     #----------------------------------- step4 -- plot paml results  -----------------------------------------#
     #ds_method="codeml" #choose between codeml (default or yn00) 
     source config/config
+    mkdir Rlogs 2>/dev/null
     if [ -n "${ancestral_genome}" ]; then
         echo "using ancestral genome"
         if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$ds_method" "$haplo1" "$haplo2" "$scaffold" ancestral_sp 2> Rlogs/Rlogs_plot_paml 

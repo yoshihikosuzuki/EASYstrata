@@ -406,9 +406,9 @@ if(!(is.null(opt$ds))){
   
   z <- cbind(rbind(0, data.frame(unname(quantile(syn_ds$Ds[syn_ds$Ds>0], 
                                                  na.rm = T, 
-                                                 prob=c(0.3, 0.6, 0.7, 0.8, 0.9, 0.95 )))) , 
-    data.frame(table((rcols2))))) %>% 
-    set_colnames(.,c("ds","cols","Freq"))
+                                                 prob=c(0.3, 0.6, 0.7, 0.8, 0.9, 0.95 ))))) , 
+    data.frame(unique(rcols2))) %>% 
+    set_colnames(.,c("ds","cols"))
 
   df <- data.frame(x = c(0,rep(2,6)),  y = seq(1,7) )
 

@@ -279,18 +279,18 @@ if ("geneX" %in%  colnames(dsfile)) {
 
     pdf(file = "02_results/ideogram/ds_keychart_ideogram.pdf", 5,5)  
     ggplot(df1, aes(x=x,y=y)) +
-      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = -Inf, ymax = all$y[1],       fill = all$cols[1]) +
-      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[1], ymax = all$y[2],   fill = all$cols[2]) +
-      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[2], ymax = all$y[3],   fill = all$cols[3]) +
-      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[3], ymax = all$y[4],   fill = all$cols[4]) +
-      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[4], ymax = all$y[5],   fill = all$cols[5]) +
-      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[5], ymax = all$y[6],   fill = all$cols[6]) + 
-      geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[6], ymax = all$y[7],   fill = all$cols[7]) + 
+      geom_rect(xmin = -Inf, xmax = df1$x[2],   ymin = -Inf, ymax = df1$y[1],       fill = df1$cols[1]) +
+      geom_rect(xmin = -Inf, xmax = df1$x[2],   ymin = df1$y[1], ymax = df1$y[2],   fill = df1$cols[2]) +
+      geom_rect(xmin = -Inf, xmax = df1$x[2],   ymin = df1$y[2], ymax = df1$y[3],   fill = df1$cols[3]) +
+      geom_rect(xmin = -Inf, xmax = df1$x[2],   ymin = df1$y[3], ymax = df1$y[4],   fill = df1$cols[4]) +
+      geom_rect(xmin = -Inf, xmax = df1$x[2],   ymin = df1$y[4], ymax = df1$y[5],   fill = df1$cols[5]) +
+      geom_rect(xmin = -Inf, xmax = df1$x[2],   ymin = df1$y[5], ymax = df1$y[6],   fill = df1$cols[6]) + 
+      geom_rect(xmin = -Inf, xmax = df1$x[2],   ymin = df1$y[6], ymax = df1$y[7],   fill = df1$cols[7]) + 
       theme_void() +
       annotate("text", x=df1$x[2]+0.12, y = df1$y[1:ncol], label=df1$ds[1:ncol], size = 4) +
       coord_cartesian(xlim = c(0, 2), clip='off') + 
       theme(plot.margin = unit(c(1,3,1,1), "lines")) + 
-      annotate("text", x=df$x[2]+0.05,y=7.1, label = expression(italic(d[S])*" values:"),size = 5)
+      annotate("text", x=df1$x[2]+0.05,y=7.1, label = expression(italic(d[S])*" values:"),size = 5)
     dev.off()
 
     df2 <- data.frame(quantile(dsfile1$Ds[dsfile1$Ds>0],

@@ -430,7 +430,7 @@ if (argv[1]=="-h" || length(argv)==0){
         hyp6[10,] <-  hypothesis(fitcp[[i]],  c("int_5 > int_6"))
 
         write.table(hyp6, paste0(path, "hypothesis6strata.txt"), quote= F)
-        ds6 <- dplot(df, nstrata=6, "six_strata")
+        ds6.1 <- dplot(df, nstrata=6, "six_strata")
         ds6.2 <- dplot2(df, nstrata=6, "six_strata")
 
 
@@ -453,7 +453,7 @@ if (argv[1]=="-h" || length(argv)==0){
        hyp7[12,] <-  hypothesis(fitcp[[i]],  c("int_6 > int_7"))
 
        write.table(hyp7, paste0(path, "hypothesis7strata.txt"), quote= F)
-       ds7 <- dplot(df, nstrata=7, "seven_strata")
+       ds7.1 <- dplot(df, nstrata=7, "seven_strata")
        ds7.2 <- dplot2(df, nstrata=7, "seven_strata")
 
 
@@ -478,7 +478,7 @@ if (argv[1]=="-h" || length(argv)==0){
        hyp8[14,] <-  hypothesis(fitcp[[i]],  c("int_7 > int_8"))
     
      write.table(hyp8, paste0(path, "hypothesis8strata.txt"), quote= F)
-     ds8 <- dplot(df, nstrata=8, "eight_strata")
+     ds8.1 <- dplot(df, nstrata=8, "eight_strata")
      ds8.2 <- dplot2(df, nstrata=8, "eight_strata")
 
      }
