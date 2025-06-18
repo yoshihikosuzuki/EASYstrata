@@ -115,7 +115,7 @@ writeLines("\n~~~~~~ compulsory data loaded ~~~~~~~\n")
 #        \n")
 
 #--------------- check if library are installed -------------------------------#
-packages <- c('RIdeogram','dplyr','magrittr','data.table','magrittr','ggplot2')
+packages <- c('RIdeogram','dplyr','data.table','magrittr','ggplot2')
 install.packages(setdiff(packages, rownames(installed.packages())), repos="https://cloud.r-project.org" )
 
 #---------------- load libraries ---------------------------------------------#

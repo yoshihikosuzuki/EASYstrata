@@ -119,12 +119,12 @@ then
     mkdir -p 02_results/plots
 elif [[ $options = "synteny_and_Ds" ]] ; 
 then
-    rm -rf genespace peptide 02_results/paml #02_results/plots  #2>/dev/null
+    #rm -rf genespace peptide 02_results/paml #02_results/plots  #2>/dev/null
     mkdir -p genespace/bed genespace/peptide 
     mkdir -p  02_results/paml #02_results/plots 
 elif [[ $options = "synteny_only" ]] ; 
 then
-    rm -rf genespace/bed genespace/peptide 02_results/paml 02_results/plots #2>/dev/null
+    #rm -rf genespace/bed genespace/peptide 02_results/paml 02_results/plots #2>/dev/null
     mkdir -p genespace/bed genespace/peptide 
     mkdir 02_results/paml
 elif [[ $options == "changepoint" ]] ;
@@ -323,7 +323,9 @@ fi
 
 
 #optional - to be optimize: 
-if [[ $options = "Ds_only" ]] ; then
+#if [[ $options = "Ds_only" ]] ; then
+if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
+
 
     if [ -n "${ancestral_genome}" ]; then
         #ancestral genome exist
@@ -429,7 +431,11 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
             exit 1
         fi
     fi
-       
+fi
+
+#if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $options = "plots" ]] ; then 
+if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $options = "plots" ]] || [[ $options = "synteny_only" ]] ; then 
+
     # ---------------------------------- step5 -- plot ideogram -----------------------------------------------#
     #this part has been done elsewhere and should be removed:
     pathN0="genespace/orthofinder/Results_*/Phylogenetic_Hierarchical_Orthogroups/N0.tsv"
@@ -610,8 +616,8 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
     samtools faidx haplo1/03_genome/"$haplo1".fa 
     samtools faidx haplo2/03_genome/"$haplo2".fa
     
-    eval "$(conda shell.bash hook)"
-    conda activate superannot
+    #eval "$(conda shell.bash hook)"
+    #conda activate superannot
     #conda deactivate 
     
     echo -e "~~~~~~~~~~~~~\ncreating ideogram plots\n~~~~~~~~~~~~"
@@ -934,12 +940,10 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
         PLEASE CHECK PACKAGES AND INTPUT DATA------------------${NC}\n"
         exit 1
     fi
-    #
-    ##---------------------------------- step7 -- run minimap between the genomes -----------------------------#
-    #run minimap on the genome 
-    #assumption : each genome MUST BE located in folder 03-genome
-    
+fi
     #------------------------ step 8 -- model comparison -------------------------------------------------#
+if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] ; then 
+
     echo -e "\n\n~~~~~~~~~~~\n\trunning changepoint\n~~~~~~~~~~~~~~~\n"
     if [[ -d 02_results/modelcomp ]]
     then
@@ -997,6 +1001,9 @@ then
     fi
 
 fi 
+
+
+if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $options = "plots" ]] ; then
 
 echo -e "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo -e "~ \tcreating ideogram colored by strata\t ~"
@@ -1346,6 +1353,6 @@ else #assume no TE:
                     exit 1
                 fi
 fi
-
+fi 
 echo "all analyses finished"
 

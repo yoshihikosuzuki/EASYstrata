@@ -55,3 +55,6 @@ bamlist2="" #full path to a list of bam on genome2
 
 #ds method (choose between "yn00" or "codeml", default: codeml)
 ds_method="codeml"
+
+aln_method="macse" #default: macse - choose among "macee" or "muscle" 
+

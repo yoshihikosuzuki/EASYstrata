@@ -125,7 +125,14 @@ invisible(lapply(packages, suppressMessages(suppressWarnings(suppressPackageStar
 # import synteny data
 writeLines("\n~~~~~~ loading data ~~~~~~~\n")
 if(!is.null(opt$synteny_file)) {
-    syn <- read.table(opt$synteny_file, header=T, as.is=T, sep='\t')
+    syn <- read.table(opt$synteny_file, header=T, as.is=T, sep='\t') %>%
+        group_by(chrom1) %>%
+        filter(n()>4) %>%
+        #ungroup %>%
+        group_by(chrom2) %>% 
+        filter(n()>4) %>% ungroup()
+
+    print(head(syn))
 } else {
     stop("synteny table is a compulsory parameter.\nto see script usage:
          \t./00_scripts/Rscripts/05_plot_circos.R --help")
@@ -178,6 +185,10 @@ invisible(lapply(packages, suppressMessages(suppressWarnings(suppressPackageStar
 #------------- Prepare data sets ----------------------------------------------#
 
 # Get list of focus scaffolds for each haplotype
+chromosomes <- chromosomes %>% 
+    filter(chr %in% unique(syn$chrom1) | chr %in% unique(syn$chrom2))
+
+
 chr_ref <- chromosomes[which(chromosomes$species == reference),]
 chr_hap <- chromosomes[which(chromosomes$species == haplo),]
 chromosomes <- chromosomes[(chromosomes$species==reference) | (chromosomes$species==haplo),]

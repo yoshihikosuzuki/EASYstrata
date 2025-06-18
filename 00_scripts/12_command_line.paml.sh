@@ -5,6 +5,7 @@
 #purpose: compute dS, dN, and their SE based on paml using yn00 model
 #it will perform some checks and if all is ok will run muscle from TranslatorX first
 
+source config/config
 #run: ./12.command_line.paml.sh -h1 haplo1.cds.fa \
     #-h2 haplo2.cds.fa \
     #-s scaffold.txt \
@@ -245,24 +246,29 @@ do
     
     grep -w -A1 "${line[0]}"  "$newf1" > sequence_files/tmp."${line[0]}".vs."${line[1]}"/sequence.fasta
     grep -w -A1 "${line[1]}"  "$newf2" >> sequence_files/tmp."${line[0]}".vs."${line[1]}"/sequence.fasta
-    
-    #run muscle from within translatorX, so we also have gblocks output and the html files:
-    #translatorx_vLocal.pl -i sequence_files/tmp."${line[0]}".vs."${line[1]}"/sequence.fasta \
-    #    -o sequence_files/tmp."${line[0]}".vs."${line[1]}"/results 2>&1 |tee log.translator
-    
-    cmd=$(command -v macse_v2.07.jar )
-    java -jar $cmd -prog alignSequences -seq sequence_files/tmp."${line[0]}".vs."${line[1]}"/sequence.fasta
-    
+   
+
     cp ../../config/yn00_template.ctl sequence_files/tmp."${line[0]}".vs."${line[1]}"/
     cp ../../config/codeml.ctl sequence_files/tmp."${line[0]}".vs."${line[1]}"/
+
+    if [[ "$aln_method" = "muscle" ]] 
+    then 
+    
+        #run muscle from within translatorX, so we also have gblocks output and the html files:
+        translatorx_vLocal.pl -i sequence_files/tmp."${line[0]}".vs."${line[1]}"/sequence.fasta \
+            -o sequence_files/tmp."${line[0]}".vs."${line[1]}"/results 2>&1 |tee log.translator
+   
+        sed -i 's/sequence_NT.fasta/results.nt_ali.fasta/g' sequence_files/tmp."${line[0]}".vs."${line[1]}"/yn00_template.ctl
+        sed -i 's/sequence_NT.fasta/results.nt_ali.fasta/g' sequence_files/tmp."${line[0]}".vs."${line[1]}"/codeml.ctl
+
+    else 
+        cmd=$(command -v macse_v2.07.jar )
+        java -jar $cmd -prog alignSequences -seq sequence_files/tmp."${line[0]}".vs."${line[1]}"/sequence.fasta
+        sed -i 's/!/-/g' sequence_files/tmp."${line[0]}".vs."${line[1]}"/sequence_NT.fasta 
+   
+    fi
     
     cd sequence_files/tmp."${line[0]}".vs."${line[1]}"/ || exit 1
-    
-    #configure paml:
-    #path=$(pwd)
-    #echo "$path"
-    #sed -i "s|PATH|$path|g" yn00_template.ctl #"
-    sed -i 's/!/-/g' sequence_NT.fasta
     
     #run paml :
     yn00 yn00_template.ctl
