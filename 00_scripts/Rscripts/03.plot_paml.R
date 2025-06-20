@@ -67,7 +67,7 @@ if (argv[1]=="-h" || length(argv)==0){
     # yn00 results:
     ds_method <- argv[1] #default if unset : codeml
     if(!exists("ds_method")){ds_method="codeml"}
-    if(ds_method=='yn') {
+    if(ds_method=='yn00') {
         print(paste0("ds_method is", ds_method))
         dat <- read.table("02_results/paml/results_YN.txt") %>% 
     	   set_colnames(., c("Ds","SEDs","Dn","SEDn", "geneX", "geneY"))
@@ -81,7 +81,7 @@ if (argv[1]=="-h" || length(argv)==0){
     if (length(argv)<1) {
     	  stop("At least the name of 2 species to compare and a txt file containing the name and order of scaffold must be supplied.n", call.=FALSE)
     } else if (length(argv)==4) {
-    	writeLines("assuming no ancestral species was used\n")
+    	writeLines("\n\nassuming no ancestral species was used\n")
     	sp1 <- argv[2]     # only the basename is needed !
     	sp2 <- argv[3]     # only the basename is needed !
     	chr <- argv[4]     # table with chr\tstatus [Reversed or Not]
@@ -93,18 +93,20 @@ if (argv[1]=="-h" || length(argv)==0){
     		     set_colnames(., c("ortho","geneX","geneY" ))
     
     } else {
-    	writeLines("assuming an ancestral species exist\n")
+    	writeLines("\n\nassuming an ancestral species exist\n")
     	sp1 <- argv[2]     #only the basename is needed !
     	sp2 <- argv[3]     #only the basename is needed !
     	chr <- argv[4]     # table with chr\tstatus [Reversed or Not]
     	#optional 
     	sp3 <- argv[5]     #the basename of the ancestral species !
-    	
-    	writeLines("load scaffold info\n")
+        writeLines(paste0("\nhaplotype1 is :", sp1, \n))	
+        writeLines(paste0("\nhaplotype2 is :", sp2, \n ))	
+
+    	writeLines("\nload scaffold info\n")
     	scaf <- read.table(chr, sep ="\t") %>% set_colnames(., c("haplo","chr","order"))
     
     	#orthofinder single copy orthologs:
-    	writeLines("load single copy info\n")
+    	writeLines("\nload single copy info\n")
     	single_cp <- read.table("02_results/paml/single.copy.orthologs", sep = "\t") %>% 
     		     set_colnames(., c("ortho","gene","geneX","geneY" ))
     
@@ -114,7 +116,7 @@ if (argv[1]=="-h" || length(argv)==0){
     	#we will create a vector of color according to the number of status
     	
     	## read Ancestral species :
-    	writeLines("load ancestral species info\n")
+    	writeLines("\nload ancestral species info\n")
     	bedAnc <- read.table(paste0("genespace/bed/",sp3, ".bed", sep = "" )) %>% 
     		set_colnames(., c("scaff","start","end","gene"))
     
@@ -160,16 +162,16 @@ if (argv[1]=="-h" || length(argv)==0){
     writeLines(paste0('size of data frame is :' , nrow(all)))
         
     #Ds values above 0.3 will be considered as pseudo-genes for the changepoint analyses. 
-    allgood <- all %>% filter((Ds < 0.20) %>% replace_na(TRUE))
+    allgood <- all %>% filter(Ds < 0.20) #%>% replace_na(TRUE)
     
     #export the df for model comparison on the cluster:
     #write.table(df, "02_results/dS.values.forchangepoint.txt", quote =F, row.names = F, col.names = T, sep = "\t")
     write.table(allgood, "02_results/dS.values.forchangepoint.txt", quote =F, row.names = F, col.names = T, sep = "\t")
     #write.table(all, "02_results/dS.values.metadata.txt", quote =F, row.names = F, col.names = T, sep = "\t")
-    allgood2 <- na.omit(allgood) %>% mutate(orderchp = seq(1:nrow(.)))
+    #allgood2 <- na.omit(allgood) %>% mutate(orderchp = seq(1:nrow(.)))
     
-    write.table(allgood2, "02_results/dS.values.forchangepoint_noNA.txt",
-                quote =F, row.names = F, col.names = T, sep = "\t")
+    #write.table(allgood2, "02_results/dS.values.forchangepoint_noNA.txt",
+    #            quote =F, row.names = F, col.names = T, sep = "\t")
     
     ########################## make plot now using ALL GENES #######################################
     

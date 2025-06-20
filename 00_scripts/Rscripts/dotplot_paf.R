@@ -49,6 +49,6 @@ pdf(file=paste0("02_results/genomeplots/dotplot_long_ali",base,".pdf"))
 dotplot(long_ali)
 dev.off()
 
-pdf(file=paste0("02_results/genomeplots/dotplot_prim_ali_bw", base, ".pdf"))
+pdf(file=paste0("02_results/genomeplots/dotplot_prim_ali_theme_bw_", base, ".pdf"))
 dotplot(prim_alignment, label_seqs=TRUE, order_by="qstart") + theme_bw()
 dev.off()
