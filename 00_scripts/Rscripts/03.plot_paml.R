@@ -86,6 +86,9 @@ if (argv[1]=="-h" || length(argv)==0){
     	sp2 <- argv[3]     # only the basename is needed !
     	chr <- argv[4]     # table with chr\tstatus [Reversed or Not]
     
+        writeLines(paste0("\nhaplotype1 is :", sp1, "\n" ))	
+        writeLines(paste0("\nhaplotype2 is :", sp2, "\n" ))	
+
     	scaf <- read.table(chr, sep="\t") %>% set_colnames(., c("haplo","chr","order"))
     
     	#orthofinder single copy orthologs:
@@ -99,8 +102,9 @@ if (argv[1]=="-h" || length(argv)==0){
     	chr <- argv[4]     # table with chr\tstatus [Reversed or Not]
     	#optional 
     	sp3 <- argv[5]     #the basename of the ancestral species !
-        writeLines(paste0("\nhaplotype1 is :", sp1, \n))	
-        writeLines(paste0("\nhaplotype2 is :", sp2, \n ))	
+        writeLines(paste0("\nhaplotype1 is :", sp1, "\n" ))	
+        writeLines(paste0("\nhaplotype2 is :", sp2, "\n" ))	
+        writeLines(paste0("\nancestral species is :", sp3, "\n" ))	
 
     	writeLines("\nload scaffold info\n")
     	scaf <- read.table(chr, sep ="\t") %>% set_colnames(., c("haplo","chr","order"))

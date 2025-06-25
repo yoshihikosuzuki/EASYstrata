@@ -278,7 +278,7 @@ if ("geneX" %in%  colnames(dsfile)) {
 
 
     pdf(file = "02_results/ideogram/ds_keychart_ideogram.pdf", 5,5)  
-    ggplot(df1, aes(x=x,y=y)) +
+    print(ggplot(df1, aes(x=x,y=y)) +
       geom_rect(xmin = -Inf, xmax = df1$x[2],   ymin = -Inf, ymax = df1$y[1],       fill = df1$cols[1]) +
       geom_rect(xmin = -Inf, xmax = df1$x[2],   ymin = df1$y[1], ymax = df1$y[2],   fill = df1$cols[2]) +
       geom_rect(xmin = -Inf, xmax = df1$x[2],   ymin = df1$y[2], ymax = df1$y[3],   fill = df1$cols[3]) +
@@ -291,6 +291,7 @@ if ("geneX" %in%  colnames(dsfile)) {
       coord_cartesian(xlim = c(0, 2), clip='off') + 
       theme(plot.margin = unit(c(1,3,1,1), "lines")) + 
       annotate("text", x=df1$x[2]+0.05,y=7.1, label = expression(italic(d[S])*" values:"),size = 5)
+   )
     dev.off()
 
     df2 <- data.frame(quantile(dsfile1$Ds[dsfile1$Ds>0],

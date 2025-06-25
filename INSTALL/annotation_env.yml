@@ -21,6 +21,7 @@ dependencies:
   - samtools=1.21
   - minimap2=2.28
   - emboss=6.6.0
+  - orthofinder=2.5.5
   - perl-app-cpanminus
   - perl-hash-merge
   - perl-parallel-forkmanager

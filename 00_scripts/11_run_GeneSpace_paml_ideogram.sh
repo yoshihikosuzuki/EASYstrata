@@ -597,6 +597,14 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
     awk '{print $1"\t"$5"\t"$9}' 02_results/synteny_ancestral_sp_"$haplo1".txt |sed 1d > 02_results/sco_anc
     awk '{print $1"\t"$5"\t"$9}' 02_results/synteny_"$haplo1"_"$haplo2".txt |sed 1d > 02_results/sco
 
+         #MODIFICATION A FAIRE ICI TO ADD ANY FUSED AUTOSOMES
+   #  grep "MpingA2_tig00000027\|MpingA2_tig00000001" genespace/orthofinder/Results_Dec12/Phylogenetic_Hierarchical_Orthogroups/N0.tsv |awk 'NF==6 || NF==5' > all_orthologs_Mping 
+    
+    #ensuite on créer un fichier de syenteny additionnel et on concatène avec le fichier précédent.
+    #join -1 4 -2 4 <(sort -k 4,4 all_orthologs_Mping) <(sort -k4,4 genespace/bed/MpingA1.bed ) |join -1 5 -2 4 <(sort -k 5,5 -) <(sort -k 4,4 genespace/bed/MpingA2.bed ) |awk '{print $3"\t"$4"\t"$5"\t"$7"\t"$2"\t"$8"\t"$9"\t"$10"\t"$1"\t"$11"\t"$12}'
+    #then these must be added to the "scaffold.txt" file > synteny must be redone !!
+
+
     else
            sed 1d 02_results/synteny_"$haplo1"_"$haplo2".txt \
              |awk -v var1="$haplo1" -v var2="$haplo2"  '{print var1"\t"$4"\n"var2"\t"$8}' \
@@ -971,8 +979,8 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] ; then
 elif [[ $options = "changepoint" ]]
 then
 
-    #eval "$(conda shell.bash hook)"
-    #conda activate superannot
+    eval "$(conda shell.bash hook)"
+    conda activate superannot
 
     #eventually check its existence - ask user if he wants to remove it
     mkdir 02_results/modelcomp/ 2>/dev/null

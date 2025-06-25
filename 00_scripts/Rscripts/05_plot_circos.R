@@ -426,7 +426,7 @@ if(!(is.null(opt$ds))){
   all <- cbind(df,z)
 
   pdf(file = "02_results/circos/ds_keychart_circos.pdf", 5,5)  
-  ggplot(df, aes(x=x,y=y)) +
+  print(ggplot(df, aes(x=x,y=y)) +
       geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = -Inf, ymax = all$y[1],       fill = all$cols[1]) +
       geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[1], ymax = all$y[2],   fill = all$cols[2]) +
       geom_rect(xmin = -Inf, xmax = all$x[2],   ymin = all$y[2], ymax = all$y[3],   fill = all$cols[3]) +
@@ -437,6 +437,7 @@ if(!(is.null(opt$ds))){
       coord_cartesian(xlim = c(0, 2), clip='off') + 
       theme(plot.margin = unit(c(1,3,1,1), "lines")) + 
       annotate("text", x=all$x[2]+0.05,y=6.3, label = expression(italic(d[S])*" values:"), size = 5)
+  )
   dev.off()
 
     df2 <- data.frame(quantile(syn_ds$Ds[syn_ds$Ds>0],

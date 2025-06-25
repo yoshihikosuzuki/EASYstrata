@@ -385,7 +385,7 @@ then
    #direct install: 
    wget https://github.com/abacus-gene/paml/releases/download/v4.10.9/paml-4.10.9-linux-x86_64.tar.gz
    tar zxf paml-4.10.9-linux-x86_64.tar.gz
-   cd paml-4.10.9/bin
+   cd paml-4.10.9-linux-x86_64/bin
    path=$(pwd)
    echo -e "\n#Path to $command\n export PATH=\$PATH:$path" >> ~/.bashrc 
    source ~/.bashrc  

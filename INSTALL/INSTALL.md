@@ -8,8 +8,9 @@ If you want to avoid potential conflicting versions or do not have root access o
 I recommend **mamba** for linux:
 
 ```
-curl -L -O https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge-pypy3-Linux-x86_64.sh
-bash Miniforge-pypy3-Linux-x86_64.sh
+example
+curl -L -O curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+bash Miniforge3-$(uname)-$(uname -m).sh
 #note: see here for other verions of mamba: https://github.com/conda-forge/miniforge
 ```
 

@@ -2361,9 +2361,9 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
             echo file is gff ;
             echo converting into gtf
             gffread "$gtf1" -T -o tmp
-            gtf1=${gtf1%.gff}.gtf
+            gtf1=${gtf1%.gff*}.gtf
             mv tmp "$gtf1"
-            sed -i -E '/gtf1/ s/.gff/.gtf/' config/config
+            sed -i -E '/gtf1/ s/.gff*/.gtf/' config/config
         else
             echo " "
         fi
@@ -2372,7 +2372,7 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
         if file --mime-type "$gtf2" | grep -q gzip$; then
            echo "$gtf2 is gzipped"
            gunzip "$gtf2"
-           gtf2=${gtf1%.gz}
+           gtf2=${gtf2%.gz}
            sed -i -E '/^gtf2/ s/.gz//g' config/config
         else
            echo "$gtf2 is not gzipped"
@@ -2383,9 +2383,9 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
             echo file is gff ;
             echo converting into gtf
             gffread "$gtf2" -T -o tmp
-            gtf2=${gtf2%.gff}.gtf
+            gtf2=${gtf2%.gff*}.gtf
             mv tmp "$gtf2"
-            sed -i -E '/gtf2/ s/.gff/.gtf/' config/config
+            sed -i -E '/gtf2/ s/.gff*/.gtf/' config/config
         else
             echo " "
         fi
