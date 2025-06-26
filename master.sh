@@ -2363,7 +2363,7 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
             gffread "$gtf1" -T -o tmp
             gtf1=${gtf1%.gff*}.gtf
             mv tmp "$gtf1"
-            sed -i -E '/gtf1/ s/.gff*/.gtf/' config/config
+            sed -i -E '/gtf1/ s/.gff./.gtf/' config/config
         else
             echo " "
         fi
@@ -2385,7 +2385,7 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
             gffread "$gtf2" -T -o tmp
             gtf2=${gtf2%.gff*}.gtf
             mv tmp "$gtf2"
-            sed -i -E '/gtf2/ s/.gff*/.gtf/' config/config
+            sed -i -E '/gtf2/ s/.gff./.gtf/' config/config
         else
             echo " "
         fi
@@ -2448,9 +2448,9 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
             echo file is gff ;
             echo converting into gtf
             gffread "$gtf1" -T -o tmp
-            gtf1=${gtf1%.gff}.gtf
+            gtf1=${gtf1%.gff*}.gtf
             mv tmp "$gtf1"
-            sed -i -E '/gtf1/ s/.gff/.gtf/' config/config
+            sed -i -E '/gtf1/ s/.gff./.gtf/' config/config
         else
             echo " "
         fi

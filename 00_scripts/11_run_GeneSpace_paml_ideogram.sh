@@ -235,13 +235,16 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
     echo -e "\n-------------------- running minimap  ------------------------\n\n" 
     
     mkdir 02_results/minimap_alns/ 2>/dev/null 
-    minimap2 -cx asm5 \
-        haplo1/03_genome/"$haplo1".fa \
-        haplo2/03_genome/"$haplo2".fa \
-        > 02_results/minimap_alns/aln."$haplo1"_"$haplo2".paf || \
-        { echo -e "${RED} ERROR! minimap2 failed - check your data\n${NC} " ; exit 1 ; }
+    if [ -s 02_results/minimap_alns/aln."$haplo1"_"$haplo2".paf ] ;
+    then
+        #create paf file:
+        minimap2 -cx asm5 \
+            haplo1/03_genome/"$haplo1".fa \
+            haplo2/03_genome/"$haplo2".fa \
+            > 02_results/minimap_alns/aln."$haplo1"_"$haplo2".paf || \
+            { echo -e "${RED} ERROR! minimap2 failed - check your data\n${NC} " ; exit 1 ; }
 
-    
+    fi 
     #/!\ to do: replace by the simple NO.file!
     if [ -n "${ancestral_genome}" ]; then
         #ancestral genome exist
@@ -254,21 +257,24 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
 
     if [ -n "${ancestral_genome}" ] ; then
         echo -e "\n------- an ancestral genome was provided ------ "
-        echo -e "running minimap for genome broad synteny plots  -------\n" 
-    
-        minimap2 -cx asm5 \
-            ancestral_sp/ancestral_sp.fa \
-            haplo2/03_genome/"$haplo2".fa \
-            > 02_results/minimap_alns/aln.ancestral_sp_"$haplo2".paf || \
-        { echo -e "${RED} ERROR! minimap2 faield - check your data\n${NC} " ; exit 1 ; }
- 
-        minimap2 -cx asm5 \
-            ancestral_sp/ancestral_sp.fa \
-            haplo1/03_genome/"$haplo1".fa \
-            > 02_results/minimap_alns/aln.ancestral_sp_"$haplo1".paf  || \
-        { echo -e "${RED} ERROR! minimap2 faield - check your data\n${NC} " ; exit 1 ; }
-
-    
+        if [ -s 02_results/minimap_alns/aln.ancestral_sp_"$haplo2".paf ];
+        then
+            echo -e "running minimap for genome broad synteny plots  -------\n" 
+            minimap2 -cx asm5 \
+                ancestral_sp/ancestral_sp.fa \
+                haplo2/03_genome/"$haplo2".fa \
+                > 02_results/minimap_alns/aln.ancestral_sp_"$haplo2".paf || \
+            { echo -e "${RED} ERROR! minimap2 faield - check your data\n${NC} " ; exit 1 ; }
+        fi
+        if [ -s 02_results/minimap_alns/aln.ancestral_sp_"$haplo1".paf ];
+        then
+            echo -e "running minimap for genome broad synteny plots  -------\n" 
+            minimap2 -cx asm5 \
+                ancestral_sp/ancestral_sp.fa \
+                haplo1/03_genome/"$haplo1".fa \
+                > 02_results/minimap_alns/aln.ancestral_sp_"$haplo1".paf  || \
+            { echo -e "${RED} ERROR! minimap2 faield - check your data\n${NC} " ; exit 1 ; }
+        fi 
     
         #preparing scaffold to highlight in dotplot:
         awk '{gsub("_","\t",$0) ; print $2"_"$3"\t"$5"_"$6}' 02_results/paml/single.copy.orthologs|\
