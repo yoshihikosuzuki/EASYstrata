@@ -58,3 +58,9 @@ ds_method="codeml"
 
 aln_method="macse" #default: macse - choose among "macee" or "muscle" 
 
+#max_ds threshold for changepoint :
+max_ds=0.5 #dS values above this threshold will be removed for the changepoint analysis (putative pseudogene, too divergent values)  
+
+
+#to add:
+#single copy orthologs files [when orthology infered from multiple species]

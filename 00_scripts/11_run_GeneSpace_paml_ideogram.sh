@@ -417,14 +417,14 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
     mkdir Rlogs 2>/dev/null
     if [ -n "${ancestral_genome}" ]; then
         echo "using ancestral genome"
-        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$ds_method" "$haplo1" "$haplo2" "$scaffold" ancestral_sp 2> Rlogs/Rlogs_plot_paml 
+        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$ds_method" "$max_ds" "$haplo1" "$haplo2" "$scaffold" ancestral_sp 2> Rlogs/Rlogs_plot_paml 
         then
             echo -e "\nERROR plotting paml results failed\n"
             echo -e "\nplease check input files and logs!!\n\n"
             exit 1
         fi
     else
-        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$ds_method" "$haplo1" "$haplo2" "$scaffold" 2> Rlogs/Rlogs_plot_paml 
+        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$ds_method" "$max_ds" "$haplo1" "$haplo2" "$scaffold" 2> Rlogs/Rlogs_plot_paml 
         then
             echo -e "\nERROR plotting paml results failed\n"
             echo -e "\nplease check input files and logs!!\n\n"
@@ -624,8 +624,8 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
     samtools faidx haplo1/03_genome/"$haplo1".fa 
     samtools faidx haplo2/03_genome/"$haplo2".fa
     
-    #eval "$(conda shell.bash hook)"
-    #conda activate superannot
+    eval "$(conda shell.bash hook)"
+    conda activate superannot
     #conda deactivate 
     
     echo -e "~~~~~~~~~~~~~\ncreating ideogram plots\n~~~~~~~~~~~~"
@@ -983,7 +983,6 @@ then
     conda activate superannot
 
     #eventually check its existence - ask user if he wants to remove it
-    mkdir 02_results/modelcomp/ 2>/dev/null
     if [[ -d 02_results/modelcomp ]]
     then
         echo -e "WARNING directory modelcomp already exists! check its content first
@@ -998,6 +997,7 @@ then
             esac
         done
     else
+       mkdir 02_results/modelcomp/ 2>/dev/null
        if [ -n "${ancestral_genome}" ] ; then
           Rscript 00_scripts/Rscripts/06.MCP_model_comp.R YES || \
           { echo -e "${RED} ERROR! changepoint failed - check your data\n${NC} " ; exit 1 ; }

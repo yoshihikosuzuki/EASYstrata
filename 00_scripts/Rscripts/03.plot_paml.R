@@ -78,7 +78,16 @@ if (argv[1]=="-h" || length(argv)==0){
            set_colnames(., c("Ds","Dn","dNdS", "geneX", "geneY"))
     }
 
-    if (length(argv)<1) {
+    #set a maximum ds value for trimming data for the changepoint analysis
+    #genes with dS values above this threshold are considered pseudogenes
+    if(!exists("max_ds")){
+        max_ds=0.5
+    } else {
+       max_ds <- argv[2] #default if unset : 0.5
+    }
+
+
+    if (length(argv)<4) {
     	  stop("At least the name of 2 species to compare and a txt file containing the name and order of scaffold must be supplied.n", call.=FALSE)
     } else if (length(argv)==4) {
     	writeLines("\n\nassuming no ancestral species was used\n")
@@ -165,8 +174,8 @@ if (argv[1]=="-h" || length(argv)==0){
     }
     writeLines(paste0('size of data frame is :' , nrow(all)))
         
-    #Ds values above 0.3 will be considered as pseudo-genes for the changepoint analyses. 
-    allgood <- all %>% filter(Ds < 0.20) #%>% replace_na(TRUE)
+    #Ds values above max_ds (default =0.5) will be considered as pseudo-genes for the changepoint analyses. 
+    allgood <- all %>% filter(Ds < max_ds) #%>% replace_na(TRUE)
     
     #export the df for model comparison on the cluster:
     #write.table(df, "02_results/dS.values.forchangepoint.txt", quote =F, row.names = F, col.names = T, sep = "\t")
