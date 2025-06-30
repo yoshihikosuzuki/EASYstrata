@@ -368,7 +368,17 @@ if (argv[1]=="-h" || length(argv)==0){
     writeLines("\nn~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     
     
-    for (i in 3:maxchgp){
+    for (i in 2:maxchgp){
+     if (i == 2){
+      hyp2 <- data.frame(matrix(ncol = 6, nrow = 2)) %>%
+        set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
+      hyp2[1,] <-  hypothesis(fitcp[[i]],  c("int_1 < int_2"))
+      hyp2[2,] <-  hypothesis(fitcp[[i]],  c("int_2 < int_1"))
+      
+      write.table(hyp2, paste0(path, "hypothesis2strata"), quote= F)
+      ds2.1 <- dplot(df, nstrata=2, "two_strata")
+      ds2.2 <- dplot2(df, nstrata=2, "two_strata")
+
       if (i == 3){
       hyp3 <- data.frame(matrix(ncol = 6, nrow = 4)) %>%
         set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
@@ -495,26 +505,28 @@ if (argv[1]=="-h" || length(argv)==0){
     if (i == 8) {
     
     pdf(file=paste0(path,"plot_dS_all_position.pdf"),8,12)
-    print(plot_grid(ds3.1, ds4.1, ds5.1, ds6.1, ds7.1, ds8.1, 
-              labels = c("A - three changepoint",
-                         "B - four changepoint" ,
-                         "C - five changepoint" ,
-                         "D - six changepoint"  ,
-                         "E - seven changepoint" ,
-                         "F - eight changepoint") , 
+    print(plot_grid(ds2.1, ds3.1, ds4.1, ds5.1, ds6.1, ds7.1, ds8.1, 
+              labels = c("A - two changepoint", 
+                         "B - three changepoint",
+                         "C - four changepoint" ,
+                         "D - five changepoint" ,
+                         "E - six changepoint"  ,
+                         "F - seven changepoint" ,
+                         "G - eight changepoint") , 
              label_size = 7,
              hjust = -0.5, vjust = -0.5,
              ncol = 1))
     dev.off()
     
     pdf(file=paste0(path,"plot_Ds_along_order.pdf"),8,12)
-    print(plot_grid(ds3.2, ds4.2, ds5.2, ds6.2, ds7.2, ds8.2, 
-              labels = c("A - three changepoint",
-                         "B - four changepoint" ,
-                         "C - five changepoint" ,
-                         "D - six changepoint"  ,
-                         "E - seven changepoint" ,
-                         "F - eight changepoint") , 
+    print(plot_grid(ds2.1, ds3.2, ds4.2, ds5.2, ds6.2, ds7.2, ds8.2, 
+              labels = c("A - two changepoint", 
+                         "B - three changepoint",
+                         "C - four changepoint" ,
+                         "D - five changepoint" ,
+                         "E - six changepoint"  ,
+                         "F - seven changepoint" ,
+                         "G - eight changepoint") , 
              label_size = 7,
              hjust = -0.5, vjust = -0.5,
              ncol = 1))
@@ -524,6 +536,7 @@ if (argv[1]=="-h" || length(argv)==0){
 
     #finally: 
     if(is_anc=="YES"){ 
+    s2.anc.h1 <- select(df, gene, geneX, two_strata)
     s3.anc.h1 <- select(df, gene, geneX, three_strata)
     s4.anc.h1 <- select(df, gene, geneX, four_strata)
     s5.anc.h1 <- select(df, gene, geneX, five_strata)
@@ -532,6 +545,7 @@ if (argv[1]=="-h" || length(argv)==0){
     s7.anc.h1 <- select(df, gene, geneX, seven_strata)
     s8.anc.h1 <- select(df, gene, geneX, eight_strata)
     
+    s2.h1.h2 <- select(df, geneX, geneY.x, two_strata)
     s3.h1.h2 <- select(df, geneX, geneY.x, three_strata)
     s4.h1.h2 <- select(df, geneX, geneY.x, four_strata)
     s5.h1.h2 <- select(df, geneX, geneY.x, five_strata)
@@ -539,7 +553,8 @@ if (argv[1]=="-h" || length(argv)==0){
     s6.h1.h2 <- select(df, geneX, geneY.x, six_strata)
     s7.h1.h2 <- select(df, geneX, geneY.x, seven_strata)
     s8.h1.h2 <- select(df, geneX, geneY.x, eight_strata)
-    
+   write.table(s2.anc.h1,paste0(path,"classif.s2.ancestral.haplo1"),
+        quote=F,row.names=F,col.names=F,sep="\t")
     write.table(s3.anc.h1,paste0(path,"classif.s3.ancestral.haplo1"),
         quote=F,row.names=F,col.names=F,sep="\t")
     write.table(s4.anc.h1,paste0(path,"classif.s4.ancestral.haplo1"),
@@ -555,6 +570,7 @@ if (argv[1]=="-h" || length(argv)==0){
     
     }else{
             #geneY.x ortho   geneY.y
+    s2.h1.h2 <- select(df, gene, geneY.y, two_strata)
     s3.h1.h2 <- select(df, gene, geneY.y, three_strata)
     s4.h1.h2 <- select(df, gene, geneY.y, four_strata)
     s5.h1.h2 <- select(df, gene, geneY.y, five_strata)
@@ -565,6 +581,8 @@ if (argv[1]=="-h" || length(argv)==0){
     
     }
     
+    write.table(s2.h1.h2,paste0(path,"classif.s2.haplo1.haplo2"),
+        quote=F,row.names=F,col.names=F,sep="\t")
     write.table(s3.h1.h2,paste0(path,"classif.s3.haplo1.haplo2"),
         quote=F,row.names=F,col.names=F,sep="\t")
     write.table(s4.h1.h2,paste0(path,"classif.s4.haplo1.haplo2"),
@@ -588,7 +606,7 @@ if (argv[1]=="-h" || length(argv)==0){
     writeLines("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     writeLines("\n\n comparing models with gstatsplot\n\n")
     writeLines("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
-    
+    vp2s <- ggbetweenstats(df, two_strata, Ds)  + ylab(expression(italic(d[s]))) + th_plot3
     vp3s <- ggbetweenstats(df, three_strata, Ds)  + ylab(expression(italic(d[s]))) + th_plot3
     vp4s <- ggbetweenstats(df, four_strata, Ds)   + ylab(expression(italic(d[s]))) + th_plot3
     vp5s <- ggbetweenstats(df, five_strata, Ds)   + ylab(expression(italic(d[s]))) + th_plot3
@@ -603,6 +621,7 @@ if (argv[1]=="-h" || length(argv)==0){
     
     pdf(file = paste0(path, "viobox_ds_strata_distribution_priors.pdf"), 10,28)
     print(plot_grid(
+        vp2s,
         vp3s, 
         vp4s,
         vp5s,
@@ -644,6 +663,6 @@ if (argv[1]=="-h" || length(argv)==0){
 
     writeLines("\n exporting Rsession !! \n\n")
 
-save.image( file = "02_results/noprior/modelcomp/changepoint_analysis.RData")
+save.image( file = "02_results/modelcomp/noprior/changepoint_analysis.RData")
 
 }
