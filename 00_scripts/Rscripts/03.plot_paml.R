@@ -87,13 +87,13 @@ if (argv[1]=="-h" || length(argv)==0){
     }
 
 
-    if (length(argv)<4) {
-    	  stop("At least the name of 2 species to compare and a txt file containing the name and order of scaffold must be supplied.n", call.=FALSE)
+    if (length(argv)<5) {
+    	  stop("At least the name of 2 species to compare, a txt file containing the name and order of scaffold must be supplied.n", call.=FALSE)
     } else if (length(argv)==4) {
     	writeLines("\n\nassuming no ancestral species was used\n")
-    	sp1 <- argv[2]     # only the basename is needed !
-    	sp2 <- argv[3]     # only the basename is needed !
-    	chr <- argv[4]     # table with chr\tstatus [Reversed or Not]
+    	sp1 <- argv[3]     # only the basename is needed !
+    	sp2 <- argv[4]     # only the basename is needed !
+    	chr <- argv[5]     # table with chr\tstatus [Reversed or Not]
     
         writeLines(paste0("\nhaplotype1 is :", sp1, "\n" ))	
         writeLines(paste0("\nhaplotype2 is :", sp2, "\n" ))	
@@ -106,11 +106,11 @@ if (argv[1]=="-h" || length(argv)==0){
     
     } else {
     	writeLines("\n\nassuming an ancestral species exist\n")
-    	sp1 <- argv[2]     #only the basename is needed !
-    	sp2 <- argv[3]     #only the basename is needed !
-    	chr <- argv[4]     # table with chr\tstatus [Reversed or Not]
+    	sp1 <- argv[3]     #only the basename is needed !
+    	sp2 <- argv[4]     #only the basename is needed !
+    	chr <- argv[5]     # table with chr\tstatus [Reversed or Not]
     	#optional 
-    	sp3 <- argv[5]     #the basename of the ancestral species !
+    	sp3 <- argv[6]     #the basename of the ancestral species !
         writeLines(paste0("\nhaplotype1 is :", sp1, "\n" ))	
         writeLines(paste0("\nhaplotype2 is :", sp2, "\n" ))	
         writeLines(paste0("\nancestral species is :", sp3, "\n" ))	
