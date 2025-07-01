@@ -93,6 +93,18 @@ if [ -n "${ancestral_genome}" ] ; then
 
     fi
 
+    #check if gtf or gff:
+    if file --mime-type "$ancestral_gtf" | grep -q gff; then
+        echo file is gff ;
+        echo converting into gtf
+        gffread "$ancestral_gtf" -T -o tmp
+        ancestral_gtf=${ancestral_gtf%.gff*}.gtf
+        mv tmp "$ancestral_gtf" 
+        sed -i -E '/ancestral_gtf/ s/.gff./.gtf/' config/config
+    else
+        echo " "
+    fi
+
     cd ancestral_sp || exit 
     if [ -f ancestral_sp.fa ] ; then
         rm ancestral_sp.fa
@@ -103,8 +115,11 @@ if [ -n "${ancestral_genome}" ] ; then
     transeq -sequence ancestral_sp/ancestral_sp.spliced_cds.fa \
         -outseq ancestral_sp/ancestral_sp_prot.fa
     awk '$3=="transcript" {print $1"\t"$4"\t"$5"\t"$10}' "$ancestral_gtf" |\
-        sed 's/"//g' > ancestral_sp/ancestral_sp.bed
+        sed 's/"//g' |sed 's/;//g'  > ancestral_sp/ancestral_sp.bed
     sed -i 's/_1 CDS=.*$//g'  ancestral_sp/ancestral_sp_prot.fa
+     
+    #gffread --bed -E ${ancestral_gtf} -o ancestral_sp/ancestral_sp.bed 
+    #cut -f 1-4  ancestral_sp/ancestral_sp.bed > genespace/bed/ancestral_sp/ancestral_sp.bed
 
 fi
 
@@ -284,7 +299,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
             sort |\
             uniq -c|\
             awk '$1>10 '  > 02_results/scaff.anc.haplo1.txt
-        awk '{gsub("_","\t",$0) ; print $2"_"$3""\t"$8"_"$9}' 02_results/paml/single.copy.orthologs|\
+        awk '{gsub("_","\t",$0) ; print $2"_"$3"\t"$8"_"$9}' 02_results/paml/single.copy.orthologs|\
             sort |\
             uniq -c\
             |awk '$1>10 ' > 02_results/scaff.anc.haplo2.txt
