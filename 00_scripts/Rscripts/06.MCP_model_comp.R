@@ -134,18 +134,18 @@ if (argv[1]=="-h" || length(argv)==0){
          xlab(xl) +
          ylab(expression(italic(d[S])))
     }
-    
+   
     ################################################################################
     #                   perform the changepoint analyis here: 
     ################################################################################
     #define the model we want to test:
     #model10cp = list(Ds ~ 1, 1~ 1, 1 ~ 1, 1 ~ 1, 1 ~ 1 , 1 ~ 1 , 1 ~ 1, 1  ~ 1, 1 ~ 1, 1 ~ 1,1 ~ 1) 
     #we probably don't need 10 !
-    model9cp = list(Ds ~ 1, 1~ 1, 1 ~ 1, 1 ~ 1, 1 ~ 1 , 1 ~ 1 , 1 ~ 1, 1  ~ 1 , 1 ~ 1, 1 ~ 1) 
-    model8cp = list(Ds ~ 1, 1~ 1, 1 ~ 1, 1 ~ 1, 1 ~ 1 , 1 ~ 1 , 1 ~ 1, 1  ~ 1 , 1 ~ 1) 
-    model7cp = list(Ds ~ 1, 1~ 1, 1 ~ 1, 1 ~ 1, 1 ~ 1 , 1 ~ 1 , 1 ~ 1, 1  ~ 1 ) 
-    model6cp = list(Ds ~ 1, 1~ 1, 1 ~ 1, 1 ~ 1, 1 ~ 1 , 1 ~ 1 , 1 ~ 1)
-    model5cp = list(Ds ~ 1, 1~ 1, 1 ~ 1, 1 ~ 1, 1 ~ 1 , 1 ~ 1)
+    model9cp = list(Ds ~ 1, 1~ 1, 1 ~ 1, 1 ~ 1, 1 ~ 1 , 1 ~ 1 , 1 ~ 1, 1  ~ 1 , 1 ~ 1, 1 ~ 1) #10 strata (8 strata if PAR on each side) 
+    model8cp = list(Ds ~ 1, 1~ 1, 1 ~ 1, 1 ~ 1, 1 ~ 1 , 1 ~ 1 , 1 ~ 1, 1  ~ 1 , 1 ~ 1)        #9 strata  (7 strata if PAR on each side)  
+    model7cp = list(Ds ~ 1, 1~ 1, 1 ~ 1, 1 ~ 1, 1 ~ 1 , 1 ~ 1 , 1 ~ 1, 1  ~ 1 )               #8 strata  
+    model6cp = list(Ds ~ 1, 1~ 1, 1 ~ 1, 1 ~ 1, 1 ~ 1 , 1 ~ 1 , 1 ~ 1)                        #7 strata
+    model5cp = list(Ds ~ 1, 1~ 1, 1 ~ 1, 1 ~ 1, 1 ~ 1 , 1 ~ 1)                                #....
     model4cp = list(Ds ~ 1, 1~ 1, 1 ~ 1, 1 ~ 1, 1 ~ 1)
     model3cp = list(Ds ~ 1, 1~ 1, 1 ~ 1, 1 ~ 1)
     model2cp = list(Ds ~ 1, 1~ 1, 1 ~ 1)
@@ -156,24 +156,24 @@ if (argv[1]=="-h" || length(argv)==0){
     path <- "02_results/modelcomp/noprior/"
     
     modelcp <- list(model1cp, model2cp, model3cp, model4cp, 
-                    model5cp, model6cp, model7cp, model8cp)
+                    model5cp, model6cp, model7cp, model8cp, model9cp)
     
     #note : the whole good below will be changed
-    maxchgp = 8
+    maxchgp <- 9
     figcp <- vector('list', max(maxchgp))
     fitcp <- vector('list', max(maxchgp))
     m <- list()
     
-    
+
     for(i in 1:maxchgp){
         message(i)
         fitcp[[i]] <- mcp(modelcp[[i]], 
                      data = df, 
                      par_x = "orderchp", 
-                     iter = 5e5, 
-                     adapt = 1.5e3,  
-                     chains = 5, 
-                     cores = 5 )
+                     iter = 8e4, 
+                     adapt = 1e3,  
+                     chains = 6, 
+                     cores = 6 )
     
         figcp[[i]] <- plotcp(fitcp[[i]], paste0("Posterior fit ", i ,"  changepoint")) 
         
@@ -309,7 +309,7 @@ if (argv[1]=="-h" || length(argv)==0){
             print(vp8)
             dev.off()
             
-      } else { #assuming (i = 8)
+      } else if (i == 8){ 
             pdf(file = paste0(path, "pars_8cp.pdf"))
             print(plot_pars(fitcp[[i]], 
                             pars = c("cp_1" ,"cp_2","cp_3","cp_4",
@@ -331,21 +331,40 @@ if (argv[1]=="-h" || length(argv)==0){
             pdf(file = paste0(path, "violin_plot9strata.pdf"), 10,6)
             print(vp9)
             dev.off()
+      } else { #assuming (i == 9) - 10 strata
+            pdf(file = paste0(path, "pars_9cp.pdf"))
+            print(plot_pars(fitcp[[i]], 
+                            pars = c("cp_1" ,"cp_2","cp_3","cp_4",
+                                     "cp_5","cp_6", "cp_7","cp_8","cp_9")))
+            dev.off()
             
+            fitcp[[i]]$loo <- loo(fitcp[[i]])
+     
+            df$ten_strata <- ifelse(df$orderchp <m[[9]]$mean[1], "strata1", 
+                              ifelse(df$orderchp > m[[9]]$mean[9], "strata10",
+                              ifelse(df$orderchp > m[[9]]$mean[1] & df$orderchp < m[[9]]$mean[2], "strata2",
+                              ifelse(df$orderchp > m[[9]]$mean[2] & df$orderchp < m[[9]]$mean[3], "strata3",
+                              ifelse(df$orderchp > m[[9]]$mean[3] & df$orderchp < m[[9]]$mean[4], "strata4",
+                              ifelse(df$orderchp > m[[9]]$mean[4] & df$orderchp < m[[9]]$mean[5], "strata5",
+                              ifelse(df$orderchp > m[[9]]$mean[5] & df$orderchp < m[[9]]$mean[6], "strata6",
+                              ifelse(df$orderchp > m[[9]]$mean[6] & df$orderchp < m[[9]]$mean[7], "strata7",
+                              ifelse(df$orderchp > m[[9]]$mean[7] & df$orderchp < m[[9]]$mean[8], "strata8",
+                                              "strata9" )))))))))
+            vp10 <- vplot(df,10,"ten_strata")
+            pdf(file = paste0(path, "violin_plot9strata.pdf"), 10,6)
+            print(vp10)
+            dev.off()
+
       }
     }
     
-    
-    #save.image( file = "02_results/modelcomp/changepoint_analysis.RData")
-    
     # part 2: 
-    writeLines("\nn~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+    writeLines("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     writeLines("\n\nperforming model choice \n\n")
-    writeLines("\nn~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+    writeLines("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     
     #perform model choice and extract weights:
     loo_list = list()
-    
     for (i in 1:maxchgp) {
     loo_list[i] <- list(fitcp[[i]]$loo)
     }
@@ -363,36 +382,43 @@ if (argv[1]=="-h" || length(argv)==0){
     #see more here: https://lindeloev.github.io/mcp/articles/comparison.html
     #below 3 changepoints, there is little relevance, so we test this directly
     
-    writeLines("\nn~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+    writeLines("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     writeLines("\n\n compare adjacent strata value through BF \n\n")
-    writeLines("\nn~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+    writeLines("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     
-    
-    for (i in 2:maxchgp){
-     if (i == 2){
-      hyp2 <- data.frame(matrix(ncol = 6, nrow = 2)) %>%
-        set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
-      hyp2[1,] <-  hypothesis(fitcp[[i]],  c("int_1 < int_2"))
-      hyp2[2,] <-  hypothesis(fitcp[[i]],  c("int_2 < int_1"))
-      
-      write.table(hyp2, paste0(path, "hypothesis2strata"), quote= F)
-      ds2.1 <- dplot(df, nstrata=2, "two_strata")
-      ds2.2 <- dplot2(df, nstrata=2, "two_strata")
-
-      if (i == 3){
-      hyp3 <- data.frame(matrix(ncol = 6, nrow = 4)) %>%
-        set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
-      hyp3[1,] <-  hypothesis(fitcp[[i]],  c("int_1 < int_2"))
-      hyp3[2,] <-  hypothesis(fitcp[[i]],  c("int_2 < int_3"))
-      hyp3[3,] <-  hypothesis(fitcp[[i]],  c("int_1 > int_2"))
-      hyp3[4,] <-  hypothesis(fitcp[[i]],  c("int_2 > int_3"))
-      
-      write.table(hyp3, paste0(path, "hypothesis3strata"), quote= F)
-      ds3.1 <- dplot(df, nstrata=3, "three_strata")
-      ds3.2 <- dplot2(df, nstrata=3, "three_strata")
-
+    for (i in 1:maxchgp){
+      if (i == 1){
+        hyp2 <- data.frame(matrix(ncol = 6, nrow = 2)) %>%
+            set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
+        hyp2[1,] <-  hypothesis(fitcp[[i]],  c("int_1 < int_2"))
+        hyp2[2,] <-  hypothesis(fitcp[[i]],  c("int_2 < int_1"))
         
-      } else if (i == 4){
+        write.table(hyp2, paste0(path, "hypothesis2strata"), quote= F)
+        #plot_pos_list[[1]] <- dplot(df, nstrata=2, "two_strata") + ggtitle("A - two strata")
+        #plot_order_list[[1]] <- dplot2(df, nstrata=2, "two_strata") + ggtitle("A - two strata")
+        #viobox_list[[1]] <- ggbetweenstats(df, two_strata, Ds)  + ylab(expression(italic(d[s]))) + th_plot3
+    
+        ds2.1 <- dplot(df, nstrata=2, "two_strata") + ggtitle("A - one changepoint")
+        ds2.2 <- dplot2(df, nstrata=2, "two_strata") + ggtitle("A - one changepoint")
+        vp2s <- ggbetweenstats(df, two_strata, Ds)  + ylab(expression(italic(d[s]))) + th_plot3
+
+     } else if (i == 2){
+        hyp3 <- data.frame(matrix(ncol = 6, nrow = 4)) %>%
+            set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
+        hyp3[1,] <-  hypothesis(fitcp[[i]],  c("int_1 < int_2"))
+        hyp3[2,] <-  hypothesis(fitcp[[i]],  c("int_2 < int_3"))
+        hyp3[3,] <-  hypothesis(fitcp[[i]],  c("int_1 > int_2"))
+        hyp3[4,] <-  hypothesis(fitcp[[i]],  c("int_2 > int_3"))
+        
+        write.table(hyp3, paste0(path, "hypothesis3strata"), quote= F)
+        #plot_pos_list[[2]] <- dplot(df, nstrata=3, "three_strata") + ggtitle("B - three changepoint")
+        #plot_order_list[[2]] <- dplot2(df, nstrata=3, "three_strata") +
+        #viobox_list[[2]] <- ggbetweenstats(df, two_strata, Ds)  + ylab(expression(italic(d[s]))) + th_plot3
+        ds3.1 <- dplot(df, nstrata=3, "three_strata")  + ggtitle("B - two changepoint")
+        ds3.2 <- dplot2(df, nstrata=3, "three_strata")  + ggtitle("B - two changepoint")
+        vp3s <- ggbetweenstats(df, three_strata, Ds)  + ylab(expression(italic(d[s]))) + th_plot3
+
+      } else if (i == 3){
         hyp4 <- data.frame(matrix(ncol = 6, nrow = 6))%>%
           set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
       
@@ -404,10 +430,11 @@ if (argv[1]=="-h" || length(argv)==0){
         hyp4[6,] <-  hypothesis(fitcp[[i]],  c("int_3 > int_4"))
         
         write.table(hyp4, paste0(path,  "hypothesis4strata.txt"), quote= F)
-        ds4.1 <- dplot(df, nstrata=4, "four_strata")
-        ds4.2 <- dplot2(df, nstrata=4, "four_strata")
+        ds4.1 <- dplot(df, nstrata=4, "four_strata")  + ggtitle("C - three changepoint")
+        ds4.2 <- dplot2(df, nstrata=4, "four_strata") + ggtitle("C - three changepoint")
+        vp4s <- ggbetweenstats(df, four_strata, Ds)   + ylab(expression(italic(d[s]))) + th_plot3
     
-      } else if (i == 5){
+      } else if (i == 4){
         hyp5 <- data.frame(matrix(ncol = 6, nrow = 8))%>%
           set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
         
@@ -421,10 +448,11 @@ if (argv[1]=="-h" || length(argv)==0){
         hyp5[8,] <-  hypothesis(fitcp[[i]],  c("int_4 > int_5"))
     
         write.table(hyp5, paste0(path, "hypothesis5strata.txt"), quote= F)
-        ds5.1 <- dplot(df, nstrata=5, "five_strata")
-        ds5.2 <- dplot2(df, nstrata=5, "five_strata")
+        ds5.1 <- dplot(df, nstrata=5, "five_strata")  + ggtitle("D - four changepoint")
+        ds5.2 <- dplot2(df, nstrata=5, "five_strata") + ggtitle("D - four changepoint")
+        vp5s <- ggbetweenstats(df, five_strata, Ds)   + ylab(expression(italic(d[s]))) + th_plot3
 
-     } else if (i == 6){
+     } else if (i == 5){
         hyp6 <- data.frame(matrix(ncol = 6, nrow = 10))%>%
           set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
         
@@ -440,11 +468,11 @@ if (argv[1]=="-h" || length(argv)==0){
         hyp6[10,] <-  hypothesis(fitcp[[i]],  c("int_5 > int_6"))
 
         write.table(hyp6, paste0(path, "hypothesis6strata.txt"), quote= F)
-        ds6.1 <- dplot(df, nstrata=6, "six_strata")
-        ds6.2 <- dplot2(df, nstrata=6, "six_strata")
+        ds6.1 <- dplot(df, nstrata=6, "six_strata")  + ggtitle("E - five changepoint")
+        ds6.2 <- dplot2(df, nstrata=6, "six_strata") + ggtitle("E - five changepoint")
+        vp6s <- ggbetweenstats(df, six_strata, Ds)    + ylab(expression(italic(d[s]))) +th_plot3
 
-
-     } else if (i == 7){
+     } else if (i == 6){
       
        hyp7 <- data.frame(matrix(ncol = 6, nrow = 12))%>%
        set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
@@ -462,77 +490,142 @@ if (argv[1]=="-h" || length(argv)==0){
        hyp7[11,] <-  hypothesis(fitcp[[i]],  c("int_5 > int_6"))
        hyp7[12,] <-  hypothesis(fitcp[[i]],  c("int_6 > int_7"))
 
-       write.table(hyp7, paste0(path, "hypothesis7strata.txt"), quote= F)
-       ds7.1 <- dplot(df, nstrata=7, "seven_strata")
-       ds7.2 <- dplot2(df, nstrata=7, "seven_strata")
+        write.table(hyp7, paste0(path, "hypothesis7strata.txt"), quote= F)
+        ds7.1 <- dplot(df, nstrata=7, "seven_strata")  + ggtitle("F - six changepoint")
+        ds7.2 <- dplot2(df, nstrata=7, "seven_strata") + ggtitle("F - six changepoint")
+        vp7s <- ggbetweenstats(df, seven_strata, Ds)  + ylab(expression(italic(d[s]))) + th_plot3
 
+     } else if (i == 7){
+        
+        hyp8 <- data.frame(matrix(ncol = 6, nrow = 14))%>%
+         set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
+       
+        hyp8[1,] <-  hypothesis(fitcp[[i]],  c("int_1 < int_2"))
+        hyp8[2,] <-  hypothesis(fitcp[[i]],  c("int_2 < int_3"))
+        hyp8[3,] <-  hypothesis(fitcp[[i]],  c("int_3 < int_4"))
+        hyp8[4,] <-  hypothesis(fitcp[[i]],  c("int_4 < int_5"))
+        hyp8[5,] <-  hypothesis(fitcp[[i]],  c("int_5 < int_6"))
+        hyp8[6,] <-  hypothesis(fitcp[[i]],  c("int_6 < int_7"))
+        hyp8[7,] <-  hypothesis(fitcp[[i]],  c("int_7 < int_8"))
+        hyp8[8,] <-  hypothesis(fitcp[[i]],  c("int_1 > int_2"))
+        hyp8[9,] <-  hypothesis(fitcp[[i]],  c("int_2 > int_3"))
+        hyp8[10,] <-  hypothesis(fitcp[[i]],  c("int_3 > int_4"))
+        hyp8[11,] <-  hypothesis(fitcp[[i]],  c("int_4 > int_5"))
+        hyp8[12,] <-  hypothesis(fitcp[[i]],  c("int_5 > int_6"))
+        hyp8[13,] <-  hypothesis(fitcp[[i]],  c("int_6 > int_7"))
+        hyp8[14,] <-  hypothesis(fitcp[[i]],  c("int_7 > int_8"))
+    
+        write.table(hyp8, paste0(path, "hypothesis8strata.txt"), quote= F)
+        ds8.1 <- dplot(df, nstrata=8, "eight_strata")  + ggtitle("H - seven changepoint")
+        ds8.2 <- dplot2(df, nstrata=8, "eight_strata") + ggtitle("H - seven changepoint")
+        vp8s <- ggbetweenstats(df, eight_strata, Ds, palette = "Paired")  + th_plot3
 
      } else if (i == 8){
        
-       hyp8 <- data.frame(matrix(ncol = 6, nrow = 14))%>%
-         set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
-       
-       hyp8[1,] <-  hypothesis(fitcp[[i]],  c("int_1 < int_2"))
-       hyp8[2,] <-  hypothesis(fitcp[[i]],  c("int_2 < int_3"))
-       hyp8[3,] <-  hypothesis(fitcp[[i]],  c("int_3 < int_4"))
-       hyp8[4,] <-  hypothesis(fitcp[[i]],  c("int_4 < int_5"))
-       hyp8[5,] <-  hypothesis(fitcp[[i]],  c("int_5 < int_6"))
-       hyp8[6,] <-  hypothesis(fitcp[[i]],  c("int_6 < int_7"))
-       hyp8[7,] <-  hypothesis(fitcp[[i]],  c("int_7 < int_8"))
-       hyp8[8,] <-  hypothesis(fitcp[[i]],  c("int_1 > int_2"))
-       hyp8[9,] <-  hypothesis(fitcp[[i]],  c("int_2 > int_3"))
-       hyp8[10,] <-  hypothesis(fitcp[[i]],  c("int_3 > int_4"))
-       hyp8[11,] <-  hypothesis(fitcp[[i]],  c("int_4 > int_5"))
-       hyp8[12,] <-  hypothesis(fitcp[[i]],  c("int_5 > int_6"))
-       hyp8[13,] <-  hypothesis(fitcp[[i]],  c("int_6 > int_7"))
-       hyp8[14,] <-  hypothesis(fitcp[[i]],  c("int_7 > int_8"))
+        hyp9 <- data.frame(matrix(ncol = 6, nrow = 16))%>%
+          set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
+        
+        hyp9[1,] <-  hypothesis(fitcp[[i]],  c("int_1 < int_2"))
+        hyp9[2,] <-  hypothesis(fitcp[[i]],  c("int_2 < int_3"))
+        hyp9[3,] <-  hypothesis(fitcp[[i]],  c("int_3 < int_4"))
+        hyp9[4,] <-  hypothesis(fitcp[[i]],  c("int_4 < int_5"))
+        hyp9[5,] <-  hypothesis(fitcp[[i]],  c("int_5 < int_6"))
+        hyp9[6,] <-  hypothesis(fitcp[[i]],  c("int_6 < int_7"))
+        hyp9[7,] <-  hypothesis(fitcp[[i]],  c("int_7 < int_8"))
+        hyp9[8,] <-  hypothesis(fitcp[[i]],  c("int_1 > int_2"))
+        hyp9[9,] <-  hypothesis(fitcp[[i]],  c("int_2 > int_3"))
+        hyp9[10,] <-  hypothesis(fitcp[[i]],  c("int_3 > int_4"))
+        hyp9[11,] <-  hypothesis(fitcp[[i]],  c("int_4 > int_5"))
+        hyp9[12,] <-  hypothesis(fitcp[[i]],  c("int_5 > int_6"))
+        hyp9[13,] <-  hypothesis(fitcp[[i]],  c("int_6 > int_7"))
+        hyp9[14,] <-  hypothesis(fitcp[[i]],  c("int_7 > int_8"))
+        hyp9[15,] <-  hypothesis(fitcp[[i]],  c("int_8 < int_9"))
+        hyp9[16,] <-  hypothesis(fitcp[[i]],  c("int_8 > int_9"))
     
-     write.table(hyp8, paste0(path, "hypothesis8strata.txt"), quote= F)
-     ds8.1 <- dplot(df, nstrata=8, "eight_strata")
-     ds8.2 <- dplot2(df, nstrata=8, "eight_strata")
+        write.table(hyp9, paste0(path, "hypothesis9strata.txt"), quote= F)
+        ds8.1 <- dplot(df, nstrata=9, "nine_strata")  + ggtitle("I - eight changepoint")
+        ds8.2 <- dplot2(df, nstrata=9, "nine_strata") + ggtitle("I - eight changepoint")
+        vp9s <- ggbetweenstats(df, nine_strata, Ds, palette = "Paired")  + th_plot3
+
+     } else if (i == 9){
+       
+        hyp10 <- data.frame(matrix(ncol = 6, nrow = 18))%>%
+          set_colnames(.,c('hypothesis','mean','lower','upper','p','BF'))
+        
+        hyp9[1,] <-  hypothesis(fitcp[[i]],  c("int_1 < int_2"))
+        hyp9[2,] <-  hypothesis(fitcp[[i]],  c("int_2 < int_3"))
+        hyp9[3,] <-  hypothesis(fitcp[[i]],  c("int_3 < int_4"))
+        hyp9[4,] <-  hypothesis(fitcp[[i]],  c("int_4 < int_5"))
+        hyp9[5,] <-  hypothesis(fitcp[[i]],  c("int_5 < int_6"))
+        hyp9[6,] <-  hypothesis(fitcp[[i]],  c("int_6 < int_7"))
+        hyp9[7,] <-  hypothesis(fitcp[[i]],  c("int_7 < int_8"))
+        hyp9[8,] <-  hypothesis(fitcp[[i]],  c("int_1 > int_2"))
+        hyp9[9,] <-  hypothesis(fitcp[[i]],  c("int_2 > int_3"))
+        hyp9[10,] <-  hypothesis(fitcp[[i]],  c("int_3 > int_4"))
+        hyp9[11,] <-  hypothesis(fitcp[[i]],  c("int_4 > int_5"))
+        hyp9[12,] <-  hypothesis(fitcp[[i]],  c("int_5 > int_6"))
+        hyp9[13,] <-  hypothesis(fitcp[[i]],  c("int_6 > int_7"))
+        hyp9[14,] <-  hypothesis(fitcp[[i]],  c("int_7 > int_8"))
+        hyp9[15,] <-  hypothesis(fitcp[[i]],  c("int_8 < int_9"))
+        hyp9[16,] <-  hypothesis(fitcp[[i]],  c("int_8 > int_9"))
+        hyp9[17,] <-  hypothesis(fitcp[[i]],  c("int_9 < int_10"))
+        hyp9[18,] <-  hypothesis(fitcp[[i]],  c("int_9 > int_10"))
+
+        write.table(hyp10, paste0(path, "hypothesis10strata.txt"), quote= F)
+        ds9.1 <- dplot(df, nstrata=10, "ten_strata") + ggtitle("J - nine changepoint")
+        ds9.2 <- dplot2(df, nstrata=10, "ten_strata") + ggtitle("J - nine changepoint")
+        vp10s <- ggbetweenstats(df, ten_strata, Ds, palette = "Paired")  + th_plot3
 
      }
     }
     
-    writeLines("\nn~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+    writeLines("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     writeLines("\n\n exporting some more plots \n\n")
-    writeLines("\nn~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+    writeLines("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+
+    ds_pos_files <- mget(ls(pattern="ds[0-9].1"))
+    ds_order_files <- mget(ls(pattern="ds[0-9].2"))
+    viobox_files <-  mget(ls(pattern="vp[0-9]*.s"))
+
+    for(i in 1:length(ds_pos_files)){
+        pdf(file=paste0(path,"plot_ds_position_",i,"changepoint.pdf"),8,6)
+        print(plot_grid(ds_pos_files[[i]]))
+ 
+        pdf(file=paste0(path,"plot_ds_order_",i,"changepoint.pdf"),8,6)
+        print(plot_grid(ds_order_files[[i]]))
+    }
+
+    for(i in 1:length(viobox_files)){
+        pdf(file=paste0(path,"viobox_ds__",i,"strata.pdf"),8,6)
+        print(plot_grid(viobox_files[[i]]))
+    }
+
     
-    
-    ##TO DO: generalise the code below 
-    
-    #other plots: 
-    if (i == 8) {
-    
-    pdf(file=paste0(path,"plot_dS_all_position.pdf"),8,12)
-    print(plot_grid(ds2.1, ds3.1, ds4.1, ds5.1, ds6.1, ds7.1, ds8.1, 
-              labels = c("A - two changepoint", 
-                         "B - three changepoint",
-                         "C - four changepoint" ,
-                         "D - five changepoint" ,
-                         "E - six changepoint"  ,
-                         "F - seven changepoint" ,
-                         "G - eight changepoint") , 
-             label_size = 7,
-             hjust = -0.5, vjust = -0.5,
-             ncol = 1))
+    ############################################################################
+    #finally construct some combined plot:
+    pdf(file=paste0(path,"plot_dS_all_position.pdf"),8,24)
+    print(plot_grid(plotlist=ds_pos_files, ncol=1))
     dev.off()
     
-    pdf(file=paste0(path,"plot_Ds_along_order.pdf"),8,12)
-    print(plot_grid(ds2.1, ds3.2, ds4.2, ds5.2, ds6.2, ds7.2, ds8.2, 
-              labels = c("A - two changepoint", 
-                         "B - three changepoint",
-                         "C - four changepoint" ,
-                         "D - five changepoint" ,
-                         "E - six changepoint"  ,
-                         "F - seven changepoint" ,
-                         "G - eight changepoint") , 
+    pdf(file=paste0(path,"plot_ds_along_order.pdf"),8,22)
+    print(plot_grid(plotlist=ds_order_files, ncol=1))
+    dev.off()
+
+    pdf(file=paste0(path,"plot_viobox_all_strata.pdf"),8,24)
+    print(plot_grid(plotlist=viobox_files, ncol=1, 
              label_size = 7,
              hjust = -0.5, vjust = -0.5,
-             ncol = 1))
+            labels = "AUTO"))
     dev.off()
+
+    plot <- list()
+    for (i in 1:maxchgp) {
+    plot[[i]] <- plot_grid(print(figcp[[i]]) + th_plot3, ncol = 1)
+    }
     
-    }   
+    pdf(file=paste0(path,"plot_all_changepoint.pdf"), 10, 20)
+    print(plot_grid(plotlist=plot, ncol=1, labels = "AUTO"))
+    dev.off()
 
     #finally: 
     if(is_anc=="YES"){ 
@@ -596,70 +689,10 @@ if (argv[1]=="-h" || length(argv)==0){
     write.table(s8.h1.h2,paste0(path,"classif.s8.haplo1.haplo2"),
         quote=F,row.names=F,col.names=F,sep="\t")
     
-    ################################################################################
-    #finally construct some combined plot:
-    plot <- list()
-    for (i in 1:maxchgp) {
-    plot[[i]] <- plot_grid(print(figcp[[i]]) + th_plot3, ncol = 1)
-    }
-    
-    writeLines("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
-    writeLines("\n\n comparing models with gstatsplot\n\n")
-    writeLines("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
-    vp2s <- ggbetweenstats(df, two_strata, Ds)  + ylab(expression(italic(d[s]))) + th_plot3
-    vp3s <- ggbetweenstats(df, three_strata, Ds)  + ylab(expression(italic(d[s]))) + th_plot3
-    vp4s <- ggbetweenstats(df, four_strata, Ds)   + ylab(expression(italic(d[s]))) + th_plot3
-    vp5s <- ggbetweenstats(df, five_strata, Ds)   + ylab(expression(italic(d[s]))) + th_plot3
-    vp6s <- ggbetweenstats(df, six_strata, Ds)    + ylab(expression(italic(d[s]))) +th_plot3
-    vp7s <- ggbetweenstats(df, seven_strata, Ds)  + ylab(expression(italic(d[s]))) + th_plot3
-    #this is probably too much: 
-    #vp8s <- ggbetweenstats(df, eight_strata, Ds, palette = "Paired")  + th_plot3
-    #vp9s <- ggbetweenstats(df, nine_strata, Ds, palette = "Paired")  + th_plot3
-    
-    #comment if you don't want some:
-    #TO DO: modify to plot each separately and to remove boxplot when n is low 
-    
-    pdf(file = paste0(path, "viobox_ds_strata_distribution_priors.pdf"), 10,28)
-    print(plot_grid(
-        vp2s,
-        vp3s, 
-        vp4s,
-        vp5s,
-        vp6s,
-        vp7s,
-        #vp8s, 
-        #vp9s,
-        labels = "AUTO", ncol = 1))
-    dev.off()
-    
-    pdf(file = paste0(path, "all_comp.pdf"), 10,20)
-    print(plot_grid(
-      plot[[2]],
-      plot[[3]],
-      plot[[4]],
-      plot[[5]],
-      plot[[6]],
-      plot[[7]],
-      plot[[8]],
-      labels = "AUTO", ncol = 1))
-    dev.off()
-    
-    #comment those that are not wanted:
-    pdf(file = paste0(path, "strata_and_viobox_ds_strata_distribution_priors.pdf"), 20,20)
-    print(plot_grid(
-      plot[[2]],vp3s,
-      plot[[3]],vp4s,
-      plot[[4]],vp5s,
-      plot[[5]],vp6s,
-      #plot[[6]],vp6s,
-      #plot[[7]],vp8s,
-      #plot[[8]],vp9s,
-      labels = "AUTO", ncol = 2, rel_heights = c(.4,1,.4,1,.4,1)))
-    dev.off()
-    
+     
     writeLines("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
     writeLines("\n analyses finished !! \n\n")
-    writeLines("\nn~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+    writeLines("\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
 
     writeLines("\n exporting Rsession !! \n\n")
 

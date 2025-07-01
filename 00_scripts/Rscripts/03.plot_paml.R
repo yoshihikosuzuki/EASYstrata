@@ -89,7 +89,7 @@ if (argv[1]=="-h" || length(argv)==0){
 
     if (length(argv)<5) {
     	  stop("At least the name of 2 species to compare, a txt file containing the name and order of scaffold must be supplied.n", call.=FALSE)
-    } else if (length(argv)==4) {
+    } else if (length(argv)==5) {
     	writeLines("\n\nassuming no ancestral species was used\n")
     	sp1 <- argv[3]     # only the basename is needed !
     	sp2 <- argv[4]     # only the basename is needed !
@@ -202,7 +202,7 @@ if (argv[1]=="-h" || length(argv)==0){
       theme_classic() +
       scale_y_break(c(1,max(all$Ds, na.rm = T)-0.1)) +
       ylim(c(0,max(all$Ds, na.rm=T)+.1)) +
-      xlab("position along chr") +
+      xlab("position along chromosome") +
       ylab( expression(italic(d[S]))) +
       th_plot + theme(legend.position = "none") +
       ggtitle("A") 
@@ -233,7 +233,7 @@ if (argv[1]=="-h" || length(argv)==0){
     dev.off()
     
     
-    if(length(argv)==5){
+    if(length(argv)==6){
         writeLines("-------------------------------------------------------")
         writeLines("------- constructing graph with gene order-------------\n")
         writeLines("-------------------------------------------------------")
