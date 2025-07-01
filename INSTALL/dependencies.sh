@@ -397,8 +397,10 @@ command='translatorx_vLocal.pl'
 if ! command -v $command &> /dev/null
 then
    #direct install: 
-    mkdir translatorx ; cd translatorx
-    wget http://161.111.160.230/cgi-bin/translatorx_vLocal.pl
+    mkdir translatorx ; #cd translatorx
+    #wget http://161.111.160.230/cgi-bin/translatorx_vLocal.pl #webiste down ?
+    cp ../INSTALL/translatorx_vLocal.pl translatorx/ 
+    cd translatorx 
     chmod +x translatorx_vLocal.pl
     path=$(pwd)
     echo -e "\n#Path to translatorx\n export PATH=\$PATH:$path" >> ~/.bashrc 
