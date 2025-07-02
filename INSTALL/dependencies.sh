@@ -107,10 +107,11 @@ then
     make install
     if [ $? -eq 0 ]; then
         echo $command installation worked successfully
-	cd $(find . -name "include" )
+	cd $(find . -name "include" -type d )
 	bt_inc=$(pwd)
 	cd ../../
-	cd $(find . -name "lib*" |head -n 1 )
+    cd $(find . -name "lib*" -type d )
+    
 	bt_lib=$(pwd)
 
 	cd ../src
@@ -140,9 +141,15 @@ then
     ./configure --prefix=$(pwd)
     make
     make install
-    htpath=$(pwd)
+    if [ $? -eq 0 ]; then
+        echo $command installation worked successfully
 
-    cd ../
+        htpath=$(pwd)
+        cd ../
+    else
+        echo installation of $command failed! check the logs
+        exit 1
+    fi
 else
     #note: should be installed from braker_env (through minimap2)
     htcmd=$(command -v "$command")
