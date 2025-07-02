@@ -116,7 +116,7 @@ if [ -n "${ancestral_genome}" ] ; then
         -outseq ancestral_sp/ancestral_sp_prot.fa
     awk '$3=="transcript" {print $1"\t"$4"\t"$5"\t"$10}' "$ancestral_gtf" |\
         sed 's/"//g' |sed 's/;//g'  > ancestral_sp/ancestral_sp.bed
-    sed -i 's/_1 CDS=.*$//g'  ancestral_sp/ancestral_sp_prot.fa
+    sed -i 's/_1//g'  ancestral_sp/ancestral_sp_prot.fa
      
     #gffread --bed -E ${ancestral_gtf} -o ancestral_sp/ancestral_sp.bed 
     #cut -f 1-4  ancestral_sp/ancestral_sp.bed > genespace/bed/ancestral_sp/ancestral_sp.bed

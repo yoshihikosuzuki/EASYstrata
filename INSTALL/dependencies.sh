@@ -19,12 +19,39 @@ Rscript -e  'devtools::install_github("jtlovell/GENESPACE")' || \
 mkdir softs
 cd softs 
 
+
+#**MCScanX** : 
+command='MCScanX'
+if ! command -v $command &> /dev/null
+then
+    #direct install: 
+    echo "$command could not be found"
+    echo -e "trying automatic installation\n\n"
+    git clone https://github.com/wyp1125/MCScanX
+    cd MCScanX ; make -j 8
+    #if command was successfull then add to path:
+    if [ $? -eq 0 ]; then
+        echo $command installation worked successfully
+	MCScanpath=$(pwd)
+        echo -e "\n#Path to $command\nexport PATH=\$PATH:$MCScanpath" >> ~/.bashrc 
+        source ~/.bashrc  
+        cd ../
+
+    else
+       echo installation failed\nmake sur to have make and git
+       exit 1
+    fi
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
+fi
+
+
 #braker: 
 command='braker.pl'
 if ! command -v $command &> /dev/null
 then
     echo "$command could not be found"
-    echo "will try a manual installation" 
+    echo -e "trying automatic installation\n\n"
     git clone https://github.com/Gaius-Augustus/BRAKER
     cd BRAKER/scripts 
     chmod a+x *.pl *.py
@@ -32,6 +59,8 @@ then
     echo -e "\n#Path to $command\nexport PATH=\$PATH:$path" >> ~/.bashrc 
     source ~/.bashrc  
     cd ../../
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
 fi
 
 #**Protint** 
@@ -40,6 +69,7 @@ command='prothint.py'
 if ! command -v $command &> /dev/null
 then
     echo "$command could not be found"
+    echo -e "trying automatic installation\n"
     wget https://github.com/gatech-genemark/ProtHint/releases/download/v2.6.0/ProtHint-2.6.0.tar.gz 
     tar zxvf ProtHint-2.6.0.tar.gz
     cd ProtHint-2.6.0/bin 
@@ -49,7 +79,10 @@ then
     echo -e "\nexport PATH=\$PATH:$protpath" >> ~/.bashrc
     source ~/.bashrc  
     cd ../../
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
 fi
+
 
 #**Diamond**
 #direct install: 
@@ -57,6 +90,7 @@ command='diamond'
 if ! command -v $command &> /dev/null
 then
     echo "$command could not be found"
+    echo -e "trying automatic installation\n\n"
     mkdir diamond ; cd diamond
     wget https://github.com/bbuchfink/diamond/releases/download/v2.1.1/diamond-linux64.tar.gz
     tar zxvf diamond-linux64.tar.gz
@@ -65,7 +99,8 @@ then
     echo -e "\n#Path to $command\nexport PATH=\$PATH:$path" >> ~/.bashrc 
     source ~/.bashrc  
     cd ../ 
-
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
 fi
 
 #**cdbfasta**:
@@ -73,6 +108,7 @@ command='cdbfasta'
 if ! command -v $command &> /dev/null
 then
     echo "$command could not be found"
+    echo -e "trying automatic installation\n\n"
     #direct install: 
     git clone https://github.com/gpertea/cdbfasta.git
     cd cdbfasta
@@ -88,6 +124,205 @@ then
         echo -e "\n#ERROR : Installation failed please check everything"  
 	exit 1
     fi
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
+fi
+
+#**genemark** 
+command="gms2hints.pl" 
+if ! command -v $command &> /dev/null
+    then
+    echo "$command could not be found"
+    echo -e "will try a manual installation through git\n\n"
+    git clone https://github.com/gatech-genemark/GeneMark-ETP/
+    cd GeneMark-ETP/
+    cd bin/gmes
+    gmarkpath=$(pwd)
+    echo -e "export GENEMARK_PATH=$gmarkpath/ " >> ~/.bashrc
+    echo -e "\nexport PATH=\$PATH:$gmarkpath" >> ~/.bashrc
+    source ~/.bashrc  
+    cd ../../../ 
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
+fi
+
+#**TSEBRA** available [here](https://github.com/Gaius-Augustus/TSEBRA)
+#direct install: 
+command='tsebra.py'
+if ! command -v $command &> /dev/null
+    then
+    echo "$command could not be found"
+    echo -e "will try a manual installation through git\n\n"
+    git clone https://github.com/Gaius-Augustus/TSEBRA 
+    cd TSEBRA/bin
+    tsebrapath=$(pwd)
+    echo -e "\n#Path to $command\nexport TSEBRA_PATH=$tsebrapath" >> ~/.bashrc 
+    echo -e "\n#Path to $command\nexport PATH=\$PATH:$tsebrapath" >> ~/.bashrc 
+
+    source ~/.bashrc  
+    cd ../../
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
+fi 
+
+#**GSNAP** for read mappig available [here](http://research-pub.gene.com/gmap/)
+#direct install :
+command='gsnap'
+if ! command -v $command &> /dev/null
+    then
+    echo "$command could not be found"
+    echo -e "trying automatic installation\n\n"
+    wget http://research-pub.gene.com/gmap/src/gmap-gsnap-2023-10-10.v2.tar.gz
+    tar zxf gmap-gsnap-2023-10-10.v2.tar.gz
+    cd gmap-2023-10-10/
+    path=$(pwd)
+    ./configure --prefix=$path  
+    make -j8
+    make install
+    if [ $? -eq 0 ]; then
+        echo $command installation worked successfully
+	cd bin/
+        path=$(pwd)
+        echo -e "\n#Path to $command\nexport PATH=\$PATH:$path" >> ~/.bashrc 
+        source ~/.bashrc  
+        cd ../../
+    else
+       echo installation failed\nmake sur to have git, make and gclib
+       exit 1
+    fi
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
+fi
+
+#**gffread** to extract CDS from fasta [see](http://ccb.jhu.edu/software/stringtie/gff.shtml#gffread)
+#direct install: 
+command='gffread'
+if ! command -v $command &> /dev/null
+    then
+    echo "$command could not be found"
+    echo -e "trying automatic installation\n\n"
+    git clone https://github.com/gpertea/gffread
+    cd gffread
+    make release
+    #if command was successfull then add to path:
+    if [ $? -eq 0 ]; then
+        echo $command installation worked successfully
+        path=$(pwd)
+        echo -e "\n#Path to $command\nexport PATH=\$PATH:$path" >> ~/.bashrc 
+        source ~/.bashrc  
+        cd ../
+
+    else
+       echo installation failed\nmake sur to have git, make and gclib
+       exit 1
+    fi
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
+fi
+
+## test if orthoFinder is installed
+command='orthofinder'
+if ! command -v $command &> /dev/null
+then
+    echo "$command could not be found"
+    echo "will try a manual installation through wget"
+    wget https://github.com/davidemms/OrthoFinder/releases/download/2.5.5/OrthoFinder.tar.gz
+    tar zxf OrthoFinder.tar.gz
+    cd OrthoFinder
+    #if command was successfull then add to path:
+    path=$(pwd)
+    echo -e "\n#Path to $command\nexport PATH=\$PATH:$path" >> ~/.bashrc 
+    source ~/.bashrc  
+    
+    #also add diamond, fastme and mcl which are present within orthofinder:
+    cd bin/
+    path=$(pwd)
+    echo -e "\n#Path to diamond\n export PATH=\$PATH:$path" >> ~/.bashrc 
+    source ~/.bashrc  
+    cd ../../
+    #exit 1
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
+fi
+
+
+
+#**muscle** 
+command='muscle'
+if ! command -v $command &> /dev/null
+then
+   echo "$command could not be found"
+   echo -e "trying automatic installation\n\n"
+   #direct install: 
+   mkdir muscle ; cd muscle
+   #wget https://github.com/rcedgar/muscle/releases/download/5.1.0/muscle5.1.linux_intel64
+   #ln -s muscle5.1.linux_intel64 muscle
+   #if using muscle5 then modify the -in option into -align in the perl code of translocator
+   wget https://drive5.com/muscle/downloads3.8.31/muscle3.8.31_i86linux64.tar.gz
+   tar zxf muscle3.8.31_i86linux64.tar.gz
+   ln -s muscle3.8.31_i86linux64 muscle
+   chmod +x muscle
+   path=$(pwd)
+   echo -e "\n#Path to $command\n export PATH=\$PATH:$path" >> ~/.bashrc 
+   source ~/.bashrc  
+   cd ../
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
+fi
+
+command='macse_v2.07.jar'
+if ! command -v $command &> /dev/null
+then
+   echo "$command could not be found"
+   echo -e "trying automatic installation\n\n"
+   #direct install: 
+   mkdir macse ; cd macse
+   wget https://www.agap-ge2pop.org/wp-content/uploads/macse/releases/macse_v2.07.jar
+   chmod +x macse*jar
+   path=$(pwd)
+   echo -e "\n#Path to $command\n export PATH=\$PATH:$path" >> ~/.bashrc 
+   source ~/.bashrc  
+   cd ../
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
+fi
+
+#**yn00/paml:** 
+command='yn00'
+if ! command -v $command &> /dev/null
+then
+   echo "$command could not be found"
+   echo -e "trying automatic installation\n\n"
+   #direct install: 
+   wget https://github.com/abacus-gene/paml/releases/download/v4.10.9/paml-4.10.9-linux-x86_64.tar.gz
+   tar zxf paml-4.10.9-linux-x86_64.tar.gz
+   cd paml-4.10.9-linux-x86_64/bin
+   path=$(pwd)
+   echo -e "\n#Path to $command\n export PATH=\$PATH:$path" >> ~/.bashrc 
+   source ~/.bashrc  
+   cd ../../
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
+fi
+
+#**translatorx_vLocal.pl** 
+command='translatorx_vLocal.pl'
+if ! command -v $command &> /dev/null
+then
+    echo "$command could not be found"
+    echo "copying from INSTALL folder"
+    #direct install: 
+    mkdir translatorx ; #cd translatorx
+    #wget http://161.111.160.230/cgi-bin/translatorx_vLocal.pl #webiste down ?
+    cp ../INSTALL/translatorx_vLocal.pl translatorx/ 
+    cd translatorx 
+    chmod +x translatorx_vLocal.pl
+    path=$(pwd)
+    echo -e "\n#Path to translatorx\n export PATH=\$PATH:$path" >> ~/.bashrc 
+    source ~/.bashrc  
+    cd ../
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
 fi
 
 #**bamtools**
@@ -95,6 +330,7 @@ command='bamtools'
 if ! command -v $command &> /dev/null
 then
     echo "$command could not be found"
+    echo -e "trying automatic installation\n\n"
     #direct install: 
     #bamtools : https://github.com/pezmaster31/bamtools
     git clone https://github.com/pezmaster31/bamtools
@@ -124,6 +360,8 @@ then
        echo installation failed\nmake sur to have git, make and cmake
        exit 1
     fi
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
 fi
 
 # -- htslib --
@@ -132,6 +370,7 @@ command='htsfile'
 if ! command -v $command &> /dev/null
 then
     echo "$command could not be found"
+    echo -e "trying automatic installation\n\n"
     #download the latest htslib to recover the path for Augustus::
     wget https://github.com/samtools/htslib/releases/download/1.18/htslib-1.18.tar.bz2
     bzip2 -d htslib-1.18.tar.bz2
@@ -174,7 +413,7 @@ command='augustus'
 if ! command -v $command &> /dev/null
 then
     echo "$command could not be found"
-    echo "will attempt a manual install" 
+    echo -e "trying automatic installation\n\n"
     echo "you may encounter several error and have to comment/uncomment or change path in "common.mk" especially without root privilege"
     git clone https://github.com/Gaius-Augustus/Augustus.git
     cd Augustus
@@ -201,10 +440,10 @@ then
     if [ $? -eq 0 ]; then
         echo $command installation worked successfully
         augustuspath=$(pwd)
-	echo -e "#path to AUGUSTUS:" >> ~/.bashrc 
+	    echo -e "#path to AUGUSTUS:" >> ~/.bashrc 
         echo -e "export AUGUSTUS_CONFIG_PATH=$augustuspath/config " >> ~/.bashrc
         echo -e "export AUGUSTUS_BIN_PATH=$augustuspath/bin/ " >> ~/.bashrc
-	echo -e "export PATH=\$PATH:$augustuspath/bin" >> ~/.bashrc
+	    echo -e "export PATH=\$PATH:$augustuspath/bin" >> ~/.bashrc
         echo -e "export AUGUSTUS_SCRIPTS_PATH=/$augustuspath/augustus_scripts " >> ~/.bashrc
 	source ~/.bashrc
 	cd ./auxprogs/joingenes
@@ -221,213 +460,26 @@ then
 	    echo "see details here: https://github.com/Gaius-Augustus/Augustus/blob/master/docs/INSTALL.md"
 	    exit 1
     fi
-fi
-
-#**genemark** 
-command="gms2hints.pl" 
-if ! command -v $command &> /dev/null
-    then
-    echo "$command could not be found"
-    echo "will try a manual installation through git"
-    git clone https://github.com/gatech-genemark/GeneMark-ETP/
-    cd GeneMark-ETP/
-    cd bin/gmes
-    gmarkpath=$(pwd)
-    echo -e "export GENEMARK_PATH=$gmarkpath/ " >> ~/.bashrc
-    echo -e "\nexport PATH=\$PATH:$gmarkpath" >> ~/.bashrc
-    source ~/.bashrc  
-    cd ../../../ 
-fi
-
-#**TSEBRA** available [here](https://github.com/Gaius-Augustus/TSEBRA)
-#direct install: 
-command='tsebra.py'
-if ! command -v $command &> /dev/null
-    then
-    echo "$command could not be found"
-    echo "will try a manual installation through git"
-    git clone https://github.com/Gaius-Augustus/TSEBRA 
-    cd TSEBRA/bin
-    tsebrapath=$(pwd)
-    echo -e "\n#Path to $command\nexport TSEBRA_PATH=$tsebrapath" >> ~/.bashrc 
-    echo -e "\n#Path to $command\nexport PATH=\$PATH:$tsebrapath" >> ~/.bashrc 
-
-    source ~/.bashrc  
-    cd ../../
-fi 
-
-#**GSNAP** for read mappig available [here](http://research-pub.gene.com/gmap/)
-#direct install :
-command='gsnap'
-if ! command -v $command &> /dev/null
-    then
-    echo "$command could not be found"
-    echo "will try a manual installation through git"
-    wget http://research-pub.gene.com/gmap/src/gmap-gsnap-2023-10-10.v2.tar.gz
-    tar zxf gmap-gsnap-2023-10-10.v2.tar.gz
-    cd gmap-2023-10-10/
-    path=$(pwd)
-    ./configure --prefix=$path  
-    make -j8
-    make install
-    if [ $? -eq 0 ]; then
-        echo $command installation worked successfully
-	cd bin/
-        path=$(pwd)
-        echo -e "\n#Path to $command\nexport PATH=\$PATH:$path" >> ~/.bashrc 
-        source ~/.bashrc  
-        cd ../../
-    else
-       echo installation failed\nmake sur to have git, make and gclib
-       exit 1
-    fi
-fi
-
-#**gffread** to extract CDS from fasta [see](http://ccb.jhu.edu/software/stringtie/gff.shtml#gffread)
-#direct install: 
-command='gffread'
-if ! command -v $command &> /dev/null
-    then
-    echo "$command could not be found"
-    echo "will try a manual installation through git"
-    git clone https://github.com/gpertea/gffread
-    cd gffread
-    make release
-    #if command was successfull then add to path:
-    if [ $? -eq 0 ]; then
-        echo $command installation worked successfully
-        path=$(pwd)
-        echo -e "\n#Path to $command\nexport PATH=\$PATH:$path" >> ~/.bashrc 
-        source ~/.bashrc  
-        cd ../
-
-    else
-       echo installation failed\nmake sur to have git, make and gclib
-       exit 1
-    fi
-fi
-
-## test if orthoFinder is installed
-command='orthofinder'
-if ! command -v $command &> /dev/null
-then
-    echo "$command could not be found"
-    echo "will try a manual installation through wget"
-    wget https://github.com/davidemms/OrthoFinder/releases/download/2.5.5/OrthoFinder.tar.gz
-    tar zxf OrthoFinder.tar.gz
-    cd OrthoFinder
-    #if command was successfull then add to path:
-    path=$(pwd)
-    echo -e "\n#Path to $command\nexport PATH=\$PATH:$path" >> ~/.bashrc 
-    source ~/.bashrc  
-    
-    #also add diamond, fastme and mcl which are present within orthofinder:
-    cd bin/
-    path=$(pwd)
-    echo -e "\n#Path to diamond\n export PATH=\$PATH:$path" >> ~/.bashrc 
-    source ~/.bashrc  
-    cd ../../
-    #exit 1
+else 
+    echo -e "\ncommand $command already installed\nskipping installation\n\n"
 fi
 
 
-#**MCScanX** : 
-command='MCScanX'
-if ! command -v $command &> /dev/null
-then
-   #direct install: 
-   git clone https://github.com/wyp1125/MCScanX
-   cd MCScanX ; make -j 8
-   #if command was successfull then add to path:
-   if [ $? -eq 0 ]; then
-        echo $command installation worked successfully
-	MCScanpath=$(pwd)
-        echo -e "\n#Path to $command\nexport PATH=\$PATH:$MCScanpath" >> ~/.bashrc 
-        source ~/.bashrc  
-        cd ../
-
-    else
-       echo installation failed\nmake sur to have make and git
-       exit 1
-    fi
-fi
-
-
-#**muscle** 
-command='muscle'
-if ! command -v $command &> /dev/null
-then
-   #direct install: 
-   mkdir muscle ; cd muscle
-   #wget https://github.com/rcedgar/muscle/releases/download/5.1.0/muscle5.1.linux_intel64
-   #ln -s muscle5.1.linux_intel64 muscle
-   #if using muscle5 then modify the -in option into -align in the perl code of translocator
-   wget https://drive5.com/muscle/downloads3.8.31/muscle3.8.31_i86linux64.tar.gz
-   tar zxf muscle3.8.31_i86linux64.tar.gz
-   ln -s muscle3.8.31_i86linux64 muscle
-   chmod +x muscle
-   path=$(pwd)
-   echo -e "\n#Path to $command\n export PATH=\$PATH:$path" >> ~/.bashrc 
-   source ~/.bashrc  
-   cd ../
-fi
-
-command='macse_v2.07.jar'
-if ! command -v $command &> /dev/null
-then
-   #direct install: 
-   mkdir macse ; cd macse
-   wget https://www.agap-ge2pop.org/wp-content/uploads/macse/releases/macse_v2.07.jar
-   chmod +x macse*jar
-   path=$(pwd)
-   echo -e "\n#Path to $command\n export PATH=\$PATH:$path" >> ~/.bashrc 
-   source ~/.bashrc  
-   cd ../
-fi
-
-#**yn00/paml:** 
-command='yn00'
-if ! command -v $command &> /dev/null
-then
-   #direct install: 
-   wget https://github.com/abacus-gene/paml/releases/download/v4.10.9/paml-4.10.9-linux-x86_64.tar.gz
-   tar zxf paml-4.10.9-linux-x86_64.tar.gz
-   cd paml-4.10.9-linux-x86_64/bin
-   path=$(pwd)
-   echo -e "\n#Path to $command\n export PATH=\$PATH:$path" >> ~/.bashrc 
-   source ~/.bashrc  
-   cd ../../
-fi
-
-#**translatorx_vLocal.pl** 
-command='translatorx_vLocal.pl'
-if ! command -v $command &> /dev/null
-then
-   #direct install: 
-    mkdir translatorx ; #cd translatorx
-    #wget http://161.111.160.230/cgi-bin/translatorx_vLocal.pl #webiste down ?
-    cp ../INSTALL/translatorx_vLocal.pl translatorx/ 
-    cd translatorx 
-    chmod +x translatorx_vLocal.pl
-    path=$(pwd)
-    echo -e "\n#Path to translatorx\n export PATH=\$PATH:$path" >> ~/.bashrc 
-    source ~/.bashrc  
-    cd ../
-fi
-
+#stuff getting installed via conda now:
 #**minimap2** 
 #direct install: 
-command='minimap2'
-if ! command -v $command &> /dev/null
-then
-   #direct install: 
-   curl -L https://github.com/lh3/minimap2/releases/download/v2.26/minimap2-2.26_x64-linux.tar.bz2 | tar -jxvf -
-   cd ./minimap2-2.26_x64-linux 
-   path=$(pwd)
-   echo -e "\n#Path to minimap2\n export PATH=\$PATH:$path" >> ~/.bashrc 
-   source ~/.bashrc  
-   cd ../
-fi
+#command='minimap2'
+#if ! command -v $command &> /dev/null
+#then
+#   echo -e "trying automatic installation\n\n"
+#   #direct install: 
+#   curl -L https://github.com/lh3/minimap2/releases/download/v2.26/minimap2-2.26_x64-linux.tar.bz2 | tar -jxvf -
+#   cd ./minimap2-2.26_x64-linux 
+#   path=$(pwd)
+#   echo -e "\n#Path to minimap2\n export PATH=\$PATH:$path" >> ~/.bashrc 
+#   source ~/.bashrc  
+#   cd ../
+#fi
 
 ##RepeatModeler and RepeatMasker through conda (easiest way)
 ##mamba create -n repeatmodeler_env  -c bioconda repeatmasker=4.1.5 repeatmodeler=2.0.5
