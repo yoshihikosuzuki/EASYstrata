@@ -2396,7 +2396,7 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
         cp "$genome2" haplo2/03_genome/
 
 
-        if ! gffread -g "$genome1" -w haplo1/08_best_run/"$haplotype1".spliced_cds.fa "$gtf1" 
+        if ! gffread -g "$genome1" -x haplo1/08_best_run/"$haplotype1".spliced_cds.fa "$gtf1" 
         then 
             echo "error failed to extract cds from genome $genome1 and gtf $gtf1"
             echo "please check input file synchronisation"
@@ -2406,7 +2406,7 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
                     -outseq haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa
 
         fi     
-        if ! gffread -g "$genome2" -w haplo2/08_best_run/"$haplotype2".spliced_cds.fa  "$gtf2"
+        if ! gffread -g "$genome2" -x haplo2/08_best_run/"$haplotype2".spliced_cds.fa  "$gtf2"
         then
             echo "error failed to extract cds from genome $genome2 and gtf $gtf2"
             echo "please check input file synchronisation"
@@ -2459,7 +2459,7 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
         cp "$gtf1" haplo1/08_best_run/"${haplotype1}".final.gtf
         cp "$genome1" haplo1/03_genome/
 
-        if ! gffread -g "$genome1" -w haplo1/08_best_run/"$haplotype1".spliced_cds.fa "$gtf1" 
+        if ! gffread -g "$genome1" -x haplo1/08_best_run/"$haplotype1".spliced_cds.fa "$gtf1" 
         then 
             echo "error failed to extract cds from genome $genome1 and gtf $gtf1"
             echo "please check input file synchronisation"

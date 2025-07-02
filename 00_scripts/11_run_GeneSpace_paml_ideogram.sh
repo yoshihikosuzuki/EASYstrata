@@ -111,7 +111,7 @@ if [ -n "${ancestral_genome}" ] ; then
     fi
 
     ln -s "${ancestral_genome}" ancestral_sp.fa ; samtools faidx ancestral_sp.fa ; cd ../
-    gffread -g "${ancestral_genome}" -w ancestral_sp/ancestral_sp.spliced_cds.fa  "${ancestral_gtf}" 
+    gffread -g "${ancestral_genome}" -x ancestral_sp/ancestral_sp.spliced_cds.fa  "${ancestral_gtf}" 
     transeq -sequence ancestral_sp/ancestral_sp.spliced_cds.fa \
         -outseq ancestral_sp/ancestral_sp_prot.fa
     awk '$3=="transcript" {print $1"\t"$4"\t"$5"\t"$10}' "$ancestral_gtf" |\
