@@ -14,6 +14,19 @@ else
     NCPU=$2 #number of CPU (optional)
 fi
 
+############################################################
+# ERROR TRACKING.                                          #
+############################################################
+set -eE -o functrace
+
+failure() {
+  local lineno=$1
+  local msg=$2
+   echo "command failed at line $lineno: $msg"
+}
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+##################################################
+
 #file : read1.fastq.gz located in 01_raw folder 
 base=$(basename "$file")
 
@@ -21,8 +34,9 @@ TIMESTAMP=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 LOG_FOLDER="LOGS"
 
 #create folder if not existent:
-mkdir $LOG_FOLDER 2>/dev/null
-mkdir 02_trimmed  2>/dev/null
+if [ ! -d "$LOG_FOLDER" ] ; then mkdir $LOG_FOLDER  ; fi 
+if [ ! -d 02_trimmed ] ; then mkdir 02_trimmed ; fi 
+
 
 ADAPTERFILE="Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa"
 

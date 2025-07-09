@@ -70,7 +70,7 @@ if ! command -v $command &> /dev/null
 then
     echo "$command could not be found"
     echo -e "trying automatic installation\n"
-    wget https://github.com/gatech-genemark/ProtHint/releases/download/v2.6.0/ProtHint-2.6.0.tar.gz 
+    wget -q https://github.com/gatech-genemark/ProtHint/releases/download/v2.6.0/ProtHint-2.6.0.tar.gz 
     tar zxvf ProtHint-2.6.0.tar.gz
     cd ProtHint-2.6.0/bin 
     #then add to ~/.bashrc
@@ -92,7 +92,7 @@ then
     echo "$command could not be found"
     echo -e "trying automatic installation\n\n"
     mkdir diamond ; cd diamond
-    wget https://github.com/bbuchfink/diamond/releases/download/v2.1.1/diamond-linux64.tar.gz
+    wget -q https://github.com/bbuchfink/diamond/releases/download/v2.1.1/diamond-linux64.tar.gz
     tar zxvf diamond-linux64.tar.gz
     #then add to ~/.bashrc
     path=$(pwd)
@@ -172,7 +172,7 @@ if ! command -v $command &> /dev/null
     then
     echo "$command could not be found"
     echo -e "trying automatic installation\n\n"
-    wget http://research-pub.gene.com/gmap/src/gmap-gsnap-2023-10-10.v2.tar.gz
+    wget -q http://research-pub.gene.com/gmap/src/gmap-gsnap-2023-10-10.v2.tar.gz
     tar zxf gmap-gsnap-2023-10-10.v2.tar.gz
     cd gmap-2023-10-10/
     path=$(pwd)
@@ -225,8 +225,8 @@ command='orthofinder'
 if ! command -v $command &> /dev/null
 then
     echo "$command could not be found"
-    echo "will try a manual installation through wget"
-    wget https://github.com/davidemms/OrthoFinder/releases/download/2.5.5/OrthoFinder.tar.gz
+    echo "will try a manual installation through wget -q"
+    wget -q https://github.com/davidemms/OrthoFinder/releases/download/2.5.5/OrthoFinder.tar.gz
     tar zxf OrthoFinder.tar.gz
     cd OrthoFinder
     #if command was successfull then add to path:
@@ -255,10 +255,10 @@ then
    echo -e "trying automatic installation\n\n"
    #direct install: 
    mkdir muscle ; cd muscle
-   #wget https://github.com/rcedgar/muscle/releases/download/5.1.0/muscle5.1.linux_intel64
+   #wget -q https://github.com/rcedgar/muscle/releases/download/5.1.0/muscle5.1.linux_intel64
    #ln -s muscle5.1.linux_intel64 muscle
    #if using muscle5 then modify the -in option into -align in the perl code of translocator
-   wget https://drive5.com/muscle/downloads3.8.31/muscle3.8.31_i86linux64.tar.gz
+   wget -q https://drive5.com/muscle/downloads3.8.31/muscle3.8.31_i86linux64.tar.gz
    tar zxf muscle3.8.31_i86linux64.tar.gz
    ln -s muscle3.8.31_i86linux64 muscle
    chmod +x muscle
@@ -277,7 +277,7 @@ then
    echo -e "trying automatic installation\n\n"
    #direct install: 
    mkdir macse ; cd macse
-   wget https://www.agap-ge2pop.org/wp-content/uploads/macse/releases/macse_v2.07.jar
+   wget -q https://www.agap-ge2pop.org/wp-content/uploads/macse/releases/macse_v2.07.jar
    chmod +x macse*jar
    path=$(pwd)
    echo -e "\n#Path to $command\n export PATH=\$PATH:$path" >> ~/.bashrc 
@@ -294,7 +294,7 @@ then
    echo "$command could not be found"
    echo -e "trying automatic installation\n\n"
    #direct install: 
-   wget https://github.com/abacus-gene/paml/releases/download/v4.10.9/paml-4.10.9-linux-x86_64.tar.gz
+   wget -q https://github.com/abacus-gene/paml/releases/download/v4.10.9/paml-4.10.9-linux-x86_64.tar.gz
    tar zxf paml-4.10.9-linux-x86_64.tar.gz
    cd paml-4.10.9-linux-x86_64/bin
    path=$(pwd)
@@ -313,7 +313,7 @@ then
     echo "copying from INSTALL folder"
     #direct install: 
     mkdir translatorx ; #cd translatorx
-    #wget http://161.111.160.230/cgi-bin/translatorx_vLocal.pl #webiste down ?
+    #wget -q http://161.111.160.230/cgi-bin/translatorx_vLocal.pl #webiste down ?
     cp ../INSTALL/translatorx_vLocal.pl translatorx/ 
     cd translatorx 
     chmod +x translatorx_vLocal.pl
@@ -372,7 +372,7 @@ then
     echo "$command could not be found"
     echo -e "trying automatic installation\n\n"
     #download the latest htslib to recover the path for Augustus::
-    wget https://github.com/samtools/htslib/releases/download/1.18/htslib-1.18.tar.bz2
+    wget -q https://github.com/samtools/htslib/releases/download/1.18/htslib-1.18.tar.bz2
     bzip2 -d htslib-1.18.tar.bz2
     tar xf htslib-1.18.tar
     cd htslib-1.18/
@@ -397,7 +397,7 @@ fi
 
 #in case this did not work test this: 
 #download the latest htslib to recover the path for Augustus::
-#wget https://github.com/samtools/htslib/releases/download/1.18/htslib-1.18.tar.bz2
+#wget -q https://github.com/samtools/htslib/releases/download/1.18/htslib-1.18.tar.bz2
 #bzip2 -d htslib-1.18.tar.bz2 
 #tar xf htslib-1.18.tar 
 #cd htslib-1.18/
@@ -501,7 +501,7 @@ fi
 #command='recon.pl'
 #if ! command -v $command &> /dev/null
 #then
-#   wget http://www.repeatmasker.org/RepeatModeler/RECON-1.08.tar.gz
+#   wget -q http://www.repeatmasker.org/RepeatModeler/RECON-1.08.tar.gz
 #   tar zxvf RECON-1.08.tar.gz
 #   cd RECON-1.08/src
 #   make 
@@ -518,7 +518,7 @@ fi
 #     source ~/.bashrc  
 #     cd ../../
 #  else
-#     echo installation failed\nmake sur to have make and wget
+#     echo installation failed\nmake sur to have make and wget -q
 #     exit 1
 #  fi
 #fi 
@@ -527,7 +527,7 @@ fi
 #command='RepeatScout'
 #if ! command -v $command &> /dev/null
 #then
-#    wget http://www.repeatmasker.org/RepeatScout-1.0.6.tar.gz
+#    wget -q http://www.repeatmasker.org/RepeatScout-1.0.6.tar.gz
 #    tar zxvf RepeatScout-1.0.6.tar.gz
 #    cd RepeatScout-1.0.6
 #    make
@@ -538,7 +538,7 @@ fi
 #        source ~/.bashrc  
 #        cd ../
 #    else
-#       echo installation failed\nmake sur to have make and wget
+#       echo installation failed\nmake sur to have make and wget -q
 #       exit 1
 #    fi
 #fi
@@ -549,7 +549,7 @@ fi
 #then
 #    mkdir trf 
 #    cd trf
-#    wget https://github.com/Benson-Genomics-Lab/TRF/releases/download/v4.09.1/trf409.linux64
+#    wget -q https://github.com/Benson-Genomics-Lab/TRF/releases/download/v4.09.1/trf409.linux64
 #    mv trf409.linux64 trf
 #    chmod +x trf
 #    path=$(pwd)
@@ -563,7 +563,7 @@ fi
 #command=rmblastn
 #if ! command -v $command &> /dev/null
 #then
-#    wget https://www.repeatmasker.org/rmblast/rmblast-2.14.1+-x64-linux.tar.gz
+#    wget -q https://www.repeatmasker.org/rmblast/rmblast-2.14.1+-x64-linux.tar.gz
 #    tar zxf rmblast-2.14.1+-x64-linux.tar.gz
 #    cd rmblast-2.14.1+-x64-linux/bin
 #    path=$(pwd)
@@ -602,7 +602,7 @@ fi
 ##mamba activate h5pyenv
 #
 ##RepeatMasker
-#wget https://www.repeatmasker.org/RepeatMasker/RepeatMasker-4.1.5.tar.gz
+#wget -q https://www.repeatmasker.org/RepeatMasker/RepeatMasker-4.1.5.tar.gz
 #tar zxf RepeatMasker-4.1.5
 #cd RepeatMasker
 #
@@ -630,7 +630,7 @@ fi
 #    -cdhit_dir $HOME/genome_annotation/softs/cdhit 
 #
 ##**genemark** 
-##wget http://topaz.gatech.edu/GeneMark/tmp/GMtool_pxuuc/gmes_linux_64.tar.gz
+##wget -q http://topaz.gatech.edu/GeneMark/tmp/GMtool_pxuuc/gmes_linux_64.tar.gz
 #echo "to get genemark to work you must register online at http://exon.gatech.edu/GeneMark/license_download.cgi"
 #echo "the gm_key is necessary" 
 #echo "please download the the GeneMark-ES/ET/EP under the appropriate linux kernel"

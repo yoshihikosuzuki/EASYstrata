@@ -11,7 +11,7 @@ TIME=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 LOG_FOLDER="LOGS"
 
 #create folder if not existent:
-mkdir $LOG_FOLDER 2>/dev/null
+if [ ! -d "$LOG_FOLDER" ] ; then mkdir $LOG_FOLDER ; fi 
 
 haplotype=$1
 genome=03_genome/"$haplotype".fa

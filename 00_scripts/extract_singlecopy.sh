@@ -63,7 +63,7 @@ scopy="genespace/orthofinder/Results_*/Orthogroups/Orthogroups_SingleCopyOrtholo
 sed -i -e "s/\r//g" $scopy
 sed -i -e "s/\r//g" genespace/orthofinder/Results_*/Orthologues/*/*tsv
 
-mkdir 02_results/paml/ 2>/dev/null
+if [ ! -d 02_results/paml/ ] ; then mkdir 02_results/paml/ ; fi 
 #first we test if an ancestral ref is provided an extract orthologs accordingly:
 if [ -n "$ancestral_genome" ] ; then
     echo "using ancestral genome"

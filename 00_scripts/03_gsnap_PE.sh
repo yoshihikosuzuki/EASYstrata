@@ -18,11 +18,23 @@ else
     echo " "
 fi
 
-# Global variables
+############################################################
+# ERROR TRACKING.                                          #
+############################################################
+set -eE -o functrace
 
+failure() {
+  local lineno=$1
+  local msg=$2
+   echo "command failed at line $lineno: $msg"
+}
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+##################################################
+
+#Global variables:
 DATAOUTPUT="04_mapped/"
 DATAINPUT="../02_trimmed"
-mkdir -p "$DATAOUTPUT" 2>/dev/null
+if [ ! -d "$DATAOUTPUT" ] ; then mkdir -p "$DATAOUTPUT" ; fi 
 
 NCPUS=$NCPUS_GSNAP
 
@@ -90,7 +102,7 @@ then
      samtools view "$base".sorted.bam |cut -f 3-5|uniq |awk -v var="$base" '{print var"\t"$0}' |gzip > mapq."${base}".txt.gz
      samtools depth "$base".sorted.bam |gzip > "$base".dp.gz  
      
-     mkdir Rlogs 2>/dev/null
+     if [ ! -d Rlogs ] ; then mkdir Rlogs ; fi
      #plot depth along the genome:
      Rscript ../../00_scripts/Rscripts/plot_dp.R "$base".dp.gz 2> Rlogs/Rlogs_gsnap_PE_depth_"$base"
      

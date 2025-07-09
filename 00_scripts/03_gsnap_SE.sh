@@ -16,10 +16,24 @@ else
     echo " "
 fi
 source ../config/cpu_mem
-# Global variables
+
+############################################################
+# ERROR TRACKING.                                          #
+############################################################
+set -eE -o functrace
+
+failure() {
+  local lineno=$1
+  local msg=$2
+   echo "command failed at line $lineno: $msg"
+}
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+##################################################
+
+# Global variables: 
 DATAOUTPUT="04_mapped/"
 DATAINPUT="../02_trimmed"
-mkdir -p $DATAOUTPUT 2>/dev/null
+if [ ! -d "$DATAOUTPUT" ] ; then mkdir -p "$DATAOUTPUT" ; fi 
 
 NCPUS=$NCPUS_GSNAP
 
@@ -37,7 +51,7 @@ minsize=150999000 #any bam smaller than this (150 mb) will be ignored and recrea
 bamfile="$DATAOUTPUT"/"$base".sorted.bam
 if [ -s $bamfile ]
 then
-    filesize=$(wc -c <$bamfile )
+    filesize=$(wc -c <$bamfile |awk '{print $1}' )
 else
     filesize=0
 fi
@@ -81,7 +95,7 @@ then
     
     samtools depth "$base".sorted.bam |gzip > "$base".dp.gz  
     
-    mkdir Rlogs 2>/dev/null    
+    if [ ! -d Rlogs ] ; then mkdir Rlogs ; fi
     #plot depth along the genome:
     Rscript ../../00_scripts/Rscripts/plot_dp.R "$base".dp.gz 2> Rlogs/Rlogs_gsnap_SE."$base"
     

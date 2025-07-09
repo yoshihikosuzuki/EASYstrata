@@ -227,7 +227,7 @@ fi
 #conda deactivate
 
 if [[ -n "${ancestral_genome}" ]] ; then 
-    mkdir ancestral_sp  2>/dev/null
+    if [[ ! -d ancestral_sp ]] ; then mkdir ancestral_sp ; fi
     #test if ancestral gtf is also provided in the config file:
     if [ -z "${ancestral_gtf}" ] ; then 
         echo "error ! you provided an ancestral genome but no corresponding annotation (gff/gtf file)"
@@ -261,7 +261,7 @@ fi
 # Process the input options.                               #
 ############################################################
 
-mkdir LOGS 2>/dev/null
+if [[ ! -d LOGS ]] ; then mkdir LOGS ; fi
 
 echo -e "\n\ntesting use cases and checking inputs\n\n"
 

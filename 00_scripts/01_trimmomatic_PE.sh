@@ -22,14 +22,27 @@ fi
 base=$(basename ${file1%[_.]*[._]f**gz} )
 
 base=$(basename ${file1%R1.*f**gz} )
-echo base is $base
+echo input file  is "$base"
+
+############################################################
+# ERROR TRACKING.                                          #
+############################################################
+set -eE -o functrace
+
+failure() {
+  local lineno=$1
+  local msg=$2
+   echo "command failed at line $lineno: $msg"
+}
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+##################################################
 
 TIMESTAMP=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 LOG_FOLDER="LOGS"
 
 #create folder if not existent:
-mkdir $LOG_FOLDER 2>/dev/null
-mkdir 02_trimmed  2>/dev/null
+if [ ! -d "$LOG_FOLDER" ] ; then mkdir $LOG_FOLDER  ; fi 
+if [ ! -d 02_trimmed ] ; then mkdir 02_trimmed ; fi 
 
 ADAPTERFILE="Trimmomatic-0.39/adapters/TruSeq3-PE-2.fa"
 NCPU="$NCPUS_TRIMMO"

@@ -696,6 +696,6 @@ if (argv[1]=="-h" || length(argv)==0){
 
     writeLines("\n exporting Rsession !! \n\n")
 
-save.image( file = "02_results/modelcomp/noprior/changepoint_analysis.RData")
+#save.image( file = "02_results/modelcomp/noprior/changepoint_analysis.RData")
 
 }

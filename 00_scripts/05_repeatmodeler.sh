@@ -35,13 +35,25 @@ else
     echo " "
 fi
 
+############################################################
+# ERROR TRACKING.                                          #
+############################################################
+set -eE -o functrace
 
-base=$(basename "$genome")
+failure() {
+  local lineno=$1
+  local msg=$2
+   echo "command failed at line $lineno: $msg"
+}
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+##################################################
+
 #--------------DECLARE THE USUAL GENERIQ STUFF: -----------------#
+base=$(basename "$genome")
 TIME=$(date +%Y-%m-%d_%Hh%Mm%Ss)
 LOG_FOLDER="LOGS"
 #create log folder
-mkdir $LOG_FOLDER 2>/dev/null
+if [ ! -d "$LOG_FOLDER" ] ; then mkdir $LOG_FOLDER ; fi 
 NCPUS="$NCPUS_REPEATEMODELER"
 
 # ----- check compression of fasta  ------ ##
@@ -68,7 +80,7 @@ fi
 
 base=$(basename "$genome" )
 
-mkdir 05_TE 2>/dev/null
+if [ ! -d 05_TE ] ; then mkdir 05_TE ; fi
 cd 05_TE || exit
 
 #--------------STEP1 : RUN REPEATMODELER  -----------------------#

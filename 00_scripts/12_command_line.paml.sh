@@ -55,6 +55,19 @@ if [ -z "${haplo1}" ] && [ -z "${haplo2}" ]  && [ -z "${scaffold}" ]    ; then
     exit 2
 fi
 
+############################################################
+# ERROR TRACKING.                                          #
+############################################################
+set -eE -o functrace
+
+failure() {
+  local lineno=$1
+  local msg=$2
+   echo "command failed at line $lineno: $msg"
+}
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+##################################################
+
 #test if ancestral genome is provided or not:
 if [ -n "$ancestral_genome" ] ; then
     echo -e the ancestral reference name "$ancestral_genome"  will be used
@@ -323,7 +336,7 @@ fi
 if [ -e correspondance.table.hap2.txt ] && [ ! -e correspondance.table.hap1.txt ]  ; then
    sed -i 's/>//g' correspondance.table.hap2.txt
    awk 'NR==FNR{a[$2]=$1;next}$6 in a{$6=a[$6]}1' correspondance.table.hap2.txt results_YN.txt > tmp
-   awk 'NR==FNR{a[$2]=$1;next}$5 in a{$6=a[$5]}1' correspondance.table.hap2.txt results_codeml.txt > tmp_cdml
+   awk 'NR==FNR{a[$2]=$1;next}$5 in a{$5=a[$5]}1' correspondance.table.hap2.txt results_codeml.txt > tmp_cdml
    mv tmp results_YN.txt
    mv tmp_cdml results_codeml.txt
 fi

@@ -6,8 +6,10 @@
 source ../config/config
 source ../config/colors 
 
-mkdir ../02_results 2>/dev/null
-mkdir LOGS/ 2>/dev/null
+
+if [ ! -d ../02_results ] ; then mkdir ../02_results ; fi 
+LOG_FOLDER="LOGS"
+if [ ! -d "$LOG_FOLDER" ] ; then mkdir $LOG_FOLDER ; fi 
 
 ##  ------------------------ general parameters --------------------------------  ##
 while [ $# -gt 0 ] ; do
@@ -44,6 +46,20 @@ if [ -z "$RNAseq" ] ; then
   RNAseq=NO
 fi
 
+############################################################
+# ERROR TRACKING.                                          #
+############################################################
+set -eE -o functrace
+
+failure() {
+  local lineno=$1
+  local msg=$2
+   echo "command failed at line $lineno: $msg"
+}
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+##################################################
+
+
 # ------------------ run RepeatModeler and RepeatMasker ------------------  ##
 
 #check that no repeatmodeler output already exist:
@@ -71,7 +87,7 @@ else
     echo -e "no repeatmodeller output \n will launch repeatmodeller " ; 
     echo -e "-----------------------------------------------------\n"
     #remove any empty rm_file
-    rm -rf $rm_file 2>/dev/null
+    rm -rf $rm_file 
 
     ../00_scripts/05_repeatmodeler.sh "$genome" "$haplotype" "$Mask" 2>&1 |tee LOGS/log_rm
     if [[  "${PIPESTATUS[0]}" -ne 0 ]]

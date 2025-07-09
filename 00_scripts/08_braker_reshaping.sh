@@ -6,17 +6,26 @@
 #extract longest protein
 #Date: 2023
 #Author: QR
+############################################################
+# ERROR TRACKING.                                          #
+############################################################
+set -eE -o functrace
 
-#set -e
+failure() {
+  local lineno=$1
+  local msg=$2
+   echo "command failed at line $lineno: $msg"
+}
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+##################################################
 
-current_command=$BASH_COMMAND
-last_command=""
+#current_command=$BASH_COMMAND
+#last_command=""
 
 # keep track of the last executed command
-trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
+#trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 # echo an error message before exiting
-trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
-
+#trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 
 ############################################################
 # Help                                                     #
@@ -67,9 +76,10 @@ if [ -z "${haplo}" ] || [ -z "${RNAseq}" ] || [ -z "${genome}" ] ; then
     exit 2 
 fi
 
-mkdir -p 08_best_run/01_haplo_cds 2>/dev/null
-mkdir 08_best_run/02_haplo_prot 2>/dev/null
-
+if [ ! -d 08_best_run ] ; then
+    mkdir -p 08_best_run/01_haplo_cds 
+    mkdir 08_best_run/02_haplo_prot 
+fi
 #------------------------------ step 1 find best run --------------------------#
 echo -e  "\n-----------------------------------------------------------------"
 echo -e "\nfinding best run \n" 

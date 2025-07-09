@@ -20,15 +20,23 @@ AUGBI_PATH
 AUGSC_PATH
 #--- end of setting path ---- " 
 
-#set -e
+############################################################
+# ERROR TRACKING.                                          #
+############################################################
+set -eE -o functrace
 
-current_command=$BASH_COMMAND
-last_command=""
+failure() {
+  local lineno=$1
+  local msg=$2
+   echo "command failed at line $lineno: $msg"
+}
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+##################################################
 
 # keep track of the last executed command
-trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
+#trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 # echo an error message before exiting
-trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
+#trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 
 #  ---- external data required arguments --------------- #
 if (( $# < 4 )) ; then
@@ -206,8 +214,9 @@ FOLDER3=06_braker/round3_braker_on_refprot #_$TIME
 FOLDER4=06_braker/round4_braker_on_refprot #_$TIME
 FOLDER5=06_braker/round5_braker_on_refprot #_$TIME
 
-mkdir -p $FOLDER1 $FOLDER2 $FOLDER3 $FOLDER4 $FOLDER5 2>/dev/null
-
+if [ ! -d $FOLDER1 ] ; then
+    mkdir -p $FOLDER1 $FOLDER2 $FOLDER3 $FOLDER4 $FOLDER5 
+fi
 echo -e "\n\n----------- round 1 ------------\n\n" 
 echo AUGUSTUS_SCRIPTS_PATH is "$AUGUSTUS_SCRIPTS_PATH" 
 echo AUGUSTUS_BINS_PATH is "$AUGUSTUS_BIN_PATH"

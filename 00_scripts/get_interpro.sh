@@ -4,7 +4,7 @@
 
 #get interpro-scan
     
-mkdir my_interproscan 2>/dev/null
+if [ ! -d my_interproscan ] ; then mkdir my_interproscan ; fi 
 cd my_interproscan || exit
 wget -q https://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.71-102.0/interproscan-5.71-102.0-64-bit.tar.gz
 wget -q https://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.71-102.0/interproscan-5.71-102.0-64-bit.tar.gz.md5

@@ -42,7 +42,7 @@ input="$haplo".spliced_cds.fa
 name=$(basename "$input" )
 
 output=diamond_blastx
-mkdir $output 2>/dev/null
+if [ ! -d $output ] ; then mkdir $output ; fi 
 
 if [ ! -s $output/matches."$name".tsv ]
 then

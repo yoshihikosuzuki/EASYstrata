@@ -68,7 +68,7 @@ if (argv[1]=="-h" || length(argv)==0){
     ds_method <- argv[1] #default if unset : codeml
     if(!exists("ds_method")){ds_method="codeml"}
     if(ds_method=='yn00') {
-        print(paste0("ds_method is", ds_method))
+        print(paste0("ds_method is: ", ds_method))
         dat <- read.table("02_results/paml/results_YN.txt") %>% 
     	   set_colnames(., c("Ds","SEDs","Dn","SEDn", "geneX", "geneY"))
     } else if(ds_method=='codeml') {
@@ -87,14 +87,15 @@ if (argv[1]=="-h" || length(argv)==0){
     }
 
 
-    if (length(argv)<5) {
+    if (length(argv)<7) {
     	  stop("At least the name of 2 species to compare, a txt file containing the name and order of scaffold must be supplied.n", call.=FALSE)
-    } else if (length(argv)==5) {
+    } else if (length(argv)==7) {
     	writeLines("\n\nassuming no ancestral species was used\n")
     	sp1 <- argv[3]     # only the basename is needed !
     	sp2 <- argv[4]     # only the basename is needed !
     	chr <- argv[5]     # table with chr\tstatus [Reversed or Not]
-    
+        bedsp1 <- argv[6]
+	bedsp2 <- argv[7] 	
         writeLines(paste0("\nhaplotype1 is :", sp1, "\n" ))	
         writeLines(paste0("\nhaplotype2 is :", sp2, "\n" ))	
 
@@ -109,8 +110,12 @@ if (argv[1]=="-h" || length(argv)==0){
     	sp1 <- argv[3]     #only the basename is needed !
     	sp2 <- argv[4]     #only the basename is needed !
     	chr <- argv[5]     # table with chr\tstatus [Reversed or Not]
+        bedsp1 <- argv[6]
+	bedsp2 <- argv[7] 	
+
     	#optional 
-    	sp3 <- argv[6]     #the basename of the ancestral species !
+    	sp3 <- argv[8]     #the basename of the ancestral species !
+	bed_anc <- argv[9]
         writeLines(paste0("\nhaplotype1 is :", sp1, "\n" ))	
         writeLines(paste0("\nhaplotype2 is :", sp2, "\n" ))	
         writeLines(paste0("\nancestral species is :", sp3, "\n" ))	
@@ -130,15 +135,18 @@ if (argv[1]=="-h" || length(argv)==0){
     	
     	## read Ancestral species :
     	writeLines("\nload ancestral species info\n")
-    	bedAnc <- read.table(paste0("genespace/bed/",sp3, ".bed", sep = "" )) %>% 
+    	#bedAnc <- read.table(paste0("genespace/bed/",sp3, ".bed", sep = "" )) %>% 
+    	bedAnc <- read.table(bed_anc) %>% 
     		set_colnames(., c("scaff","start","end","gene"))
     
     }
     
     ## sp1 + sp2
-    bedSp1 <- read.table(paste0("genespace/bed/",sp1, ".bed", sep = "" )) %>% 
+    #bedSp1 <- read.table(paste0("genespace/bed/",sp1, ".bed", sep = "" )) %>% 
+    bedSp1 <- read.table(bedsp1) %>% 
     	set_colnames(., c("scaff","start","end","gene" ))
-    bedSp2 <- read.table(paste0("genespace/bed/",sp2, ".bed", sep = "" )) %>% 
+    #bedSp2 <- read.table(paste0("genespace/bed/",sp2, ".bed", sep = "" )) %>% 
+    bedSp2 <- read.table(bedsp2) %>% 
     	set_colnames(., c("scaffSp2","startSp2","endSp2","geneY"))
     
     ## ------------- arrange the data as needed ----------------------------------------------- ##
@@ -233,7 +241,7 @@ if (argv[1]=="-h" || length(argv)==0){
     dev.off()
     
     
-    if(length(argv)==6){
+    if(length(argv)==9){
         writeLines("-------------------------------------------------------")
         writeLines("------- constructing graph with gene order-------------\n")
         writeLines("-------------------------------------------------------")

@@ -34,7 +34,9 @@ fix_gtf_ids.py --gtf "$b2" --out "$new_b2"
 b1="$new_b1"
 b2="$new_b2"
 
-rm -rf 07-tsebra_results/ 2>/dev/null
+if [  -d 07-tsebra_results ] ; then
+    rm -rf 07-tsebra_results/ 
+fi 
 mkdir 07-tsebra_results/
 cp default.cfg 07-tsebra_results/
 
