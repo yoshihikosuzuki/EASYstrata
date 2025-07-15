@@ -138,7 +138,7 @@ cd 02_results/paml || exit 1
 
 #all is run from paml folder now
 
-rm sorted* 2>/dev/null
+if [ -e sorted* ] ; then rm sorted* ; fi
 while read -r pattern ; 
 do 
     grep -w -A1 "$pattern" "$haplo2".linearised.cds  >> sorted."$haplo2".wanted_cds.fa ;
@@ -169,9 +169,7 @@ awk '{if($1 !~ /^>/) {if( substr($0, length($0)-2, length($0)) ~ /(TGA|TAG|TAA)/
 
 ##2 ------ split and cat pairwise sequence -------
 #split 
-rm -rf sequence_files 2>/dev/null
-rm wanted_sequence 2>/dev/null
-rm ID1 ID2 2>/dev/null
+if [ -d sequence_files/ ] ; then rm -rf sequence_files ; f
 
 mkdir sequence_files
 
@@ -304,11 +302,11 @@ do
 done < wanted_sequence 2>&1 |tee log.paml
 
 #we concatenate everyone to work with them in the next scripts:
-rm results_YN.txt 2>/dev/null
+if [ -e results_YN.txt ] ; then rm results_YN.txt ; fi
 cat sequence_files/tmp.*/resultat_Yang_Nielsen_2000_method.orthogp.txt >> results_YN.txt
 cp results_YN.txt results_YN.txt.bkp
 
-rm results_codeml.txt 2>/dev/null
+if [ -e results_codeml.txt ] ; then rm results_codeml.txt ; fi
 
 cat sequence_files/tmp.*/resultat_codeml.txt >> results_codeml.txt
 cp results_codeml.txt results_codeml.txt.bkp

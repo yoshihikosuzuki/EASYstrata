@@ -202,7 +202,7 @@ if (argv[1]=="-h" || length(argv)==0){
     print(summary(all$Ds))
 
     Fig1A <- all  %>%   #we plot the D dataframe to obtain the Ds along the order
-      ggplot(., aes(x = St, y = Ds )) +
+      ggplot(., aes(x = start, y = Ds )) +
       #yn00:
       #geom_errorbar(aes(ymin = Ds-SEDs, ymax = Ds + SEDs), width = .1) +
       facet_wrap(~scaff, scale="free_x") +
@@ -213,7 +213,7 @@ if (argv[1]=="-h" || length(argv)==0){
       xlab("position along chromosome") +
       ylab( expression(italic(d[S]))) +
       th_plot + theme(legend.position = "none") +
-      ggtitle("A") 
+      ggtitle("A") #if order == "R" => scale_x_reverse() 
     
     Fig1B <- all %>%   #we plot the D dataframe to obtain the Ds along the order
       filter(Ds < 1) %>%

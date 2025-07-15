@@ -71,8 +71,16 @@ failure() {
 trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 ##################################################
 
-
 scaffold=$chromosome
+if [ -z ${scaffold+x} ]; then
+        echo "ERROR! scaffold file is unset";
+        echo "please provide a file of target scaffold (e.g. X or ancestral state)"
+        echo "see example in example_data/scaffold.txt"
+        exit 1
+else
+        echo "scaffold file is set to '$scaffold'";
+fi
+
 #replace space (multiple or not) by a single tab:
 sed -i 's/ \+/\t/g' "$scaffold"
 if [ ! -d 02_results ] ; then mkdir 02_results ; fi #ignore if already existent
@@ -122,8 +130,10 @@ if [ -n "${ancestral_genome}" ] ; then
     if [ -f ancestral_sp.fa ] ; then
         rm ancestral_sp.fa
     fi
-
-    ln -s "${ancestral_genome}" ancestral_sp.fa ; samtools faidx ancestral_sp.fa ; cd ../
+    
+    ln -s "${ancestral_genome}" ancestral_sp.fa ; 
+    samtools faidx ancestral_sp.fa ; 
+    cd ../
     gffread -g "${ancestral_genome}" -x ancestral_sp/ancestral_sp.spliced_cds.fa  \
     "${ancestral_gtf}" 
     transeq -sequence ancestral_sp/ancestral_sp.spliced_cds.fa \
@@ -182,6 +192,13 @@ if [[ $options = "synteny_and_Ds" ]] || [[ $options = "synteny_only" ]] ;
 then
     path1=$(readlink -f  haplo1/08_best_run/"$haplo1".v2.bed)
     path2=$(readlink -f haplo2/08_best_run/"$haplo2".v2.bed) 
+    if [ -f genespace/bed/"$haplo1".bed ] ; then 
+        rm genespace/bed/"$haplo1".bed ;
+    fi
+    if [ -f genespace/bed/"$haplo2".bed ] ; then 
+        rm genespace/bed/"$haplo2".bed ;
+    fi
+
     ln -s "$path1" genespace/bed/"$haplo1".bed
     ln -s "$path2" genespace/bed/"$haplo2".bed
     
@@ -198,8 +215,8 @@ then
     check1=$(grep -Ff tmp1 genespace/bed/"$haplo1".bed |wc -l )
     check2=$(grep -Ff tmp2 genespace/bed/"$haplo2".bed |wc -l )
     
-    echo -e "check2 size is $check2"
-    echo -e "check1 size is $check1"
+    echo -e "number of protein in haplo1 present in bed is: $check2"
+    echo -e "number of protein in haplo2 present in bed is:  $check1"
     
     bedsize1=$(wc -l genespace/bed/"$haplo1".bed |awk '{print $1}' )
     bedsize2=$(wc -l genespace/bed/"$haplo2".bed |awk '{print $1}' )
@@ -210,20 +227,20 @@ then
     #check that all is matching:
     if [ "$bedsize1" = "$check1" ]
     then
-        echo "input1 is ok" 
+        echo "input1 passing quality check" 
         rm tmp1
     else
-        echo "input1 is not ok"
+        echo "input1 NOT passing quality check"
         echo "check your data"
         exit 2
     fi
     
     if [ "$bedsize2" = "$check2" ]
     then
-        echo "input2 is ok" 
+        echo "input2 passing quality check" 
         rm tmp2
     else
-        echo "input2 is not ok"
+        echo "input2 NOT passing quality check"
         echo "check your data"
         exit 2
     fi
@@ -233,10 +250,13 @@ then
     # -- ancestral haplo
     if [ -n "${ancestral_genome}" ] ; then
         cd genespace/bed/ || exit 1
-        ln -s ../../ancestral_sp/ancestral_sp.bed . 
+        if [ ! -f ancestral_sp.bed ] ;then
+            ln -s ../../ancestral_sp/ancestral_sp.bed . 
+        fi 
         cd ../peptide || exit 1
-        ln -s ../../ancestral_sp/ancestral_sp_prot.fa ancestral_sp.fa
-        
+        if [ ! -f ancestral_sp.fa ] ; then
+            ln -s ../../ancestral_sp/ancestral_sp_prot.fa ancestral_sp.fa
+        fi
         cd ../../
     fi
 fi
@@ -255,8 +275,9 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
     
     #plot genespace subspace of target chromosomes: 
     echo scaffold is "$scaffold"
-    ln -s "$scaffold" scaffold.txt
-    
+    if [ ! -S scaffold.txt ] ; then
+        ln -s "$scaffold" scaffold.txt
+    fi
     echo -e "---------- making subplots using scaffold data ----------------"
     if [ -n "${ancestral_genome}" ] ; then
         Rscript ../00_scripts/Rscripts/02.plot_geneSpace.R ancestral_sp
@@ -265,41 +286,79 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
     fi
     
     cd ../
-
-    cp genespace/*pdf 02_results/
-
+    
+    if [ -e genespace/*pdf ] ; then
+        cp genespace/*pdf 02_results/
+    else
+        echo "plot in genespace/*pdf does not exist"
+        echo "check your scaffold file and whether genespace run properly"
+        #exit 2
+    fi
+    
 #-- extract single copy orthologs from orthofinder for later use-----------#
         pathN0="genespace/orthofinder/Results_*/Phylogenetic_Hierarchical_Orthogroups/N0.tsv"
         sed -i -e "s/\r//g" $pathN0
 
         haplo=$(head -n1 $pathN0 |awk '{print $7}')
 
-        p1=$(awk -v hap="$haplo1" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
-        p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
-        size1=$(paste <(echo "$p1") |wc -l )
-        size2=$(paste <(echo "$p2") |wc -l )
+        if [ ! -n "${ancestral_genome}" ] ; then 
+            p1=$(awk -v hap="$haplo1" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==5' ) )
+            p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==5' ) )
+            size1=$(paste <(echo "$p1") |wc -l )
+            size2=$(paste <(echo "$p2") |wc -l )
 
-        #check size 
-        minsize=30
-        paste <(echo "$p1") <(echo "$p2") |\
-                awk '{print "OG\t"$0}' > 02_results/paml/single.copy.orthologs 
+            if [ "$size1" != "$size2" ] ; then 
+                echo "error! number of single copy orthologs in $haplo1 and $haplo2 are not identical" ; 
+                echo "please check your single copy orthologs file"
+                exit 
+            fi
         
-        filesize=$(wc -l 02_results/paml/single.copy.orthologs |awk '{print $1}' )
-        if [ "$filesize" -lt "$minsize" ] ;
-        then
-            echo "error! file 02_results/paml/single.copy.orthologs is empty"
-            echo "please check your single copy orthologs in N0.tsv"
-            echo "please check your input data as well"
-            exit 1
-        fi 
-        
-        if [ -n "${ancestral_genome}" ]
+            #check size 
+            minsize=30  
+            #minisize =minimum number of single copy orthologs for further analyses. 
+            #This is really a low bound....
+            
+            paste <(echo "$p1") <(echo "$p2") |\
+                    awk '{print "OG\t"$0}' > 02_results/paml/single.copy.orthologs 
+            
+            filesize=$(wc -l 02_results/paml/single.copy.orthologs |awk '{print $1}' )
+            if [ "$filesize" -lt "$minsize" ] ;
+            then
+                echo "error! file 02_results/paml/single.copy.orthologs is empty"
+                echo "please check your single copy orthologs in N0.tsv"
+                echo "please check your input data as well"
+                exit 1
+            fi 
+            
+        elif [ -n "${ancestral_genome}" ]
         then
             ancestral=$(head -n1 ancestral_sp/ancestral_sp.fa.fai \
                 |cut -f1 \
                 |awk '{gsub("_","\t",$0) ; print $1}')
-                
+
+            p1=$(awk -v hap="$haplo1" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
+            p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
+
+            if [ "$size1" != "$size2" ] ; then 
+                echo "error! number of single copy orthologs in $haplo1 and $haplo2 are not identical" ; 
+                echo "please check your single copy orthologs file"
+                exit 
+            fi
+
             p_anc=$(awk -v hap="$ancestral" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) ) 
+            size_anc=$(paste <(echo "$p_anc") |wc -l )
+            if [ "$size1" != "$size_anc" ] ; then 
+                echo "error! number of single copy orthologs in ancestral species is different from haplo1"
+                exit
+            fi
+
+            if [ "$size1" != "$size2" ] ; then 
+                echo "error! number of single copy orthologs in $haplo1 and $haplo2 are not identical" ; 
+                echo "please check your single copy orthologs file"
+                exit 
+            fi
+
+
             size_anc=$(paste <(echo "$p_anc") |wc -l )
             paste <(echo "$p_anc" ) <(echo "$p1") <(echo "$p2") |\
                 awk '{print "OG\t"$0}' > 02_results/paml/single.copy.orthologs 
@@ -335,7 +394,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
 
     fi 
 
-
+#no longer usefull :
 #    if [ -n "${ancestral_genome}" ]; then
 #        #ancestral genome exist
 #        ./00_scripts/extract_singlecopy.sh -h1 "$haplo1" -h2 "$haplo2" -s "$scaffold" -a ancestral_sp
@@ -343,7 +402,6 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
 #        #ancestral genome not provided
 #        ./00_scripts/extract_singlecopy.sh -h1 "$haplo1" -h2 "$haplo2" -s "$scaffold" 
 #    fi
-
 
     if [ -n "${ancestral_genome}" ] ; then
         echo -e "\n------- an ancestral genome was provided ------ "
@@ -506,7 +564,7 @@ if [ "$options" = "Ds_only" ] ; then
                         echo "please check your single copy orthologs in N0.tsv"
                         echo "please check your input data as well"
                         exit 1
-		    fi
+            fi
                     cut  -f3 02_results/paml/single.copy.orthologs > 02_results/paml/sco."$haplo1".txt 
                     cut  -f4 02_results/paml/single.copy.orthologs > 02_results/paml/sco."$haplo2".txt
                 fi
@@ -519,7 +577,7 @@ if [ "$options" = "Ds_only" ] ; then
                     echo "please check your single copy orthologs in N0.tsv"
                     echo "please check your input data as well"
                     exit 1
-	        fi
+            fi
                 cut  -f2 02_results/paml/single.copy.orthologs > 02_results/paml/sco."$haplo1".txt 
                 cut  -f3 02_results/paml/single.copy.orthologs > 02_results/paml/sco."$haplo2".txt
             fi         
@@ -610,44 +668,44 @@ fi
 
 # --------------- step8 data processing for ideogram and circos-----------------#
 if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $options = "synteny_only" ]] ; then 
-    if [[ $options != "Ds_only" ]] ; then 
-        pathN0="genespace/orthofinder/Results_*/Phylogenetic_Hierarchical_Orthogroups/N0.tsv"
-        sed -i -e "s/\r//g" $pathN0
+    #if [[ $options != "Ds_only" ]] ; then 
+    #    pathN0="genespace/orthofinder/Results_*/Phylogenetic_Hierarchical_Orthogroups/N0.tsv"
+    #    sed -i -e "s/\r//g" $pathN0
 
-        p1=$(awk -v hap="$haplo1" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
-        p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
-        size1=$(paste <(echo "$p1") |wc -l )
-        size2=$(paste <(echo "$p2") |wc -l )
-
-        #check size 
-        paste <(echo "$p1") <(echo "$p2") |\
-                awk '{print "OG\t"$0}' > 02_results/paml/single.copy.orthologs 
-        if [ ! -s "02_results/paml/single.copy.orthologs" ];then
-            echo "error! file 02_results/paml/single.copy.orthologs is empty"
-            echo "please check your single copy orthologs in N0.tsv"
-            echo "please check your input data as well"
-            exit 1
-        fi 
-        
-        if [ -n "${ancestral_genome}" ]
-        then
-            ancestral=$(head -n1 ancestral_sp/ancestral_sp.fa.fai \
-                |cut -f1 \
-                |awk '{gsub("_","\t",$0) ; print $1}')
-                
-            p_anc=$(awk -v hap="$ancestral" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) ) 
-            size_anc=$(paste <(echo "$p_anc") |wc -l )
-            paste <(echo "$p_anc" ) <(echo "$p1") <(echo "$p2") |\
-                awk '{print "OG\t"$0}' > 02_results/paml/single.copy.orthologs 
-            if [ ! -s "02_results/paml/single.copy.orthologs" ];then
-                echo "error! file 02_results/paml/single.copy.orthologs is empty"
-                echo "please check your single copy orthologs in N0.tsv"
-                echo "please check your input data as well"
-                exit 1
-            fi 
-        fi  
+        #p1=$(awk -v hap="$haplo1" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
+        #p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
+        #size1=$(paste <(echo "$p1") |wc -l )
+        #size2=$(paste <(echo "$p2") |wc -l )
+        #
+        ##check size 
+        #paste <(echo "$p1") <(echo "$p2") |\
+        #        awk '{print "OG\t"$0}' > 02_results/paml/single.copy.orthologs 
+        #if [ ! -s "02_results/paml/single.copy.orthologs" ];then
+        #    echo "error! file 02_results/paml/single.copy.orthologs is empty"
+        #    echo "please check your single copy orthologs in N0.tsv"
+        #    echo "please check your input data as well"
+        #    exit 1
+        #fi 
+        #
+        #if [ -n "${ancestral_genome}" ]
+        #then
+        #    ancestral=$(head -n1 ancestral_sp/ancestral_sp.fa.fai \
+        #        |cut -f1 \
+        #        |awk '{gsub("_","\t",$0) ; print $1}')
+        #        
+        #    p_anc=$(awk -v hap="$ancestral" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) ) 
+        #    size_anc=$(paste <(echo "$p_anc") |wc -l )
+        #    paste <(echo "$p_anc" ) <(echo "$p1") <(echo "$p2") |\
+        #        awk '{print "OG\t"$0}' > 02_results/paml/single.copy.orthologs 
+        #    if [ ! -s "02_results/paml/single.copy.orthologs" ];then
+        #        echo "error! file 02_results/paml/single.copy.orthologs is empty"
+        #        echo "please check your single copy orthologs in N0.tsv"
+        #        echo "please check your input data as well"
+        #        exit 1
+        #    fi 
+        #fi  
         #create orthologues file:
-        awk '{print "ortho1\tortho2\t"$0}' 02_results/paml/single.copy.orthologs > 02_results/orthologues
+        #awk '{print "ortho1\tortho2\t"$0}' 02_results/paml/single.copy.orthologs > 02_results/orthologues
         #echo "ancestral genome ID is $ancestral " 
         #    if [[ $haplo1 == $haplo ]] ;
         #    then
@@ -687,7 +745,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
         #fi
         #creating different synteny table 
 
-    fi
+    #fi
     if [ -n "${ancestral_genome}" ]
     then
         echo "inferring synteny with ancestral species: "

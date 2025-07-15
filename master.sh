@@ -162,6 +162,9 @@ echo -e "------------------------------------------------------------\n\n"
 ############################################################
 
 echo "Generate Architecture"
+LOG_FOLDER=LOGS
+if [ ! -d "$LOG_FOLDER" ] ; then mkdir $LOG_FOLDER  ; fi 
+
 mkdir -p haplo1/03_genome 
 
 if [[ -z "${haplotype1}" ]] ; then
@@ -2829,11 +2832,6 @@ if [ "$option" = 6 ]; then
 
     # option = 6 - only genome 2 & RNAseq : 
     elif [ -n "${genome1}" ] && [ -z "${genome2}" ] && [[ $rnaseq = "YES" ]] && [ -n "${RNAseqlist}" ]  && [ -z "$ancestral_genome" ] && [ -z "$bamlist1" ] && [ -z "$bamlist2" ] ; then
-        cd haplo1/  || exit 1
-        if [  -n "$(ls -A 03_genome/ --ignore=Readme )"  ] ; then
-            echo -e "\n\n----------------------------------------"
-            echo "only the genome of one species was provided with RNAseq data" 
-            echo "genome is ${genome1} "
 
         ./00_scripts/launch_trimm.sh 2>&1 |tee LOGS/log_trimmomatic
         if [[  "${PIPESTATUS[0]}" -ne 0 ]]
@@ -2844,6 +2842,13 @@ if [ "$option" = 6 ]; then
                 echo -e "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n"
                 exit 1
         fi
+
+        cd haplo1/  || exit 1
+        if [  -n "$(ls -A 03_genome/ --ignore=Readme )"  ] ; then
+            echo -e "\n\n----------------------------------------"
+            echo "only the genome of one species was provided with RNAseq data" 
+            echo "genome is ${genome1} "
+
             
             ../00_scripts/launch_rnaseq.sh \
                 "${haplotype1}" 2>&1 |\
@@ -2924,12 +2929,6 @@ if [ "$option" = 6 ]; then
     
     # option = 6 - only genome 2 & RNAseq :
     elif [ -z "${genome1}" ] && [ -n "${genome2}" ]  && [[ $rnaseq = "YES" ]] && [ -n "${RNAseqlist}" ]  && [ -z "$ancestral_genome" ] && [ -z "$bamlist1" ] && [ -z "$bamlist2" ]  ; then
-        cd haplo2/ || exit 1
-        if [  "$(ls -A 03_genome/ --ignore=Readme )"  ] ; then
-            echo -e "\n\n----------------------------------------"
-            echo "only the genome of one species was provided with RNAseq data" 
-            echo "genome is ${genome2} "
-
         ./00_scripts/launch_trimm.sh 2>&1 |tee LOGS/log_trimmomatic
         if [[  "${PIPESTATUS[0]}" -ne 0 ]]
             then
@@ -2939,6 +2938,13 @@ if [ "$option" = 6 ]; then
                 echo -e "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n"
                 exit 1
         fi
+
+
+        cd haplo2/ || exit 1
+        if [  "$(ls -A 03_genome/ --ignore=Readme )"  ] ; then
+            echo -e "\n\n----------------------------------------"
+            echo "only the genome of one species was provided with RNAseq data" 
+            echo "genome is ${genome2} "
 
 
             ../00_scripts/launch_rnaseq.sh \

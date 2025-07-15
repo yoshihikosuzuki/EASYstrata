@@ -17,6 +17,10 @@ else
 fi
 source ../config/cpu_mem
 
+LOG_FOLDER="Rlogs"
+if [ ! -d "$LOG_FOLDER" ] ; then mkdir $LOG_FOLDER ; fi
+
+
 ############################################################
 # ERROR TRACKING.                                          #
 ############################################################

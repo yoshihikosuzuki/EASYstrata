@@ -120,31 +120,34 @@ else
         "Stramenopiles")
     if [[ ${clades[*]} =~ $target ]]
     then
-        if [ -d odb11 ] ; then
-            rm -rf odb11 
-            mkdir odb11 
+        if [ -d odb12 ] ; then
+            echo "folder odb12 already present"
+            mkdir odb12 
         else 
-           mkdir odb11
+           mkdir odb12
         fi
 
-        cd odb11 || exit
-        for file in "$target".fa.*
+        cd odb12 || exit
+        for file in "$target".fa*
         do 
             if [ -f "$file" ] 
             then
                 echo "warning file $target.fa already present "
-                #should always be wrong since we rm the folder
             else
+                echo "download partionned odb12 for $target lineage"
                 wget -q https://bioinf.uni-greifswald.de/bioinf/partitioned_odb12/"${target}".fa.gz
                 gunzip "${target}".fa.gz
                 cd ../ 
-                if [ -z ${RelatedProt+x} ] ; then
+                if [ -z ${RelatedProt} ] ; then
                     echo "no related protein"
-                    mv odb11/"${target}".fa  relatProt.fa
+                    echo "copying file"
+                    cp odb12/"${target}".fa  relatProt.fa
                     relatProt="relatProt.fa"
+                    echo "compressing file"
+                    gzip odb12/"${target}".fa
                 else
-                    echo "combining $RelatedProt odb11 data" 
-                    cat "$RelatedProt"  odb11/"${target}".fa > relatProt.fa
+                    echo "combining $RelatedProt odb12 data" 
+                    cat "$RelatedProt"  odb12/"${target}".fa > relatProt.fa
                     relatProt="relatProt.fa"
                 fi
             fi
@@ -153,8 +156,8 @@ else
         echo -e "\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         echo -e "error the clade name you provided is not in the orthoDB list !!\n"
         echo -e "please check the clade name"
-    	echo -e "this should be one among (casee sensitive):
-	    [Metazoa Vertebrata Viridiplantae Arthropoda Eukaryota Fungi Alveolata]"
+        echo -e "this should be one among (case sensitive):
+        [Metazoa Vertebrata Viridiplantae Arthropoda Eukaryota Fungi Alveolata]"
         echo -e "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
         exit 1
     fi

@@ -142,10 +142,11 @@ cp  08_best_run/report_"$haplo"_rnaseq.pdf ../02_results
     tsebraconf=default.cfg
     cp ../config/$tsebraconf .
     if [ -f $tsebraconf ] ; then 
-        echo " $tsebraconf exist";  cp "$tsebraconf" . 
+        echo " $tsebraconf exist";
     else 
         echo "FATAL ERROR: no config file for tsebra"
-        exit
+        exit 1
+        #cp "$tsebraconf" . 
     fi
     
     #then run tsebra:
@@ -177,7 +178,7 @@ echo -e  "\n-----------renaming and fixing braker output now------------\n"
 echo -e  "--------------------------------------------------------------\n"
 
 #then this is a part common to both RNAseq + Proteins or Proteins only:
-rename_gtf.py --gtf "${file}" --prefix "${haplo}" \
+rename_gtf.py --gtf "${file}" --prefix ""  \
     --translation_tab translation_tab."$haplo" \
     --out 08_best_run/"${haplo}".renamed.gtf 
 
@@ -422,7 +423,7 @@ then
     exit 1
 fi
 
-
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TE Filtration ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # a bit more filtering of TE - identify entierely softmasked genes and remove them:
 # bedtools could be used to extract all overlapping TE in the bed 
 # but we may want to filter based on proportion of TE
