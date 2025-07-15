@@ -232,7 +232,14 @@ then
     else
         echo "input1 NOT passing quality check"
         echo "check your data"
-        exit 2
+        if [ "$check1" -lt "$bedsize1" ] ;
+        then
+            #there is less protein than bed size, we subset the bed
+            echo -e "\n\nattempting to subset the bed for haplo1\n"
+            grep -Ff tmp1 genespace/bed/"$haplo1".bed > bed.hap1.tmp
+            mv bed.hap1.tmp genespace/bed/"$haplo1".bed
+        #exit 2
+        fi
     fi
     
     if [ "$bedsize2" = "$check2" ]
@@ -242,7 +249,14 @@ then
     else
         echo "input2 NOT passing quality check"
         echo "check your data"
-        exit 2
+        if [ "$check2" -lt "$bedsize2" ] ;
+        then
+            #there is less protein than bed size, we subset the bed
+            echo -e "\n\nattempting to subset the bed for haplo2\n"
+            grep -Ff tmp2 genespace/bed/"$haplo2".bed > bed.hap2.tmp
+            mv bed.hap2.tmp genespace/bed/"$haplo2".bed
+        #exit 2
+        fi
     fi
     
     # -- handling ancestral haplo ------
