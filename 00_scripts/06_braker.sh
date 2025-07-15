@@ -122,7 +122,6 @@ else
     then
         if [ -d odb12 ] ; then
             echo "folder odb12 already present"
-            mkdir odb12 
         else 
            mkdir odb12
         fi
@@ -152,6 +151,7 @@ else
                 fi
             fi
         done 
+        cd ../
     else
         echo -e "\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         echo -e "error the clade name you provided is not in the orthoDB list !!\n"

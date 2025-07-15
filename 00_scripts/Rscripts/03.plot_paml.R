@@ -217,7 +217,7 @@ if (argv[1]=="-h" || length(argv)==0){
       ggtitle("A") #if order == "R" => scale_x_reverse() 
     
     Fig1B <- all %>%   #we plot the D dataframe to obtain the Ds along the order
-      filter(Ds < 1) %>%
+      filter(Ds < max_ds) %>%
       ggplot(., aes(x = orderchp, y = Ds, colour = scaff)) +
       #yn00
       #geom_errorbar(aes(ymin = Ds-SEDs, ymax = Ds + SEDs), width = .1) +

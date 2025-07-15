@@ -47,15 +47,15 @@ p <- a %>%
   xlab('Genomic position (bins 1 Mb)') +
   ylab('mean DP') # + th_plot
 
-
 #create dir:
 if (!dir.exists("02_results")){
-  dir.create("02_results/")
+      dir.create("02_results")
 }
 
 if (!dir.exists("02_results/RNA_depth")){
-  dir.create("02_results/RNA_Depth")
+      dir.create("02_results/RNA_depth")
 }
+
 
 #export :
 for(i in 1:n_pages(p)){

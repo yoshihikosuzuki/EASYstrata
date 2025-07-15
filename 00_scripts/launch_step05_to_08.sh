@@ -71,10 +71,14 @@ then
     echo -e "\tNO TE annotation requested\n\twill skip this step"; 
     echo -e "\tassuming genome already softmasked ";
     echo -e "-----------------------------------------------------\n"
-    if ! ln -s ../"$genome" 03_genome/genome.wholemask.fa     
-    then
-        echo "error could not copy genome!"
-        exit 1
+    if [ -L 03_genome/genome.wholemask.fa ] ; then
+            echo "symbolic link alreadry present"
+    else
+        if ! ln -s ../"$genome" 03_genome/genome.wholemask.fa     
+        then
+            echo "error could not copy genome!"
+            exit 1
+        fi
     fi
 fi
 
