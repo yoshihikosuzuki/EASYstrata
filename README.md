@@ -72,7 +72,6 @@ There are several options which allow you to choose which steps of the workflow 
 
 ```./master.sh -o 1 2>&1 |tee log```
 
-??? d'ici jusqu'à ???FIN des lignes ont pu être insérées/effacées
 **All steps:** performs all steps of the workflow, i.e. gene prediction, synteny analysis with GeneSpace including single copy orthologs inference between sex/mating type chromosomes,  synonymous divergence (d<sub>S</sub>) computation, evolutionary strata inference and production of various plots
 
 
@@ -128,9 +127,9 @@ Again, all input data, including full path to input files, should be provided in
 ### Basic input
 all options
 * **Input genome(s)** - compulsory: This may be one genome assembly containing both sex/mating type chromosomes, or **ideally** two separate haplotype assemblies containing each one of the sex/mating-type chromosomes.
-* **list of scaffolds** - compulsory: names of the contigs/scaffolds/chromosomes composing the sex/mating-type chromosomes.
+* **list of scaffolds** - compulsory: names of the contigs/scaffolds/chromosomes composing the sex/mating-type chromosomes. see example [here](https://github.com/QuentinRougemont/EASYstrata/blob/main/example_data/scaffold.txt)
 * **ancestral genome** - optional but highly recommended: The genome assembly of a species used as a proxy for the ancestral state. This will allow to plot d<sub>S</sub> along 'ancestral' gene order, and to infer more accurately single copy orthologs.
-* **ancestral gene prediction** - compulsory with ancestral genome: gene prediction associated with the ancestral genome 
+* **ancestral gene prediction** - compulsory with ancestral genome: gene prediction associated with the ancestral genome. format: gtf/gff(.gz) 
 
 ### :fire: :fire: :fire:   **WARNINGS:** :fire:  :fire: :fire:  
 
@@ -165,7 +164,7 @@ gene_id **MUST** follow this structure:
  
 * [geneID] : anyID avoid complex characters 
 
-
+### :sweat_drops: :sweat_drops: :sweat_drops:  **END OF WARNINGS** :sweat_drops: :sweat_drops: :sweat_drops: 
 
 
 ### Input for TE prediction
