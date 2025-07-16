@@ -132,7 +132,7 @@ all options
 * **ancestral genome** - optional but highly recommended: The genome assembly of a species used as a proxy for the ancestral state. This will allow to plot d<sub>S</sub> along 'ancestral' gene order, and to infer more accurately single copy orthologs.
 * **ancestral gene prediction** - compulsory with ancestral genome: gene prediction associated with the ancestral genome 
 
-### :fire:  **Warning** :fire:  
+### :fire: :fire: :fire:   **WARNINGS:** :fire:  :fire: :fire:  
 
 **names of fasta and contigs/scaffolds/chromosomes:**  
 
@@ -140,7 +140,7 @@ We recommend short names for genome assemblies and **NO SPECIAL CHARACTERS** apa
 
 *example:* species-1.fasta will not be valid in GeneSpace. => Use **species1.fasta** instead.
 
-:exclamation: chromosome/scaffold ID :exclamation:  
+:exclamation: **chromosome/scaffold IDs:** :exclamation:  
 
 you  **MUST** use **standardized IDs including the species/individual name** 
 **NO SPECIAL CHARACTERS** apart from underscore.  
@@ -161,9 +161,9 @@ gene_id **MUST** follow this structure:
 
 * [individualID] : any ID for you species/strain/individual of interest  
 
-* [chromosomeID] : ID of the chromosome should be like "chrX", "contigZ", "chrW" etc  
+* [chromosomeID] : ID of the chromosome should be like "chrX", "contigZ", "chrW" etc   
  
-5 [geneID] : anyID avoid complex characters 
+* [geneID] : anyID avoid complex characters 
 
 
 
