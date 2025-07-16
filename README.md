@@ -72,6 +72,7 @@ There are several options which allow you to choose which steps of the workflow 
 
 ```./master.sh -o 1 2>&1 |tee log```
 
+??? d'ici jusqu'à ???FIN des lignes ont pu être insérées/effacées
 **All steps:** performs all steps of the workflow, i.e. gene prediction, synteny analysis with GeneSpace including single copy orthologs inference between sex/mating type chromosomes,  synonymous divergence (d<sub>S</sub>) computation, evolutionary strata inference and production of various plots
 
 
@@ -131,13 +132,37 @@ all options
 * **ancestral genome** - optional but highly recommended: The genome assembly of a species used as a proxy for the ancestral state. This will allow to plot d<sub>S</sub> along 'ancestral' gene order, and to infer more accurately single copy orthologs.
 * **ancestral gene prediction** - compulsory with ancestral genome: gene prediction associated with the ancestral genome 
 
-#### Warning: names of fasta and contigs/scaffolds/chromosomes
-We recommend you use short names for your genome assemblies and avoid any special characters apart from underscore.
+### :fire: :exclammation: **Warning** :exclammation: :fire:  
+
+
+**names of fasta and contigs/scaffolds/chromosomes**  
+
+We recommend short names for genome assemblies and **NO SPECIAL CHARACTERS** apart from underscore.  
+
 *example:* species-1.fasta will not be valid in GeneSpace. => Use **species1.fasta** instead.
 
-For chromosome/contig/scaffold, you  **MUST** use standardized IDs including the species name, and avoid any special characters apart from underscore.  
-example: **species1_chr1** or **species1_contigX** or **species1_scaffoldZ**
+For chromosome/contig/scaffold: 
+you  **MUST** use **standardized IDs including the species/individual name** 
+**NO SPECIAL CHARACTERS** apart from underscore.  
+
+*example:* 
+**species1_chr1** or **species1_contigX** or **species1_scaffoldZ**
 **otherwise the code will failed during renaming steps**
+
+* :warning: **if starting from existing gtf/gff :**  :warning:
+
+gene_id **MUST** follow this structure:
+
+[individualID]"_"[chromosomeID]"_"[geneID]" : 
+
+1 avoid any special character in the ID
+2 use only two underscore as above. 
+3 [individualID] : any ID for you species/strain/individual of interest
+4 [chromosomeID] : ID of the chromosome should be like "chrX", "contigZ", "chrW" etc
+5 [geneID] : anyID avoid complex characters
+
+
+
 
 ### Input for TE prediction
 options 1,2,6 if your input genomes are not already softmasked
