@@ -140,7 +140,8 @@ We recommend short names for genome assemblies and **NO SPECIAL CHARACTERS** apa
 
 *example:* species-1.fasta will not be valid in GeneSpace. => Use **species1.fasta** instead.
 
-:exclamation: For chromosome/contig/scaffold :exclamation:
+:exclamation: chromosome/scaffold ID :exclamation:  
+
 you  **MUST** use **standardized IDs including the species/individual name** 
 **NO SPECIAL CHARACTERS** apart from underscore.  
 
@@ -148,19 +149,19 @@ you  **MUST** use **standardized IDs including the species/individual name**
 **species1_chr1** or **species1_contigX** or **species1_scaffoldZ**
 **otherwise the code will failed during renaming steps**
 
-* :warning: **if starting from existing gtf/gff :**  :warning:
+:warning: **if starting from existing gtf/gff :**  :warning:
 
 gene_id **MUST** follow this structure:
 
-[individualID]"_"[chromosomeID]"_"[geneID]" :  
+[individualID]_[chromosomeID]_[geneID]" :  
 
-1 avoid any special character in the ID 
+* avoid any special character in the ID 
 
-2 use only two underscore as above.  
+* use only two underscore as above.  
 
-3 [individualID] : any ID for you species/strain/individual of interest  
+* [individualID] : any ID for you species/strain/individual of interest  
 
-4 [chromosomeID] : ID of the chromosome should be like "chrX", "contigZ", "chrW" etc  
+* [chromosomeID] : ID of the chromosome should be like "chrX", "contigZ", "chrW" etc  
  
 5 [geneID] : anyID avoid complex characters 
 
