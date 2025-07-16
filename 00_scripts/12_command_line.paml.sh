@@ -138,7 +138,9 @@ cd 02_results/paml || exit 1
 
 #all is run from paml folder now
 
-if [ -e sorted* ] ; then rm sorted* ; fi
+if [ -e sorted."$haplo1".wanted_cds.fa ] ; then rm sorted."$haplo1".wanted_cds.fa ; fi
+if [ -e sorted."$haplo2".wanted_cds.fa ] ; then rm sorted."$haplo2".wanted_cds.fa ; fi
+
 while read -r pattern ; 
 do 
     grep -w -A1 "$pattern" "$haplo2".linearised.cds  >> sorted."$haplo2".wanted_cds.fa ;
@@ -169,7 +171,7 @@ awk '{if($1 !~ /^>/) {if( substr($0, length($0)-2, length($0)) ~ /(TGA|TAG|TAA)/
 
 ##2 ------ split and cat pairwise sequence -------
 #split 
-if [ -d sequence_files/ ] ; then rm -rf sequence_files ; f
+if [ -d sequence_files/ ] ; then rm -rf sequence_files ; fi
 
 mkdir sequence_files
 

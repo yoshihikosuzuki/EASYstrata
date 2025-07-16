@@ -202,14 +202,15 @@ if (argv[1]=="-h" || length(argv)==0){
     ncolors <- length(unique(all$scaff))
     print(summary(all$Ds))
 
-    Fig1A <- all  %>%   #we plot the D dataframe to obtain the Ds along the order
+    Fig1A <- all  %>%    #we plot the dataframe to obtain the Ds along the order
+      filter(Ds < 6) %>% #remove dS we extreme values as they are unlikely
       ggplot(., aes(x = start, y = Ds )) +
       #yn00:
       #geom_errorbar(aes(ymin = Ds-SEDs, ymax = Ds + SEDs), width = .1) +
       facet_wrap(~scaff, scale="free_x") +
       geom_point( size = 1) + 
       theme_classic() +
-      scale_y_break(c(1,max(all$Ds, na.rm = T)-0.1)) +
+      scale_y_break(c(1,max(all$Ds, na.rm = T)-0.1)) + #just zoom on the 0-1 range and break for extreme values
       ylim(c(0,max(all$Ds, na.rm=T)+.1)) +
       xlab("position along chromosome") +
       ylab( expression(italic(d[S]))) +

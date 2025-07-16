@@ -132,6 +132,7 @@ else
             if [ -f "$file" ] 
             then
                 echo "warning file $target.fa already present "
+                cd ..
             else
                 echo "download partionned odb12 for $target lineage"
                 wget -q https://bioinf.uni-greifswald.de/bioinf/partitioned_odb12/"${target}".fa.gz
@@ -151,7 +152,6 @@ else
                 fi
             fi
         done 
-        cd ../
     else
         echo -e "\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         echo -e "error the clade name you provided is not in the orthoDB list !!\n"

@@ -141,6 +141,18 @@ if [ -n "${ancestral_genome}" ] ; then
     awk '$3=="transcript" {print $1"\t"$4"\t"$5"\t"$10}' "$ancestral_gtf" |\
         sed 's/"//g' |sed 's/;//g'  > ancestral_sp/ancestral_sp.bed
     sed -i 's/_1//g'  ancestral_sp/ancestral_sp_prot.fa
+    gene_ids_hap=$(cut -f 4 ancestral_sp/ancestral_sp.bed |awk -F "_" '{print NF}' |sort |uniq )
+    if [ "$gene_ids_hap" = 3 ] ; then
+        echo "gene_id hap1 is ok"
+    else
+       echo "error! gene structure should be of the type:"
+       echo "[IndividualID]_[chromosomeID]_[geneID]" 
+       echo -e "it should contain exactly two underscore to separate your individual/strain/species
+             from the chromosome, and the chromosome from the geneID\n"
+       echo "please reformat the ID in your gff/gtf"   
+       exit 1
+    fi
+
 
     bedanc="ancestral_sp/ancestral_sp.bed"
 
@@ -182,8 +194,34 @@ gffread --bed -E haplo2/08_best_run/"$haplo2".final.gtf -o haplo2/08_best_run/"$
 cut -f 1-4  haplo1/08_best_run/"$haplo1".bed  > haplo1/08_best_run/"$haplo1".v2.bed
 cut -f 1-4  haplo2/08_best_run/"$haplo2".bed  > haplo2/08_best_run/"$haplo2".v2.bed
 
-bedhaplo1="haplo1/08_best_run/"$haplo1".v2.bed"
-bedhaplo2="haplo2/08_best_run/"$haplo2".v2.bed"
+bedhaplo1="haplo1/08_best_run/$haplo1.v2.bed"
+bedhaplo2="haplo2/08_best_run/$haplo2.v2.bed"
+
+#checking the architeture of gene id:
+gene_ids_hap1=$(cut -f 4 haplo1/08_best_run/"$haplo1".v2.bed | awk -F "_" '{print NF}' |sort |uniq )
+if [ "$gene_ids_hap1" = 3 ] ; then
+    echo "gene_id hap1 is ok"
+else
+   echo "error! gene structure should be of the type:"
+   echo "[IndividualID]_[chromosomeID]_[geneID]" 
+   echo -e "it should contain exactly two underscore to separate your individual/strain/species
+         from the chromosome, and the chromosome from the geneID\n"
+   echo "please reformat the ID in your gff/gtf"   
+   exit 1
+fi
+
+gene_ids_hap2=$(cut -f 4 haplo2/08_best_run/"$haplo2".v2.bed | awk -F "_" '{print NF}' |sort |uniq )
+if [ "$gene_ids_hap2" = 3 ] ; then
+    echo "gene_id hap1 is ok"
+else
+   echo "error! gene structure should be of the type:"
+   echo "[IndividualID]_[chromosomeID]_[geneID]" 
+   echo -e "it should contain exactly two underscore to separate your individual/strain/species
+         from the chromosome, and the chromosome from the geneID\n"
+   echo "please reformat the ID in your gff/gtf"   
+   exit 1
+fi
+
 
 #------------------------------ step 2 prepare genespace data------------------#
 #
@@ -301,7 +339,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
     
     cd ../
     
-    if [ -e genespace/*pdf ] ; then
+    if ls genespace/*.pdf 1> /dev/null 2>&1 ; then
         cp genespace/*pdf 02_results/
     else
         echo "plot in genespace/*pdf does not exist"
@@ -313,9 +351,14 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
         pathN0="genespace/orthofinder/Results_*/Phylogenetic_Hierarchical_Orthogroups/N0.tsv"
         sed -i -e "s/\r//g" $pathN0
 
+        #check size 
+        minsize=30  
+        #minisize =minimum number of single copy orthologs for further analyses. 
+        #This is really a low bound....
+
         haplo=$(head -n1 $pathN0 |awk '{print $7}')
 
-        if [ ! -n "${ancestral_genome}" ] ; then 
+        if [  -z "${ancestral_genome}" ] ; then 
             p1=$(awk -v hap="$haplo1" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==5' ) )
             p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==5' ) )
             size1=$(paste <(echo "$p1") |wc -l )
@@ -327,10 +370,6 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
                 exit 
             fi
         
-            #check size 
-            minsize=30  
-            #minisize =minimum number of single copy orthologs for further analyses. 
-            #This is really a low bound....
             
             paste <(echo "$p1") <(echo "$p2") |\
                     awk '{print "OG\t"$0}' > 02_results/paml/single.copy.orthologs 
@@ -352,6 +391,8 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
 
             p1=$(awk -v hap="$haplo1" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
             p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
+            size1=$(paste <(echo "$p1") |wc -l )
+            size2=$(paste <(echo "$p2") |wc -l )
 
             if [ "$size1" != "$size2" ] ; then 
                 echo "error! number of single copy orthologs in $haplo1 and $haplo2 are not identical" ; 
@@ -547,7 +588,7 @@ if [ "$options" = "Ds_only" ] ; then
     # first option: single copy orthologs provided by the user:
     if [ -r "$single_copy_file" ] ; then
         echo "single copy ortholog file is : $single_copy_file"
-        single_copy_size=$(wc -l $single_copy_file |awk '{print $1}' ) 
+        single_copy_size=$(wc -l "$single_copy_file" |awk '{print $1}' ) 
         echo -e "there is $single_copy_size orthologs in file $single_copy_file" 
         
         #matching column containing the haplotype 1 :
@@ -1342,7 +1383,7 @@ fi
 
 ## for fun we now make circos plot with links consisting of the strata and colored by their ds Values:
 #preparer des bed file pour faire des circos plots:
-if [ ! -d 02_results/bed ] ; then mkdir 02_results/bed ; fi
+if [ ! -d 02_results/bed ] ; then mkdir 02_results/bed ; fi
 if [ -n "${ancestral_genome}" ] ;
 then
     cut -f 1-3,19 02_results/modelcomp/noprior/df.txt |sed 1d > 02_results/bed/ancestralspecies.3strata.bed
