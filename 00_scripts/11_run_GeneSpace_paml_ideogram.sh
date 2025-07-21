@@ -241,11 +241,15 @@ then
     ln -s "$path2" genespace/bed/"$haplo2".bed
     
     # simplify the protein file to match the bed (i.e. remove the _1 inserted by transeq and the CDS length info):
-    sed 's/_1.*$//g' haplo1/08_best_run/"$haplo1"_prot.final.clean.fa \
-        > genespace/peptide/"$haplo1".fa
-    sed 's/_1.*$//g' haplo2/08_best_run/"$haplo2"_prot.final.clean.fa \
-        > genespace/peptide/"$haplo2".fa
-    
+    #sed 's/_1.*$//g' haplo1/08_best_run/"$haplo1"_prot.final.clean.fa \
+    #    > genespace/peptide/"$haplo1".fa
+    #sed 's/_1.*$//g' haplo2/08_best_run/"$haplo2"_prot.final.clean.fa \
+    #    > genespace/peptide/"$haplo2".fa
+    cp haplo1/08_best_run/"$haplo1"_prot.final.clean.fa \
+         genespace/peptide/"$haplo1".fa
+    cp haplo2/08_best_run/"$haplo2"_prot.final.clean.fa \
+         genespace/peptide/"$haplo2".fa
+   
     #verify that IDs in bed and fasta file are matching - else exit  
     grep ">" genespace/peptide/"$haplo1".fa |sed 's/>//g' > tmp1
     grep ">" genespace/peptide/"$haplo2".fa |sed 's/>//g' > tmp2

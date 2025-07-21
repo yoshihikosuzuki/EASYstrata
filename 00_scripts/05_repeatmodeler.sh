@@ -15,7 +15,6 @@ conda activate repeatmodeler_env
 
 echo -e "TEdatabase is ""$TEdatabase"" "
 echo -e "NCBI species is ""$ncbi_species"" "
-echo -e "genome is ""$genome"" "
 
 #------------- CHECK PARAMETERS -------------- #
 if [ $# -ne 3  ]; then

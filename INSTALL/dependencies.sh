@@ -383,7 +383,7 @@ then
     if [ $? -eq 0 ]; then
         echo $command installation worked successfully
 
-        htpath=$(pwd)
+        htpath="$(echo $(pwd)"/include/htslib/")"
         cd ../
     else
         echo installation of $command failed! check the logs

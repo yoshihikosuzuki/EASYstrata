@@ -1,16 +1,26 @@
 #!/bin/bash
+#SBATCH --account=youraccount
+#SBATCH --time=04:00:00
+#SBATCH --job-name=braker
+#SBATCH --output=log_braker-%J.out
+#SBATCH --mem=20G
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=8
+
+# Move to directory where job was submitted
+cd $SLURM_SUBMIT_DIR
 
 #Purpose:
 #script to rename the scaffold in the gtf, 
 #rename the gtf, create a synchronised genome
 #extract longest protein
-#Date: 2023
+#Date: 2025
 #Author: QR
 ############################################################
 # ERROR TRACKING.                                          #
 ############################################################
 set -eE -o functrace
-
 failure() {
   local lineno=$1
   local msg=$2
@@ -18,16 +28,6 @@ failure() {
 }
 trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 ##################################################
-
-#current_command=$BASH_COMMAND
-#last_command=""
-
-# keep track of the last executed command
-#trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
-# echo an error message before exiting
-#trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
-
-############################################################
 # Help                                                     #
 ############################################################
 Help()
@@ -45,6 +45,7 @@ Help()
    echo "-h|--help: Print this Help."
    echo "-s|--haplo: the name of the focal haplo\t will be used to rename the 
    genes"
+   echo "-o | --output ) echo the folder (haplo1 or haplo2 were analyses will be performed"
    echo "-r|--RNAseq: a float YES/NO stating whether RNAseq was used to 
    annotate the genome "
    echo "-g|--genome: the genome name (full path)"
@@ -52,8 +53,6 @@ Help()
    echo " "
    echo "dependancies: TSEBRA, samtools, gffread, transeq busco "
 }
-
-
 ############################################################
 # Process the input options.                               #
 ############################################################
@@ -61,6 +60,7 @@ while [ $# -gt 0 ] ; do
   case $1 in
     -s | --haplo )  haplo="$2" ; 
     echo -e "haplotype Name is ***${haplo}*** \n" >&2;;
+    -o | --output ) folder="$2"; echo "the data located in $folder will be processed">&2;;
     -g | --genome ) genome="$2"  ;
     echo -e "genome Name is ***${genome}*** \n" >&2;;
     -r | --rnaseq ) RNAseq="$2"  ;
@@ -70,12 +70,10 @@ while [ $# -gt 0 ] ; do
    shift
 done 
 
-
-if [ -z "${haplo}" ] || [ -z "${RNAseq}" ] || [ -z "${genome}" ] ; then
+if [ -z "${haplo}" ] || [ -z "${RNAseq}" ] || [ -z "${genome}" ] || [ -z "$folder" ] ; then
     Help
     exit 2 
 fi
-
 if [ ! -d 08_best_run ] ; then
     mkdir -p 08_best_run/01_haplo_cds 
     mkdir 08_best_run/02_haplo_prot 
@@ -84,10 +82,11 @@ fi
 echo -e  "\n-----------------------------------------------------------------"
 echo -e "\nfinding best run \n" 
 echo -e  "-----------------------------------------------------------------\n"
-source ../config/config
+source config/config
+cd "$folder" #either haplo1 or haplo2 to be provided as argument
 cd 06_braker
 
-#there is a bit of variance between braker run train on a protein database,
+#there is a bit of variance between braker run trained on a protein database,
 #therefore we perform a few replicate run and choose the 'best run' where 
 #best is defined as the run providing 
 #the highest score in terms of busco completness 
@@ -153,7 +152,7 @@ cp  08_best_run/report_"$haplo"_rnaseq.pdf ../02_results
     ../00_scripts/09_tsebra.sh "$haplo" "$best_round"
     
     cd 08_best_run
-    if [ -L "$haplo".tmp.gtf ] ; then rm "$haplo".tmp.gtf ; fi
+    
     ln -s ../07-tsebra_results/"$haplo".combined.gtf "$haplo".tmp.gtf
     cd ../
     file=08_best_run/$haplo.tmp.gtf
@@ -212,7 +211,7 @@ gtffull=08_best_run/$gtf
 #extract the cds and protein from it:
 output="$haplo"_cds.fa
 echo output cds is "$output"
-gffread -x 08_best_run/01_haplo_cds/"$output" \
+gffread -w 08_best_run/01_haplo_cds/"$output" \
         -g "${genome}" "$gtffull"
 
 #then convert also the file to its cds:
@@ -372,14 +371,14 @@ echo -e "\n-----------------------------------------------------------------"
 echo "re-extracting protein and CDS from the final non-redundan gtf" 
 echo -e "-----------------------------------------------------------------\n"
 
-gffread -x "$haplo".spliced_cds.fa -g ../03_genome/genome.wholemask.fa "$gtf4" 
+gffread -w "$haplo".spliced_cds.fa -g ../03_genome/genome.wholemask.fa "$gtf4" 
 echo "translate CDS into amino acid "
 gffread -y "$haplo"_prot.final.clean.fa -g ../03_genome/genome.wholemask.fa "$gtf4"
 
-#transeq -sequence "$haplo".spliced_cds.fa \
-#    -outseq "$haplo"_prot.final.fa
-transeq -clean -sequence "$haplo".spliced_cds.fa \
-    -outseq "$haplo"_prot.final.fa #for interproscan and other pipelines
+transeq -clean -sequence  "$haplo".spliced_cds.fa \
+    -outseq "$haplo"_prot.final.fa
+#transeq -clean -sequence "$haplo".spliced_cds.fa \
+#    -outseq "$haplo"_prot.final.clean.fa #for interproscan and other pipelines
 
 echo -e "there is $( grep -c ">" "$haplo"_prot.final.fa |\
     awk '{print $1}' ) total protein corresponding to a single longest transcript in the final files"
@@ -471,7 +470,7 @@ if [[ $removeTE = "YES" ]]
 then
     #let's assume we are not too stringeant 
     #this will be passed as a parameter later to be chosen by the user
-    prop=0.9 #see config file 
+    prop=0.9999 #see config file 
     #copy the final one :
     cp "$haplo"_prot.final.clean.fa unfiltered."$haplo"_prot.final.clean.fa
     cp "$haplo"_prot.final.fa       unfiltered."$haplo"_prot.final.fa

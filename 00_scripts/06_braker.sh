@@ -133,6 +133,7 @@ else
             then
                 echo "warning file $target.fa already present "
                 cd ..
+                if [ -s relatProt.fa ] ; then relatProt="relatProt.fa" ; fi
             else
                 echo "download partionned odb12 for $target lineage"
                 wget -q https://bioinf.uni-greifswald.de/bioinf/partitioned_odb12/"${target}".fa.gz
@@ -181,7 +182,7 @@ then
     wd=06_braker/rnaseq
     if [ -f "$wd"/"$output" ]
     then
-        echo "file $output RNAseq already exist will skip the run"
+        echo -e "file $output RNAseq already exist will skip the run\n"
     else
         echo "starting annotation with RNAseq data only"
         mkdir -p $wd
@@ -206,8 +207,8 @@ then
     echo "no related protein - only RNAseq were used"
     exit
 else
-    echo "will annotate with $relatProt "
-    echo "will perform 5 independant run of braker"
+    echo -e "will annotate with $relatProt data\n"
+    echo -e "will perform 5 independant run of braker\n"
 fi
 
 #prepare architecture:

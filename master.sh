@@ -139,16 +139,29 @@ fi
 
 echo "------------------------------------------------------------"
 echo "-----check all variables from the configuration file  ------"
+if [ -n "${ancestral_genome}" ] ; then
+    echo "ancestral_species is $ancestral_genome "
+fi
 echo "  ancestral genome ${ancestral_genome}  "
-echo "  ancestral gtf is ${ancestral_gtf} "
-echo "*** fasta for genome1 is ${genome1} **** "
-echo "*** fasta for genome2 is ${genome2} **** "
+if [ -n "${ancestral_genome}" ] ; then
+    echo "ancestral_gtf is $ancestral_gtf "
+fi
+if [ -n "${genome1}" ] ; then
+    echo "*** fasta for genome1 is ${genome1} **** "
+fi
+if [ -n "${genome2}" ] ; then
+    echo "*** fasta for genome1 is ${genome2} **** "
+fi
 echo "*** haplotype1 is ${haplotype1} ***"
-echo "*** haplotype2 is ${haplotype2}"
+if [ -n "${haplotype2}" ] ; then
+    echo "*** haplotype2 is ${haplotype2}"
+fi
 echo "*** shoulbe genome be annotated ? $annotate" 
 echo "*** is RNAseq provided? $rnaseq ***"
-echo "*** RNAseq list is: ${RNAseqlist} ****" 
-echo "*** Alternatively, BAM list might be : ${bamlist1} & ${bamlist2}****"
+if [ -n "$rnaseq" ] ; then
+    echo "*** RNAseq list is: ${RNAseqlist} ****" 
+    echo "*** Alternatively, BAM list might be : ${bamlist1} & ${bamlist2}****"
+fi
 echo "*** should TE be annotated ? $annotateTE ****"
 echo "*** TE database is : $TEdatabase ***"
 echo "*** lineage for busco analyses will be:  $busco_lineage ***"
@@ -2405,8 +2418,9 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
             echo "please check input file synchronisation"
             exit
         else
-            transeq -sequence haplo1/08_best_run/"$haplotype1".spliced_cds.fa \
-                    -outseq haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa
+            gffread -g "$genome1" -y haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa "$gtf1"
+            #transeq -sequence haplo1/08_best_run/"$haplotype1".spliced_cds.fa \
+            #        -outseq haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa
 
         fi     
         if ! gffread -g "$genome2" -x haplo2/08_best_run/"$haplotype2".spliced_cds.fa  "$gtf2"
@@ -2415,8 +2429,9 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
             echo "please check input file synchronisation"
             exit
         else
-            transeq -sequence haplo2/08_best_run/"$haplotype2".spliced_cds.fa \
-                    -outseq haplo2/08_best_run/"$haplotype2"_prot.final.clean.fa
+            gffread -g "$genome2" -y haplo2/08_best_run/"$haplotype2"_prot.final.clean.fa  "$gtf2"
+            #transeq -sequence haplo2/08_best_run/"$haplotype2".spliced_cds.fa \
+            #        -outseq haplo2/08_best_run/"$haplotype2"_prot.final.clean.fa
         fi 
         
         #if [ -z "$ancestral_genome" ] ; then

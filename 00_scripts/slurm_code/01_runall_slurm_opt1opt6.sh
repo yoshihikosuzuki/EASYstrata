@@ -1,0 +1,126 @@
+#!/bin/bash
+# Launch all jobs with dependencies
+# WARNING! All scripts must be edited prior to submitting and not changed until run!
+# HINT: Give meaningful job names in submission scripts to distinguish them
+
+# Global variables
+DEPENDS="--dependency=afterok:"
+SCRIPTPATH="./00_scripts/slurm_code"
+
+# Warning to have a population map file ready before running this script
+echo "WARNING! Make sure you have properly set up to config file in config/ folder"
+echo
+option=$1
+if [ -z "$option" ] ; then
+    echo "Error no option provided ! I don't know what to do"
+    Help
+    exit 2
+else
+    echo -e  "\n***will run workflow with option : $option*****\n\n"
+fi
+
+#getting parameters in config file:
+source ./config/config
+
+## checking option 
+if [ "$option" = 1 ] || [ "$option" = 6 ] ;
+then
+   echo "test"
+   #checking parameters in config files:
+   if [ -z "$haplotype2" ] && [ -n "$haplotype1" ] && [ -n "$genome1" ]; then
+       echo -e "only $genome1 for $haploype1 provided\n"
+       #assumes only genome1 and haplotype1 are provided: 
+       genome="$genome1"
+       folder="haplo1"
+       haplo="$haplotype1"
+       if [ ! -d "$folder" ] ; then mkdir $folder ; fi
+       if [ "$rnaseq" == YES ] ; then 
+           p1=$(sbatch "$SCRIPTPATH"/01_submit_trimmomatic.sh                                              | awk '{print $4}')
+           p2=$(sbatch "$DEPENDS"$p1 "$SCRIPTPATH"/02_submit_gmap.sh "$haplo" "$folder" "$genome"          | awk '{print $4}')
+           p3=$(sbatch "$DEPENDS"$p2 "$SCRIPTPATH"/03_gsnap_array.sh "$haplo" "$folder"           	       | awk '{print $4}')
+           if [ "$annotateTE" == YES ] ; then
+               p4=$(sbatch "$SCRIPTPATH"/04_submit_repeatmodeler.sh -g "$genome" -s "$haplo" -f "$folder"  | awk '{print $4}')
+               p5=$(sbatch "$DEPENDS"$p4:$p3 "$SCRIPTPATH"/05_braker_RNAseq.sh   -g "$genome" -s "$haplo" -o "$folder" -r YES | awk '{print $4}')
+               p6=$(sbatch "$DEPENDS"$p4:$p3 "$SCRIPTPATH"/05_braker_db_array.sh -g "$genome" -s "$haplo" -o "$folder" -r NO  | awk '{print $4}')
+           else
+               p5=$(sbatch "$DEPENDS"$p3 "$SCRIPTPATH"/05_braker_rnaseq.sh   -g "$genome" -s "$haplo" -o "$folder" -r YES | awk '{print $4}')
+               p6=$(sbatch "$DEPENDS"$p3 "$SCRIPTPATH"/05_braker_db_array.sh -g "$genome" -s "$haplo" -o "$folder" -r NO  | awk '{print $4}')
+           fi
+	   p7=$(sbatch "$DEPENDS"$p5:$p6 "$SCRIPTPATH"/06_reshape_braker_output.sh -s "$haplo" -g "$genome" -f "$folder" -r YES|awk '{print $4'} ) 
+
+       elif [ "$rnaseq" == NO ]; then
+           if [ "$annotateTE" == YES ] ; then
+                p4=$(sbatch "$SCRIPTPATH"/04_submit_repeatmodeler.sh -g "$genome" -s "$haplo" -f "$folder"  | awk '{print $4}')
+    	        p6=$(sbatch "$DEPENDS"$p4 "$SCRIPTPATH"/05_braker_db_array.sh -g "$genome" -s "$haplo" -o "$folder" -r NO  | awk '{print $4}')
+            elif [ "$annotateTE" == NO ]; then
+    	        p6=$(sbatch "$SCRIPTPATH"/05_braker_db_array.sh -g "$genome" -s "$haplo" -o "$folder" -r NO  | awk '{print $4}')
+       	    fi
+	    p7=$(sbatch "$DEPENDS"$p6 "$SCRIPTPATH"/06_reshape_braker_output.sh -s $haplo -g $genome -f "$folder" -r NO |awk '{print $4'} ) 
+       fi
+  #checking parameters in config files:
+  elif [ -n "$haplotype2" ] && [ -n "$haplotype1" ] && [ -n "$genome1" ] &&  [ -n "$genome2" ] ; then
+       echo "test2"
+       echo -e "$genome1 for $haploype1 provided\n"
+       echo -e "$genome2 for $haploype2 provided\n"
+
+	#assumes both genome1, haplotype1, genome2, haplotype2 are provided:
+	folder1="haplo1"
+	folder2="haplo2"
+	if [ ! -d "$folder1" ] ; then mkdir $folder1 ; fi
+	if [ ! -d "$folder2" ] ; then mkdir $folder2 ; fi
+           p1=$(sbatch "$SCRIPTPATH"/01_submit_trimmomatic.sh                                              | awk '{print $4}')
+
+        if [ "$rnaseq" == YES ] ; then 
+	   echo -e "rnaseq provided\n"
+           p2=$(sbatch "$DEPENDS"$p1 "$SCRIPTPATH"/02_submit_gmap.sh "$haplo1" "$folder1" "$genome1"       | awk '{print $4}')
+           p3=$(sbatch "$DEPENDS"$p2 "$SCRIPTPATH"/03_gsnap_array.sh "$haplo1" "$folder1"           	   | awk '{print $4}')
+	   #genome2:
+           p4=$(sbatch "$DEPENDS"$p1 "$SCRIPTPATH"/02_submit_gmap.sh "$haplo2" "$folder2" "$genome2"       | awk '{print $4}')
+           p5=$(sbatch "$DEPENDS"$p4 "$SCRIPTPATH"/03_gsnap_array.sh "$haplo2" "$folder2"           	   | awk '{print $4}')
+
+           if [ "$annotateTE" == YES ] ; then
+	       echo -e "TE annotation requested\n"	
+               p6=$(sbatch "$SCRIPTPATH"/04_submit_repeatmodeler.sh -g "$genome1" -s "$haplo1" -f "$folder1"  | awk '{print $4}')
+               p7=$(sbatch "$DEPENDS"$p6:$p3 "$SCRIPTPATH"/05_braker_RNAseq.sh   -g "$genome1" -s "$haplo1" -o "$folder1" -r YES | awk '{print $4}')
+               p8=$(sbatch "$DEPENDS"$p6:$p3 "$SCRIPTPATH"/05_braker_db_array.sh -g "$genome1" -s "$haplo1" -o "$folder1" -r NO  | awk '{print $4}')
+	       #genome2:
+               p9=$(sbatch "$SCRIPTPATH"/04_submit_repeatmodeler.sh -g "$genome2" -s "$haplo2" -f "$folder2"  | awk '{print $4}')
+               p10=$(sbatch "$DEPENDS"$p9:$p5 "$SCRIPTPATH"/05_braker_RNAseq.sh   -g "$genome2" -s "$haplo2" -o "$folder2" -r YES | awk '{print $4}')
+               p11=$(sbatch "$DEPENDS"$p9:$p5 "$SCRIPTPATH"/05_braker_db_array.sh -g "$genome2" -s "$haplo2" -o "$folder2" -r NO  | awk '{print $4}')
+
+           else
+               p7=$(sbatch "$DEPENDS"$p3 "$SCRIPTPATH"/05_braker_RNAseq.sh   -g "$genome1" -s "$haplo1" -o "$folder1" -r YES | awk '{print $4}')
+               p8=$(sbatch "$DEPENDS"$p3 "$SCRIPTPATH"/05_braker_db_array.sh -g "$genome1" -s "$haplo1" -o "$folder1" -r NO  | awk '{print $4}')
+	       #genome2:
+               p10=$(sbatch  "$DEPENDS"$p5 "$SCRIPTPATH"/05_braker_RNAseq.sh  -g "$genome2" -s "$haplo2" -o "$folder2" -r YES | awk '{print $4}')
+               p11=$(sbatch "$DEPENDS"$p5 "$SCRIPTPATH"/05_braker_db_array.sh -g "$genome2" -s "$haplo2" -o "$folder2" -r NO  | awk '{print $4}')
+           fi
+	   p12=$(sbatch "$DEPENDS"$p7:$p8 "$SCRIPTPATH"/06_reshape_braker_output.sh   -s $haplo1 -g $genome1 -f "$folder1" -r YES |awk '{print $4'} ) 
+	   p14=$(sbatch "$DEPENDS"$p10:$p11 "$SCRIPTPATH"/06_reshape_braker_output.sh -s $haplo2 -g $genome2 -f "$folder2" -r YES |awk '{print $4'} ) 
+
+       elif [ "$rnaseq" == NO ]; then
+	       echo "no rnaseq provided"
+           if [ "$annotateTE" == YES ] ; then
+                p6=$(sbatch "$SCRIPTPATH"/04_submit_repeatmodeler.sh -g "$genome1" -s "$haplo1" -f "$folder1"  | awk '{print $4}')
+    	        p8=$(sbatch "$DEPENDS"$p6 "$SCRIPTPATH"/05_braker_db_array.sh -g "$genome1" -s "$haplo1" -o "$folder1" -r NO  | awk '{print $4}')
+		#genome2:
+		p9=$(sbatch "$SCRIPTPATH"/04_submit_repeatmodeler.sh -g "$genome2" -s "$haplo2" -f "$folder2"  | awk '{print $4}')
+    	        p11=$(sbatch "$DEPENDS"$p9 "$SCRIPTPATH"/05_braker_db_array.sh -g "$genome2" -s "$haplo2" -o "$folder2" -r NO  | awk '{print $4}')
+
+            elif [ "$annotateTE" == NO ] ; then
+    	        p8=$(sbatch "$SCRIPTPATH"/05_braker_db_array.sh  -g "$genome1" -s "$haplo1" -o "$folder1" -r NO  | awk '{print $4}')
+		#genome2:  
+    	        p11=$(sbatch "$SCRIPTPATH"/05_braker_db_array.sh -g "$genome2" -s "$haplo2" -o "$folder2" -r NO  | awk '{print $4}')
+		#reshape:
+	   fi
+	   p12=$(sbatch "$DEPENDS"$p8 "$SCRIPTPATH"/06_reshape_braker_output.sh  -s $haplo1 -g $genome1 -f "$folder1" -r NO |awk '{print $4'} ) 
+	   p14=$(sbatch "$DEPENDS"$p11 "$SCRIPTPATH"/06_reshape_braker_output.sh -s $haplo2 -g $genome2 -f "$folder2" -r NO |awk '{print $4'} ) 
+      fi
+   fi
+fi
+
+#then launch other jobs for option 1, option2, option3, option4, option5 
+#to do: Launch genespace and stuff if opt1,3,4,5
+
+# Confirm job sumbissions
+#echo "All jobs submitted"
