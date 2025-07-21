@@ -7,14 +7,12 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=12
-
 # Move to directory where job was submitted
 cd $SLURM_SUBMIT_DIR
 
 #activate conda
 #eval "$(conda shell.bash hook)"
-#conda activate superannot
-#activate conda
+#mamba activate superannot
 #give expected number of arguments from config file:
 source config/config
 
@@ -61,9 +59,22 @@ fi
 LOG_FOLDER="LOGS"
 if [ ! -d "$LOG_FOLDER" ] ; then mkdir $LOG_FOLDER ; fi 
 
-./00_scripts/11_run_GeneSpace_paml_ideogram.sh \
-            -s1 "$haplotype1" \
-            -s2 "$haplotype2" \
-            -c "$scaffold" \
-            -o "$opt" 2>&1 |\
-            tee LOGS/log_GeneSpace_and_Co
+if [ -n "${ancestral_genome}" ] ; then
+     echo "running analyses with ancestral genome"
+    ./00_scripts/11_run_GeneSpace_paml_ideogram.sh \
+         -s1 "$haplotype1" \
+         -s2 "$haplotype2" \
+         -a "$ancestral_genome" \
+         -g "$ancestral_gtf" \
+         -c "$scaffold" \
+         -o "$opt" 2>&1 |\
+        tee LOGS/log_GeneSpace_and_Co
+else
+     echo "running analyses without ancestral genome"
+    ./00_scripts/11_run_GeneSpace_paml_ideogram.sh \
+         -s1 "$haplotype1" \
+         -s2 "$haplotype2" \
+         -c "$scaffold" \
+         -o "$opt" 2>&1 |\
+        tee LOGS/log_GeneSpace_and_Co
+fi

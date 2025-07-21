@@ -118,7 +118,22 @@ then
       fi
    fi
 fi
-
+if [ "$option" = 1 ] ;
+then
+    echo -e "option number $option is required \n\n" 
+    echo "run data preparation for these option:"    
+    ##NOT TESTED YET:
+    if [ -z "$haplotype2" ] && [ -n "$haplotype1" ] && [ -n "$genome1" ]; then
+       echo -e "only $genome1 for $haploype1 provided\n"
+       p15=$(sbatch "$DEPENDS"$p7 "$SCRIPTPATH"/07_dataprep_opt3_opt4_opt5.sh |awk '{print $4}' )
+    elif [ -n "$haplotype2" ] && [ -n "$haplotype1" ] && [ -n "$genome1" ] &&  [ -n "$genome2" ] ; then
+       echo "pouet"
+       p15=$(sbatch "$DEPENDS"$p12:$p14 "$SCRIPTPATH"/07_dataprep_opt3_opt4_opt5.sh |awk '{print $4}' )
+    fi
+    opt="synteny_and_Ds"
+    echo -e "option for genespace is $opt\n"
+    p16=$(sbatch "$DEPENDS"$p15 "$SCRIPTPATH"/08_submit_genespace_paml_and_plot.sh -o "$opt"  |awk '{print $4}' )
+fi
 ################################################################################
 # ------section for option 3 : GeneSpace/Synteny + Ds analyses ----------------#
 ################################################################################

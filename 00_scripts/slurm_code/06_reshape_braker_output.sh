@@ -7,10 +7,10 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
-
 # Move to directory where job was submitted
 cd $SLURM_SUBMIT_DIR
-
+#eval "$(conda shell.bash hook)"
+#mamba activate superannot
 #Purpose:
 #script to rename the scaffold in the gtf, 
 #rename the gtf, create a synchronised genome

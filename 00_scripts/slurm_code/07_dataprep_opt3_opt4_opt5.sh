@@ -1,9 +1,9 @@
 #!/bin/bash
 ##SBATCH --account=youraccount
-#SBATCH --time=4:00:00
+#SBATCH --time=0:50:00
 #SBATCH --job-name=dataprep
 #SBATCH --output=log_prep-%J.out
-#SBATCH --mem=20G
+#SBATCH --mem=10G
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
@@ -94,6 +94,7 @@ source config/cpu_mem
             exit
         else
             gffread -g "$genome1" -y haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa "$gtf1"
+            sed -i '/^>/!s/./*/g' haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa 
         fi     
         if ! gffread -g "$genome2" -x haplo2/08_best_run/"$haplotype2".spliced_cds.fa  "$gtf2"
         then
@@ -102,6 +103,8 @@ source config/cpu_mem
             exit
         else
             gffread -g "$genome2" -y haplo2/08_best_run/"$haplotype2"_prot.final.clean.fa  "$gtf2"
+            sed -i '/^>/!s/./*/g' haplo2/08_best_run/"$haplotype2"_prot.final.clean.fa 
+
         fi 
     elif [ -n "${gtf1}" ] && [ -n "${genome1}" ] ; then
         #else we expect them to be provided in the config file 
@@ -137,8 +140,10 @@ source config/cpu_mem
             echo "please check input file synchronisation"
             exit
         else
-            transeq -sequence haplo1/08_best_run/"$haplotype1".spliced_cds.fa \
-                    -outseq haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa
+            gffread -g "$genome1" -y haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa "$gtf1"
+            sed -i '/^>/!s/./*/g' haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa 
+            #transeq -sequence haplo1/08_best_run/"$haplotype1".spliced_cds.fa \
+            #        -outseq haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa
 
         fi     
         #handle haplotype2 now - we assumme that haplotype2 is present in the genome of "$haplotype1"

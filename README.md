@@ -22,6 +22,7 @@ This software is suitable only in linux-like systems (Unfortunately not Windows 
         * [Operations of step III: Plot d<sub>S</sub> along the genome](#operations-of-step-iii-plot-ds-along-the-genome)
         * [Operations of step IV: Perform changepoint analysis to identify evolutionary strata](#operations-of-step-iv-perform-changepoint-analysis-to-identify-evolutionary-strata)
    * [Working examples](#working-examples)
+   * [SLURM integration](#SLURM-integration)
    * [CPU and memory requirements](#CPU-and-memory-requirements)
 
 # Purpose:
@@ -422,6 +423,42 @@ each point is a gene d<sub>S</sub> value colored according to the strata of assi
 ## 7: example from stickleback data 
 
 - [see example 7](example_data/example7.md)
+
+## 8: working from existing single copy orthologs matrix (possibly from many individuals/species)
+
+Use case:
+ when a run of orthofinder was performed and included many species or sample. 
+
+ this can reduce the number of false positive single copy orthologs 
+
+(to do):
+- [see example 8](example_data/example8.md)
+
+
+
+# SLURM integration (beta)
+
+
+the workflow is being deployed on SLURM for beta testing.
+
+each major step can be run separately
+see the scripts [here](00_scripts/slurm_code/)
+
+ideally, once the config/config file is set properly and once you have chosen which option to use you can simply launch:
+
+```
+./00_scripts/slurm_code/01_runall_slurm_opt1opt6.sh <OPTION> 
+```
+
+with <OPTION> being a number between 1 to 8 depending on the chosen configuration for your data.
+
+see the summary of option [here](https://github.com/QuentinRougemont/EASYstrata?tab=readme-ov-file#summary-table-of-options)  
+
+this will submit all job and their dependencies, making appropriate check depending on whether you have RNAseq data or not, if you have already a softmasked genome, etc.
+
+## NOTE: for now only option 1 (full workflow), option 6 (only TE and gene annotation) and option 3 have been tested!
+
+
 
 
 

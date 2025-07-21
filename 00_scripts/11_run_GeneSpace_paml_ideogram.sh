@@ -125,7 +125,7 @@ if [ -n "${ancestral_genome}" ] ; then
     else
         echo " "
     fi
-
+    if [ ! -d ancestral_sp ] ; then mkdir ancestral_sp ; fi
     cd ancestral_sp || exit 
     if [ -f ancestral_sp.fa ] ; then
         rm ancestral_sp.fa
@@ -170,15 +170,17 @@ then
     echo "only drawing plots" 
 elif [[ $options = "synteny_and_Ds" ]] ; 
 then
-    if [ -d genespace ] ; then rm -rf genespace  ; fi  #02_results/plots  
-    mkdir -p genespace/bed genespace/peptide 
-    mkdir -p  02_results/paml #02_results/plots 
+    if [ ! -d genespace ] ; then #rm -rf genespace  ; fi  #02_results/plots  
+       mkdir -p genespace/bed genespace/peptide 
+       mkdir -p  02_results/paml #02_results/plots 
+    fi
 elif [[ $options = "synteny_only" ]] ; 
 then
-    if [ -d genespace ] ; then rm -rf genespace  ; fi  #02_results/plots  
+    if [ ! -d genespace ] ; then #rm -rf genespace  ; fi  #02_results/plots  
     #rm -rf genespace/bed genespace/peptide 02_results/paml 02_results/plots 
-    mkdir -p genespace/bed genespace/peptide 
-    mkdir 02_results/paml
+       mkdir -p genespace/bed genespace/peptide 
+       mkdir 02_results/paml
+    fi
 elif [[ $options == "changepoint" ]] ;
 then
         echo "only changepoint will be performed"
@@ -245,11 +247,12 @@ then
     #    > genespace/peptide/"$haplo1".fa
     #sed 's/_1.*$//g' haplo2/08_best_run/"$haplo2"_prot.final.clean.fa \
     #    > genespace/peptide/"$haplo2".fa
-    cp haplo1/08_best_run/"$haplo1"_prot.final.clean.fa \
+    if [ ! -s genespace/peptide/"$haplo1".fa ] ; then
+         cp haplo1/08_best_run/"$haplo1"_prot.final.clean.fa \
          genespace/peptide/"$haplo1".fa
-    cp haplo2/08_best_run/"$haplo2"_prot.final.clean.fa \
+         cp haplo2/08_best_run/"$haplo2"_prot.final.clean.fa \
          genespace/peptide/"$haplo2".fa
-   
+    fi 
     #verify that IDs in bed and fasta file are matching - else exit  
     grep ">" genespace/peptide/"$haplo1".fa |sed 's/>//g' > tmp1
     grep ">" genespace/peptide/"$haplo2".fa |sed 's/>//g' > tmp2
@@ -319,42 +322,40 @@ fi
 
 #------------------- step 3 run GeneSpace -------------------------------------#
 if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
-    cd genespace  || exit 1
-
-    MCScanpath=$(command -v MCScanX |xargs dirname )
-    #just in case this is not already done:
-    Rscript -e  'devtools::install_github("jtlovell/GENESPACE")'
-
-    sed -i "s#mcpath#$MCScanpath#" ../00_scripts/Rscripts/01.run_geneSpace.R
-    
-    Rscript ../00_scripts/Rscripts/01.run_geneSpace.R || exit 1
-    
-    #plot genespace subspace of target chromosomes: 
-    echo scaffold is "$scaffold"
-    if [ ! -S scaffold.txt ] ; then
-        ln -s "$scaffold" scaffold.txt
-    fi
-    echo -e "---------- making subplots using scaffold data ----------------"
-    if [ -n "${ancestral_genome}" ] ; then
-        Rscript ../00_scripts/Rscripts/02.plot_geneSpace.R ancestral_sp
+    if [ -s genespace/results/gsParams.rda ] ; then
+        echo "genespace results already exist - skipping run"
     else
-        Rscript ../00_scripts/Rscripts/02.plot_geneSpace.R "$haplo1"
-    fi
-    
-    cd ../
-    
-    if ls genespace/*.pdf 1> /dev/null 2>&1 ; then
-        cp genespace/*pdf 02_results/
-    else
-        echo "plot in genespace/*pdf does not exist"
-        echo "check your scaffold file and whether genespace run properly"
-        #exit 2
-    fi
-    
+        cd genespace  || exit 1
+        MCScanpath=$(command -v MCScanX |xargs dirname )
+        #just in case this is not already done:
+        Rscript -e  'devtools::install_github("jtlovell/GENESPACE")'
+        sed -i "s#mcpath#$MCScanpath#" ../00_scripts/Rscripts/01.run_geneSpace.R
+        
+        Rscript ../00_scripts/Rscripts/01.run_geneSpace.R || exit 1
+        #plot genespace subspace of target chromosomes: 
+        echo scaffold is "$scaffold"
+        if [ ! -S scaffold.txt ] ; then
+            ln -s "$scaffold" scaffold.txt
+        fi
+        echo -e "---------- making subplots using scaffold data ----------------"
+        if [ -n "${ancestral_genome}" ] ; then
+            Rscript ../00_scripts/Rscripts/02.plot_geneSpace.R ancestral_sp
+        else
+            Rscript ../00_scripts/Rscripts/02.plot_geneSpace.R "$haplo1"
+        fi
+        cd ../
+        
+        if ls genespace/*.pdf 1> /dev/null 2>&1 ; then
+            cp genespace/*pdf 02_results/
+        else
+            echo "plot in genespace/*pdf does not exist"
+            echo "check your scaffold file and whether genespace run properly"
+            #exit 2
+        fi
+    fi 
 #-- extract single copy orthologs from orthofinder for later use-----------#
         pathN0="genespace/orthofinder/Results_*/Phylogenetic_Hierarchical_Orthogroups/N0.tsv"
         sed -i -e "s/\r//g" $pathN0
-
         #check size 
         minsize=30  
         #minisize =minimum number of single copy orthologs for further analyses. 
@@ -363,18 +364,18 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
         haplo=$(head -n1 $pathN0 |awk '{print $7}')
 
         if [  -z "${ancestral_genome}" ] ; then 
-            p1=$(awk -v hap="$haplo1" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==5' ) )
-            p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==5' ) )
+            p1=$(awk -v hap="$haplo1" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |grep -Ff <(awk '{print $2}' $scaffold) | awk 'NF==5' ) )
+            p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |grep -Ff <(awk '{print $2}' $scaffold) | awk 'NF==5' ) )
             size1=$(paste <(echo "$p1") |wc -l )
             size2=$(paste <(echo "$p2") |wc -l )
 
             if [ "$size1" != "$size2" ] ; then 
                 echo "error! number of single copy orthologs in $haplo1 and $haplo2 are not identical" ; 
+                echo "there is $size1 single copy orthologs in $haplo1 data"
+                echo "there is $size2 single copy orthologs in $haplo2 data"
                 echo "please check your single copy orthologs file"
                 exit 
             fi
-        
-            
             paste <(echo "$p1") <(echo "$p2") |\
                     awk '{print "OG\t"$0}' > 02_results/paml/single.copy.orthologs 
             
@@ -393,35 +394,29 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
                 |cut -f1 \
                 |awk '{gsub("_","\t",$0) ; print $1}')
 
-            p1=$(awk -v hap="$haplo1" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
-            p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
+            p1=$(awk -v hap="$haplo1" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |grep -Ff <(awk '{print $2}' $scaffold) | awk 'NF==6' ) )
+            p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |grep -Ff <(awk '{print $2}' $scaffold) | awk 'NF==6' ) )
             size1=$(paste <(echo "$p1") |wc -l )
             size2=$(paste <(echo "$p2") |wc -l )
-
             if [ "$size1" != "$size2" ] ; then 
                 echo "error! number of single copy orthologs in $haplo1 and $haplo2 are not identical" ; 
+                echo "there is $size1 single copy orthologs in $haplo1 data"
+                echo "there is $size2 single copy orthologs in $haplo2 data"
                 echo "please check your single copy orthologs file"
                 exit 
             fi
 
-            p_anc=$(awk -v hap="$ancestral" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) ) 
+            p_anc=$(awk -v hap="$ancestral" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |grep -Ff <(awk '{print $2}' $scaffold) | awk 'NF==6' ) ) 
             size_anc=$(paste <(echo "$p_anc") |wc -l )
             if [ "$size1" != "$size_anc" ] ; then 
                 echo "error! number of single copy orthologs in ancestral species is different from haplo1"
+                echo "there is $size1 single copy orthologs in $haplo1 data"
+                echo "there is $size_anc single copy orthologs in ancestral data"
                 exit
             fi
-
-            if [ "$size1" != "$size2" ] ; then 
-                echo "error! number of single copy orthologs in $haplo1 and $haplo2 are not identical" ; 
-                echo "please check your single copy orthologs file"
-                exit 
-            fi
-
-
-            size_anc=$(paste <(echo "$p_anc") |wc -l )
             paste <(echo "$p_anc" ) <(echo "$p1") <(echo "$p2") |\
                 awk '{print "OG\t"$0}' > 02_results/paml/single.copy.orthologs 
-        filesize=$(wc -l 02_results/paml/single.copy.orthologs |awk '{print $1}' )
+            filesize=$(wc -l 02_results/paml/single.copy.orthologs |awk '{print $1}' )
             if [ "$filesize" -lt "$minsize" ] ;
             then
                 echo "error! file 02_results/paml/single.copy.orthologs is empty"
@@ -431,11 +426,8 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
             fi 
 
         fi  
-
         #create orthologues file:
         awk '{print "ortho1\tortho2\t"$0}' 02_results/paml/single.copy.orthologs > 02_results/orthologues
-
-
 #------------------- step 4 run minimap2 --------------------------------------#
     echo -e "\n-----------------\n\tperform whole genome synteny\n------------\n" 
     echo -e "\n-----------------\n\trunning minimap\n-------------------------\n" 
@@ -452,7 +444,6 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
             { echo -e "${RED} ERROR! minimap2 failed - check your data\n${NC} " ; exit 1 ; }
 
     fi 
-
 #no longer usefull :
 #    if [ -n "${ancestral_genome}" ]; then
 #        #ancestral genome exist
@@ -461,7 +452,6 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
 #        #ancestral genome not provided
 #        ./00_scripts/extract_singlecopy.sh -h1 "$haplo1" -h2 "$haplo2" -s "$scaffold" 
 #    fi
-
     if [ -n "${ancestral_genome}" ] ; then
         echo -e "\n------- an ancestral genome was provided ------ "
         if [ ! -s 02_results/minimap_alns/aln.ancestral_sp_"$haplo2".paf ];
@@ -482,7 +472,6 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
                 > 02_results/minimap_alns/aln.ancestral_sp_"$haplo1".paf  || \
             { echo -e "${RED} ERROR! minimap2 faield - check your data\n${NC} " ; exit 1 ; }
         fi 
-    
         #preparing scaffold to highlight in minimap2 dotplot:
         #Note: this code assume the following structure of gene id: "haploXX_chrXX_geneXXX"
         #no other separator should be used 
@@ -1651,7 +1640,6 @@ else
 fi
 
 #finally create circos plot based on dS values quantiles:
-
 if [[ $annotateTE = "YES" ]] ; then
                 echo "assuming TE bed file exist"
                 echo "assuming links"
@@ -1690,4 +1678,3 @@ else #assume no TE:
 fi
 fi 
 echo "all analyses finished"
-
