@@ -119,8 +119,42 @@ then
    fi
 fi
 
-#then launch other jobs for option 1, option2, option3, option4, option5 
-#to do: Launch genespace and stuff if opt1,3,4,5
-
+################################################################################
+# ------section for option 3 : GeneSpace/Synteny + Ds analyses ----------------#
+################################################################################
+################################################################################
+# ----------------- section for option 4 : Ds analyses  -----------------------#
+################################################################################
+################################################################################
+# -------------- section for option 5 : GeneSpace/Synteny analyses ------------#
+################################################################################
+if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then 
+       echo -e "option number $option is required \n\n" 
+       echo "run data preparation for these option"	
+       p15=$(sbatch "$SCRIPTPATH"/07_dataprep_opt3_opt4_opt5.sh |awk '{print $4}' )
+fi
+if [ "$option" == 3 ] ; then 
+    echo "----------------------------------------------------------------"
+    echo "       GeneSpace/Synteny + Ds analyses will be launched         " 
+    echo "               checking config files settings                   "
+    echo "----------------------------------------------------------------" 
+    opt="synteny_and_Ds"
+    echo -e "option for genespace is $opt\n"
+    p16=$(sbatch "$DEPENDS"$p15 "$SCRIPTPATH"/08_submit_genespace_paml_and_plot.sh -o "$opt"  |awk '{print $4}' )
+elif [ "$option" == 4 ] ; then 
+    echo "----------------------------------------------------------------"
+    echo "         only Ds + associated analyses will be launched         " 
+    echo "               checking config files settings                   "
+    echo "----------------------------------------------------------------"
+    opt="Ds_only"
+    p16=$(sbatch "$DEPENDS"$p15 "$SCRIPTPATH"/08_submit_genespace_paml_and_plot.sh -o "$opt"  |awk '{print $4}' )
+elif [ "$option" == 5 ] ; then 
+    echo "----------------------------------------------------------------"
+    echo "          only GeneSpace/Synteny  analyses will be launched     " 
+    echo "               checking config files settings                   "
+    echo "----------------------------------------------------------------"
+    opt="synteny_only"
+    p16=$(sbatch "$DEPENDS"$p15 "$SCRIPTPATH"/08_submit_genespace_paml_and_plot.sh -o "$opt"  |awk '{print $4}' )
+fi
 # Confirm job sumbissions
-#echo "All jobs submitted"
+echo "All jobs submitted"
