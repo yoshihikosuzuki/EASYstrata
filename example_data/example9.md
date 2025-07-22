@@ -153,13 +153,13 @@ sbatch 00_scripts/slurm_code/08_submit_genespace_paml_and_plot.sh "$opt"
 
 * the circos shows this:
 
-![Fig2.png](example9figure/1.circos.svg)
+<img src="example9figure/1.circos.svg" width = "590" heigth = "590">
 
 HUGE GENE LOSS !
 
 * same pattern observed in ideogram: 
 
-![Fig3.png](example9figure/3.ideogram.svg)
+<img src="example9figure/3.ideogram.svg" width = "690" heigth = "390">
 
 
 * only few genes were available for dS computation

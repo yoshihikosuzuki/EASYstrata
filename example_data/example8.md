@@ -7,9 +7,19 @@ usefull to reduce the set of single copy orthologs making it more robust
 
 example data are taken from cannabis paper with data downloaded here:
 
-inset link here
+insret download link here
 
 after getting the data for all genome we generated a table of single copy orthologs from 20 genome assemblies
+
+* extract the X/Y peptide data from all peptide file
+
+* run orthofinder
+
+* export the N0.tsv.file
+
+**formatting file**
+
+grep -v "," N0.tsv.file |awk 'NF==20' > single_copy_orthologs
 
 next we want to obtain the dS pattern from one randomly chosen assembly pair with separated X/Y chromosomes 
 
