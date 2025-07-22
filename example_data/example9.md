@@ -153,24 +153,22 @@ sbatch 00_scripts/slurm_code/08_submit_genespace_paml_and_plot.sh "$opt"
 
 * the circos shows this:
 
-<img src="example9figure/1.circos.svg" width = "790" heigth = "790">
+<img src="example9figure/1.circos.svg" width = "790" height = "790">
 
 HUGE GENE LOSS !
 
 * same pattern observed in ideogram: 
 
-<img src="example9figure/3.ideogram.svg" width = "890" heigth = "390">
+<img src="example9figure/3.ideogram.svg" width = "890" height = "390">
 
 
 * only few genes were available for dS computation
 
-
+<img src="example9figure/4.dS.svg" width="600" height = "400">
 
 Therefore we did not analyzed the data further.  
 
+We see some extrem dS value at the end of the chromosome maybe indicative of some recombination suppression and ancient strata
+
 Still this is an extrem case of genome degeneration
-
-
-
-
 
