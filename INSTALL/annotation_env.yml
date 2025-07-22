@@ -23,6 +23,7 @@ dependencies:
   - libcurl=8.14.1
   - minimap2=2.28
   - emboss=6.6.0
+  - bedtools=2.31.1
   - orthofinder=2.5.5
   - openjdk=23.0.2
   - perl-app-cpanminus

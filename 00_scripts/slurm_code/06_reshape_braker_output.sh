@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --account=youraccount
 #SBATCH --time=04:00:00
-#SBATCH --job-name=braker
-#SBATCH --output=log_braker-%J.out
+#SBATCH --job-name=reshape
+#SBATCH --output=log_reshap-%J.out
 #SBATCH --mem=20G
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1

@@ -68,4 +68,4 @@ else
         fi
 fi
 
-rm samples
+if [ -e samples ]; then rm samples ; fi

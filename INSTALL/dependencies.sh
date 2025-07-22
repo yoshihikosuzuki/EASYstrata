@@ -245,8 +245,6 @@ else
     echo -e "\ncommand $command already installed\nskipping installation\n\n"
 fi
 
-
-
 #**muscle** 
 command='muscle'
 if ! command -v $command &> /dev/null
@@ -294,9 +292,25 @@ then
    echo "$command could not be found"
    echo -e "trying automatic installation\n\n"
    #direct install: 
-   wget -q https://github.com/abacus-gene/paml/releases/download/v4.10.9/paml-4.10.9-linux-x86_64.tar.gz
-   tar zxf paml-4.10.9-linux-x86_64.tar.gz
-   cd paml-4.10.9-linux-x86_64/bin
+   #wget -q https://github.com/abacus-gene/paml/releases/download/v4.10.9/paml-4.10.9-linux-x86_64.tar.gz
+   #tar zxf paml-4.10.9-linux-x86_64.tar.gz
+   #cd paml-4.10.9-linux-x86_64/bin
+   #the precompiled binaries seems problematic in some cluster so we need to install within the superannot env:
+   mamba activate superannot
+   git clone https://github.com/abacus-gene/paml.git
+   cd paml
+   # Move to the `src` directory to compile the software.
+   cd src
+   make -f Makefile
+   # List all the compiled programs that are part of PAML and
+   # remove unnecessary files.
+   ls -lF
+   rm *.o
+   # Create a `bin` directory, which you can then export to your PATH.
+   mkdir ../bin
+   # Move the compiled programs to `bin`.
+   mv baseml basemlg chi2 codeml evolver infinitesites mcmctree pamp yn00 ../bin
+   cd ../bin
    path=$(pwd)
    echo -e "\n#Path to $command\n export PATH=\$PATH:$path" >> ~/.bashrc 
    source ~/.bashrc  
