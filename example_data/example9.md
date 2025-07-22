@@ -1,4 +1,4 @@
-# nympahlis polychloros data  
+# *Nympahlis polychloros* data  
 
 
 ## 1 - download data:
@@ -153,7 +153,7 @@ sbatch 00_scripts/slurm_code/08_submit_genespace_paml_and_plot.sh "$opt"
 
 * the circos shows this:
 
-<img src="example9figure/1.circos.svg" width = "790" height = "790">
+<img src="example9figure/1.circos.svg" width = "990" height = "990">
 
 HUGE GENE LOSS !
 
@@ -162,9 +162,9 @@ HUGE GENE LOSS !
 <img src="example9figure/3.ideogram.svg" width = "890" height = "390">
 
 
-* only few genes were available for dS computation
+* only few genes were available for dS computation :
 
-<img src="example9figure/4.dS.svg" width="600" height = "400">
+<img src="example9figure/4.dS.svg" width="900" height = "800">
 
 Therefore we did not analyzed the data further.  
 
