@@ -326,6 +326,12 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
         echo "genespace results already exist - skipping run"
     else
         cd genespace  || exit 1
+        if [ -s orthofinder ] ; then
+            #a previous unfinished run exist - remove its content:
+            rm -rf genespace/dotplots/ genespace/orthofinder/ \
+                genespace/pangenes/ genespace/results/ \
+                genespace/riparian/ genespace/syntenicHits/ genespace/tmp
+        fi
         MCScanpath=$(command -v MCScanX |xargs dirname )
         #just in case this is not already done:
         Rscript -e  'devtools::install_github("jtlovell/GENESPACE")'

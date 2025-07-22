@@ -85,8 +85,8 @@ source config/cpu_mem
 
         cp "$gtf1" haplo1/08_best_run/"${haplotype1}".final.gtf
         cp "$gtf2" haplo2/08_best_run/"${haplotype2}".final.gtf
-        cp "$genome1" haplo1/03_genome/
-        cp "$genome2" haplo2/03_genome/
+        cp "$genome1" haplo1/03_genome/"${haplotype1}".fa
+        cp "$genome2" haplo2/03_genome/"${haplotype2}".fa
         if ! gffread -g "$genome1" -x haplo1/08_best_run/"$haplotype1".spliced_cds.fa "$gtf1" 
         then 
             echo "error failed to extract cds from genome $genome1 and gtf $gtf1"
@@ -94,7 +94,7 @@ source config/cpu_mem
             exit
         else
             gffread -g "$genome1" -y haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa "$gtf1"
-            sed -i '/^>/!s/./*/g' haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa 
+            sed -i '/^>/!s/\./*/g' haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa 
         fi     
         if ! gffread -g "$genome2" -x haplo2/08_best_run/"$haplotype2".spliced_cds.fa  "$gtf2"
         then
@@ -103,7 +103,7 @@ source config/cpu_mem
             exit
         else
             gffread -g "$genome2" -y haplo2/08_best_run/"$haplotype2"_prot.final.clean.fa  "$gtf2"
-            sed -i '/^>/!s/./*/g' haplo2/08_best_run/"$haplotype2"_prot.final.clean.fa 
+            sed -i '/^>/!s/\./*/g' haplo2/08_best_run/"$haplotype2"_prot.final.clean.fa 
 
         fi 
     elif [ -n "${gtf1}" ] && [ -n "${genome1}" ] ; then
@@ -133,7 +133,8 @@ source config/cpu_mem
             echo " "
         fi
         cp "$gtf1" haplo1/08_best_run/"${haplotype1}".final.gtf
-        cp "$genome1" haplo1/03_genome/
+        cp "$genome1" haplo1/03_genome/"${haplotype1}".fa
+
         if ! gffread -g "$genome1" -x haplo1/08_best_run/"$haplotype1".spliced_cds.fa "$gtf1" 
         then 
             echo "error failed to extract cds from genome $genome1 and gtf $gtf1"

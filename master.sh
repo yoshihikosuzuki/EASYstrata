@@ -2408,9 +2408,8 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
 
         cp "$gtf1" haplo1/08_best_run/"${haplotype1}".final.gtf
         cp "$gtf2" haplo2/08_best_run/"${haplotype2}".final.gtf
-        cp "$genome1" haplo1/03_genome/
-        cp "$genome2" haplo2/03_genome/
-
+        cp "$genome1" haplo1/03_genome/"${haplotype1}".fa
+        cp "$genome2" haplo2/03_genome/"${haplotype2}".fa
 
         if ! gffread -g "$genome1" -x haplo1/08_best_run/"$haplotype1".spliced_cds.fa "$gtf1" 
         then 
@@ -2462,7 +2461,7 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
         fi
 
         cp "$gtf1" haplo1/08_best_run/"${haplotype1}".final.gtf
-        cp "$genome1" haplo1/03_genome/
+        cp "$genome1" haplo1/03_genome/"${haplotype1}".fa
 
         if ! gffread -g "$genome1" -x haplo1/08_best_run/"$haplotype1".spliced_cds.fa "$gtf1" 
         then 
