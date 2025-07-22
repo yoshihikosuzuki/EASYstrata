@@ -65,10 +65,7 @@ Augustus and Bamtools are the two tools that are most likely to fail
 please check that it works and that all path were correctly appended to your repository
 ```
 
-
 all PATH to the new softwares should have been automatically append to your .bashrc
-
-
 
 # ALTERNATIVELY: install each non-conda software one by one: 
 
@@ -85,7 +82,6 @@ mkdir softs ; cd softs
 then insall all tools one by one: 
 
 ### BRAKER 
-
 ```
 command='braker.pl'
 if ! command -v $command &> /dev/null
@@ -101,8 +97,12 @@ then
 fi
 ```
 
-### ProtHint 
+#WARNING : 
 
+each time you source your .bashrc this will deactivate the conda env - for some software you'll want it to be activated! 
+ 
+
+### ProtHint 
 ```
 command='prothint.py'
 if ! command -v $command &> /dev/null
@@ -459,6 +459,27 @@ then
    wget https://github.com/abacus-gene/paml/releases/download/4.10.7/paml-4.10.7-linux-X86_64.tgz
    tar zxvf paml-4.10.7-linux-X86_64.tgz
    cd paml-4.10.7/bin
+   path=$(pwd)
+   #the precompiled binaries seems problematic in some cluster so we need to install within the superannot env:
+   mamba activate superannot
+   git clone https://github.com/abacus-gene/paml.git
+   cd paml
+   # Move to the `src` directory to compile the software.
+   cd src
+   make -f Makefile
+   # List all the compiled programs that are part of PAML and
+   # remove unnecessary files.
+   # ls -lF
+   # rm *.o
+   # Create a `bin` directory, which you can then export to your PATH.
+   mkdir ../bin
+   # Move the compiled programs to `bin`.
+   mv baseml basemlg chi2 codeml evolver infinitesites mcmctree pamp yn00 ../bin
+   cd ../bin
+   path=$(pwd)
+   echo -e "\n#Path to $command\n export PATH=\$PATH:$path" >> ~/.bashrc 
+   source ~/.bashrc  
+   cd ../../
    path=$(pwd)
    echo -e "\n#Path to $command\n export PATH=\$PATH:$path" >> ~/.bashrc 
    source ~/.bashrc  

@@ -397,15 +397,15 @@ each point is a gene d<sub>S</sub> value colored according to the strata of assi
 # Working examples 
 ##  1: RNAseq and ancestral genome 
 
-- [see exemple 1](example_data/example1.md)
+- [see example 1](example_data/example1.md)
 
 ## 2: already mapped RNAseq and ancestral genome 
 
-- [see exemple 2](example_data/example2.md)
+- [see example 2](example_data/example2.md)
 
 ## 3: no RNAseq nor ancestral genome 
 
-- [see exemple 3](example_data/example3.md)
+- [see example 3](example_data/example3.md)
 
 ## 4: already annotated genome  
 
@@ -413,7 +413,7 @@ each point is a gene d<sub>S</sub> value colored according to the strata of assi
 
 ## 5: other use cases 
 
-- [see exemple 5](example_data/example5.md)
+- [see example 5](example_data/example5.md)
 
 ## 6: changepoint with priors
 
@@ -433,6 +433,11 @@ Use case:
 
 (to do):
 - [see example 8](example_data/example8.md)
+
+
+## 9: a completely scrambled Z/W genome 
+
+- [see example 9](example_data/example9.md) 
 
 
 
