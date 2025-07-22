@@ -797,7 +797,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
     if [ -n "${ancestral_genome}" ]
     then
         echo "inferring synteny with ancestral species: "
-        join  -1 6 -2 4 <(sort -k6,6 02_results/orthologues)  \
+        join  -1 4 -2 4 <(sort -k4,4 02_results/orthologues)  \
                         <(sort -k4,4 "$bedanc" ) \
             | sed 's/ /\t/g' \
             | join -1 5 -2 4 <(sort -k5,5 -) \
@@ -815,7 +815,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
             exit 1
         fi
     
-        join  -1 6 -2 4 <(sort -k6,6 02_results/orthologues)  \
+        join  -1 4 -2 4 <(sort -k4,4 02_results/orthologues)  \
                 <(sort -k4,4 "$bedanc" ) \
                 | sed 's/ /\t/g' \
                 |join -1 6 -2 4 <(sort -k6,6 -) \
@@ -836,10 +836,10 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
            echo -e "number of lines in synteny file ancestral_sp vs $haplo1 is $size1"
            echo -e "number of lines in synteny file ancestral_sp vs $haplo2 is $size2"
      
-        join  -1 4 -2 4 <(sort -k4,4 02_results/orthologues)  \
+        join  -1 5 -2 4 <(sort -k5,5 02_results/orthologues)  \
                         <(sort -k4,4 "$bedhaplo1" ) \
             | sed 's/ /\t/g' \
-            | join -1 5 -2 4 <(sort -k5,5 -) \
+            | join -1 6 -2 4 <(sort -k6,6 -) \
                            <(sort -k4,4 "$bed$haplo2" )  \
             |awk 'NR==1 {print "HOG\tOG\tN0\tchrom1\tGene1\tstart1\tend1\tchrom2\tGene2\tstart2\tend2"}
                     {print $3"\t"$4"\t"$5"\t"$7"\t"$2"\t"$8"\t"$9"\t"$10"\t"$1"\t"$11"\t"$12}' \
@@ -973,7 +973,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -c 02_results/sco_anc \
                 -i "$bedanc" \
                 -j "$bedhaplo1"  \
-                -f "${ancestral_genome}".fai \
+                -f ancestral_sp/ancestral_sp.fa.fai \
                 -g haplo1/03_genome/"$haplo1".fa.fai \
                 -l "$links" \
                 -s "$scafforientation" 2> Rlogs/Rlogs_plot_ideogram_ancestral_sp_with_links
@@ -988,7 +988,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -c 02_results/sco_anc \
                 -i "$bedanc"  \
                 -j "$bedhaplo1" \
-                -f "${ancestral_genome}".fai \
+                -f ancestral_sp/ancestral_sp.fa.fai \
                 -g haplo1/03_genome/"$haplo1".fa.fai \
                 -s "$scafforientation" 2> Rlogs/Rlogs_plot_ideogram_ancestral_sp_no_links
             then
@@ -1358,7 +1358,7 @@ if [ -n "${ancestral_genome}" ] ; then
                 -c 02_results/sco_anc \
                 -i "$bedanc" \
                 -j "$bedhaplo1"  \
-                -f "$ancestral_genome".fai \
+                -f ancestral_sp/ancestral_sp.fa.fai \
                 -g haplo1/03_genome/"$haplo1".fa.fai \
                 -l "$links" \
                 -s "$scafforientation"  2> Rlogs/Rlogs_plot_ideogram_colored_"$(basename "$links")"_ancestral.txt
@@ -1367,7 +1367,7 @@ if [ -n "${ancestral_genome}" ] ; then
                 -c 02_results/sco_anc \
                 -i "$bedanc" \
                 -j "$bedhaplo1"  \
-                -f "$ancestral_genome".fai \
+                -f ancestral_sp/ancestral_sp.fa.fai \
                 -g haplo1/03_genome/"$haplo1".fa.fai \
                 -l "$links" 2> Rlogs/Rlogs_plot_ideogram_colored_"$(basename "$links")".txt 
      fi
@@ -1582,7 +1582,7 @@ if [  -n "${ancestral_genome}" ] ; then
                 -i "$bedanc" \
                 -j "$bedhaplo1"  \
                 -d 02_results/dS.values.forchangepoint.txt \
-                -f "$ancestral_genome".fai \
+                -f ancestral_sp/ancestral_sp.fa.fai \
                 -g haplo1/03_genome/"$haplo1".fa.fai \
                 -s "$scafforientation" 2> Rlogs/Rlogs_plot_ideogram_colored_by_dsquantile.txt 
         then
@@ -1596,7 +1596,7 @@ if [  -n "${ancestral_genome}" ] ; then
                 -i "$bedanc" \
                 -j "$bedhaplo1"  \
                 -d 02_results/dS.values.forchangepoint.txt \
-                -f "$ancestral_genome".fai \
+                -f ancestral_sp/ancestral_sp.fa.fai \
                 -g haplo1/03_genome/"$haplo1".fa.fai \
                 -s "$scafforientation" 2> Rlogs/Rlogs_plot_ideogram_colored_by_dsquantile.txt 
         then
