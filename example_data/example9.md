@@ -1,4 +1,4 @@
-#nympahlis polychloros data
+# nympahlis polychloros data  
 
 
 ## 1 - download data:
@@ -21,19 +21,19 @@ input_fa=softmasked.fa
 busco -c12 -o busco_"$input_fa" -i $input_fa -l insecta_odb12 -m genome
 ```
 
-results:
+**results:**
 
--------------------------------------------------------------------------------------------
-|Results from dataset insecta_odb12                                                        |
--------------------------------------------------------------------------------------------
-|C:99.5%[S:99.3%,D:0.2%],F:0.2%,M:0.3%,n:3114,E:6.1%                                       |
-|3098    Complete BUSCOs (C)    (of which 188 contain internal stop codons)                |
-|3091    Complete and single-copy BUSCOs (S)                                               |
-|7    Complete and duplicated BUSCOs (D)                                                   |
-|7    Fragmented BUSCOs (F)                                                                |
-|9    Missing BUSCOs (M)                                                                   |
-|3114    Total BUSCO groups searched                                                       |
--------------------------------------------------------------------------------------------
+---------------------------------------------------
+    |Results from dataset insecta_odb12                |
+    ---------------------------------------------------
+    |C:99.5%[S:99.3%,D:0.2%],F:0.2%,M:0.3%,n:3114, E:6.1%      |
+    |3098    Complete BUSCOs (C)   (of which 188 contain internal stop codons)                         |
+    |3091    Complete and single-copy BUSCOs (S)       |
+    |7   Complete and duplicated BUSCOs (D)          |
+    |7    Fragmented BUSCOs (F)                       |
+    |9    Missing BUSCOs (M)                          |
+    |3114    Total BUSCO groups searched               |
+    ---------------------------------------------------
 
 awesome!
 
@@ -42,6 +42,9 @@ awesome!
 ```
 wget https://ftp.ebi.ac.uk/pub/ensemblorganisms/Nymphalis_polychloros/GCA_905220585.2/ensembl/geneset/2022_03/pep.fa.gz
 gunzip pep.fa.gz
+mamba activate busco6.0.0
+input_fa=pep.fa
+busco -c12 -o busco_"$input_fa" -i $input_fa -l insecta_odb12 -m protein
 
 ```
 
@@ -69,7 +72,7 @@ We can remove them with agat_sp_keep_longest_isoform.pl
 
 here we use SLURM to process the data
 
-step by step procedure:
+**step by step procedure:**
 
 **A ) trimm and map RNAseq read: (run time: ~2 hours)**
 ```
