@@ -2418,7 +2418,7 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
             exit
         else
             gffread -g "$genome1" -y haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa "$gtf1"
-            sed -i '/^>/!s/./*/g' haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa 
+            sed -i '/^>/!s/\./*/g' haplo1/08_best_run/"$haplotype1"_prot.final.clean.fa 
         fi     
         if ! gffread -g "$genome2" -x haplo2/08_best_run/"$haplotype2".spliced_cds.fa  "$gtf2"
         then
@@ -2427,7 +2427,7 @@ if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then
             exit
         else
             gffread -g "$genome2" -y haplo2/08_best_run/"$haplotype2"_prot.final.clean.fa  "$gtf2"
-            sed -i '/^>/!s/./*/g' haplo2/08_best_run/"$haplotype2"_prot.final.clean.fa 
+            sed -i '/^>/!s/\./*/g' haplo2/08_best_run/"$haplotype2"_prot.final.clean.fa 
         fi 
 
     elif [ -n "${gtf1}" ] && [ -n "${genome1}" ] ; then
