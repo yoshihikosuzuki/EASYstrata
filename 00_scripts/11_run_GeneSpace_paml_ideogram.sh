@@ -891,7 +891,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
             -l "$links" \
             -s "$scafforientation" 2> Rlogs/Rlogs_plot_ideogram_with_links
         then
-                echo -e "\nERROR: ideograms failed /!\ \n
+                echo -e "\nERROR: ideograms failed /!\
                 please check logs and input data\n" 
                 exit 1
         fi
@@ -905,7 +905,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
             -g haplo2/03_genome/"$haplo2".fa.fai \
             -s "$scafforientation" 2> Rlogs/Rlogs_plot_ideogram_no_links
         then
-                echo -e "\nERROR: ideograms failed /!\ \n
+                echo -e "\nERROR: ideograms failed /!\
                 please check logs and input data\n" 
                 exit 1
         fi
@@ -926,7 +926,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -l "$links" \
                 -s "$scafforientation" 2> Rlogs/Rlogs_plot_ideogram_ancestral_sp_with_links
             then
-                    echo -e "\nERROR: ideograms failed /!\ \n
+                    echo -e "\nERROR: ideograms failed /!\
                     please check logs and input data\n" 
                     exit 1
             fi
@@ -940,7 +940,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -g haplo1/03_genome/"$haplo1".fa.fai \
                 -s "$scafforientation" 2> Rlogs/Rlogs_plot_ideogram_ancestral_sp_no_links
             then
-                echo -e "\nERROR: ideograms failed /!\ \n
+                echo -e "\nERROR: ideograms failed /!\
                 please check logs and input data\n" 
                 exit 1
             fi
@@ -994,7 +994,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -j "$bedhaplo1"  \
                 -l "$links" 2> Rlogs/Rlogs_plot_ideogram_ancestral_sp
             then
-                echo -e "\nERROR: circos plots failed /!\ \n
+                echo -e "\nERROR: circos plots failed /!\
                 please check logs and input data\n" 
                 exit 1
             fi
@@ -1007,7 +1007,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -j "$bedhaplo2"  \
                 -l "$links" 2> Rlogs/Rlogs_plot_circos_ancestral_sp_haplo2
             then
-                echo -e "\nERROR: circos plots failed /!\ \n
+                echo -e "\nERROR: circos plots failed /!\
                 please check logs and input data\n" 
                 exit 1
             fi
@@ -1026,7 +1026,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                     -u "$genome2TE" \
                     -l "$links" 2> Rlogs/Rlogs_plot_circos_TE
                 then
-                    echo -e "\nERROR: circos plots failed /!\ \n
+                    echo -e "\nERROR: circos plots failed /!\
                     please check logs and input data\n" 
                     exit 1
                 fi
@@ -1042,7 +1042,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                     -j "$bedhaplo2"  \
                     -l "$links" 2> Rlogs/Rlogs_plot_circos_noTE
                 then
-                    echo -e "\nERROR: circos plots failed /!\ \n
+                    echo -e "\nERROR: circos plots failed /!\
                     please check logs and input data\n" 
                     exit 1
                 fi
@@ -1060,7 +1060,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -i "$bedanc"  \
                 -j "$bedhaplo1"  2> Rlogs/Rlogs_plot_circos_ancestral_sp
             then
-                echo -e "\nERROR: circos plots failed /!\ \n
+                echo -e "\nERROR: circos plots failed /!\
                 please check logs and input data\n" 
                 exit 1
             fi
@@ -1076,7 +1076,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                 -i "$bedanc"  \
                 -j "$bedhaplo2" 2> Rlogs/Rlogs_plot_circos_ancestral_sp_haplo2 
             then
-                echo -e "\nERROR: circos plots failed /!\ \n
+                echo -e "\nERROR: circos plots failed /!\
                 please check logs and input data\n" 
                 exit 1
             fi
@@ -1096,7 +1096,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                    -t "$genome1TE" \
                    -u "$genome2TE" 2> Rlogs/Rlogs_plot_circos_TE
                then
-                   echo -e "\nERROR: circos plots failed /!\ \n
+                   echo -e "\nERROR: circos plots failed /!\
                    please check logs and input data\n" 
                    exit 1
                fi
@@ -1109,7 +1109,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                    -i "$bedhaplo1"  \
                    -j "$bedhaplo2"   2> Rlogs/Rlogs_plot_circos_noTE
                then
-                   echo -e "\nERROR: circos plots failed /!\ \n
+                   echo -e "\nERROR: circos plots failed /!\
                    please check logs and input data\n" 
                    exit 1
                fi
@@ -1133,7 +1133,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                     -u "$genome2TE" \
                     -l "$links" 2> Rlogs/Rlogs_plot_circos_TE_links
                 then
-                    echo -e "\nERROR: circos plots failed /!\ \n
+                    echo -e "\nERROR: circos plots failed /!\
                     please check logs and input data\n" 
                     exit 1
                 fi
@@ -1148,7 +1148,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                     -j "$bedhaplo2"  \
                     -l "$links" 2> Rlogs/Rlogs_plot_circos_noTE_links
                 then
-                    echo -e "\nERROR: circos plots failed /!\ \n
+                    echo -e "\nERROR: circos plots failed /!\
                     please check logs and input data\n" 
                     exit 1
                 fi
@@ -1167,7 +1167,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                     -t "$genome1TE" \
                     -u "$genome2TE" 2> Rlogs/Rlogs_plot_circos_TE_noLinks 
                 then
-                    echo -e "\nERROR: circos plots failed /!\ \n
+                    echo -e "\nERROR: circos plots failed /!\
                     please check logs and input data\n" 
                     exit 1
                 fi
@@ -1181,7 +1181,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                     -i "$bedhaplo1"  \
                     -j "$bedhaplo2" 2> Rlogs/Rlogs_plot_circos 
                 then
-                    echo -e "\nERROR: circos plots failed /!\ \n
+                    echo -e "\nERROR: circos plots failed /!\
                     please check logs and input data\n" 
                     exit 1
                 fi
