@@ -650,22 +650,60 @@ fi
 if [[ "$options" = "synteny_and_Ds" ]] || [[ "$options" = "Ds_only" ]] ; then 
     #echo haplo1 is "$haplo1"
     #echo haplo2 is "$haplo2"
-    echo -e "\n${BLU}----------------------\npreparing data for paml\n-----------------------${NC}\n"
-    if [ -n "${ancestral_genome}" ]; then
-        #ancestral genome exist
-        ./00_scripts/12_command_line.paml.sh \
-        -h1 "$haplo1" \
-        -h2 "$haplo2" \
-        -s "$scaffold" \
-        -a ancestral_sp || { echo -e "${RED} ERROR! paml failed - check your data\n${NC} " ; exit 1 ; }
-    else
-        #ancestral genome not provided	
-        ./00_scripts/12_command_line.paml.sh \
-        -h1 "$haplo1" \
-        -h2 "$haplo2" \
-        -s "$scaffold" || { echo -e "${RED} ERROR! paml failed - check your data\n${NC} " ; exit 1 ; }
+    
+    if [ "$ds_method" == "codeml" ] && [ -e 02_results/paml/results_codeml.txt ] && [ -e 02_results/paml/wanted_sequence ] ; then
+        sizecodeml=$(wc -l 02_results/paml/results_codeml.txt |awk '{print $1}')
+        sizeseq=$(wc -l 02_results/paml/wanted_sequence |awk '{print $1}')
+        if [ "$sizeseq" == "$sizecodeml" ]; then 
+            echo "warning results from codeml already exist"
+            echo "not overwriting, please check the file" 
+            #exit 1 #or simply continue analysis 
+        else 
+           echo "running analysis" ; 
+           echo -e "\n${BLU}----------------------\npreparing data for paml\n-----------------------${NC}\n"
+           if [ -n "${ancestral_genome}" ]; then
+              #ancestral genome exist
+              ./00_scripts/12_command_line.paml.sh \
+              -h1 "$haplo1" \
+              -h2 "$haplo2" \
+              -s "$scaffold" \
+              -a ancestral_sp || { echo -e "${RED} ERROR! paml failed - check your data\n${NC} " ; exit 1 ; }
+           else
+              #ancestral genome not provided	
+              ./00_scripts/12_command_line.paml.sh \
+              -h1 "$haplo1" \
+              -h2 "$haplo2" \
+              -s "$scaffold" || { echo -e "${RED} ERROR! paml failed - check your data\n${NC} " ; exit 1 ; }
+           fi
+
+        fi
+    elif [ "$ds_method" == "yn00" ] && [ -e 02_results/paml/results_YN.txt ] && [ -e 02_results/paml/wanted_sequence ] ; then
+        sizecodeml=$(wc -l 02_results/paml/results_YN.txt |awk '{print $1}')
+        sizeseq=$(wc -l 02_results/paml/wanted_sequence |awk '{print $1}')
+        if [ "$sizeseq" == "$sizecodeml" ]; then 
+            echo "warning results from codeml already exist"
+            echo "not overwriting, please check the file" 
+            #exit 1
+        else 
+           echo -e "\n${BLU}----------------------\npreparing data for paml\n-----------------------${NC}\n"
+           if [ -n "${ancestral_genome}" ]; then
+              #ancestral genome exist
+              ./00_scripts/12_command_line.paml.sh \
+              -h1 "$haplo1" \
+              -h2 "$haplo2" \
+              -s "$scaffold" \
+              -a ancestral_sp || { echo -e "${RED} ERROR! paml failed - check your data\n${NC} " ; exit 1 ; }
+           else
+              #ancestral genome not provided	
+              ./00_scripts/12_command_line.paml.sh \
+              -h1 "$haplo1" \
+              -h2 "$haplo2" \
+              -s "$scaffold" || { echo -e "${RED} ERROR! paml failed - check your data\n${NC} " ; exit 1 ; }
+           fi
+        fi
     fi
 fi
+
 
 if [[ "$options" = "synteny_and_Ds" ]]  || [[ "$options" = "Ds_only" ]] || [[ "$options" = "plots" ]] ; then 
     source config/config

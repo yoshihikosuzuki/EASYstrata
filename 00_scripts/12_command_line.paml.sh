@@ -286,7 +286,6 @@ do
     #run paml :
     yn00 yn00_template.ctl
     echo -ne | codeml codeml.ctl
-
         
     cd ../../
     
@@ -300,7 +299,6 @@ do
     awk '/dS =/ {split(FILENAME, a, "."); 
         print $(NF), $(NF-3), $(NF-6),"'${line[0]}'","'${line[1]}'"}'  \
             >  sequence_files/tmp."${line[0]}".vs."${line[1]}"/resultat_codeml.txt
-
 done < wanted_sequence 2>&1 |tee log.paml
 
 #we concatenate everyone to work with them in the next scripts:
@@ -312,7 +310,6 @@ if [ -e results_codeml.txt ] ; then rm results_codeml.txt ; fi
 
 cat sequence_files/tmp.*/resultat_codeml.txt >> results_codeml.txt
 cp results_codeml.txt results_codeml.txt.bkp
-
 
 if [ -e correspondance.table.hap1.txt ] && [ ! -e correspondance.table.hap2.txt ] ; then
    sed -i 's/>//g' correspondance.table.hap1.txt
@@ -341,4 +338,5 @@ if [ -e correspondance.table.hap2.txt ] && [ ! -e correspondance.table.hap1.txt 
    mv tmp_cdml results_codeml.txt
 fi
 
-
+#cleanup:
+rm "$f1" "$f2" "$newf1" "$newf2" "$haplo2".linearised.cds "$haplo1".linearised.cds ID1 ID2
