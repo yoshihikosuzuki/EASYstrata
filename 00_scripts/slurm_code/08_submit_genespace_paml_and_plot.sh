@@ -3,7 +3,7 @@
 #SBATCH --time=09:00:00
 #SBATCH --job-name=geneSpace_and_co
 #SBATCH --output=log_geneSpace_and_co-%J.out
-#SBATCH --mem=20G
+#SBATCH --mem=80G
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=12

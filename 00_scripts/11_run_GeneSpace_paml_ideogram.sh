@@ -450,14 +450,6 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
             { echo -e "${RED} ERROR! minimap2 failed - check your data\n${NC} " ; exit 1 ; }
 
     fi 
-#no longer usefull :
-#    if [ -n "${ancestral_genome}" ]; then
-#        #ancestral genome exist
-#        ./00_scripts/extract_singlecopy.sh -h1 "$haplo1" -h2 "$haplo2" -s "$scaffold" -a ancestral_sp
-#    else
-#        #ancestral genome not provided
-#        ./00_scripts/extract_singlecopy.sh -h1 "$haplo1" -h2 "$haplo2" -s "$scaffold" 
-#    fi
     if [ -n "${ancestral_genome}" ] ; then
         echo -e "\n------- an ancestral genome was provided ------ "
         if [ ! -s 02_results/minimap_alns/aln.ancestral_sp_"$haplo2".paf ];
@@ -555,21 +547,14 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
             awk '$1>4 ' \
             |sed -e 's/^    //g' -e 's/ /\t/g' > 02_results/scaff.haplo1.haplo2.txt
 
-        #do a clean-up in case there is false positive single copy orthologs:  
-        #grep -Ff <(cut -f 2 02_results/scaff.haplo1.haplo2.txt ) 02_results/paml/single.copy.orthologs \
-        #    |grep -Ff <(cut -f3 02_results/scaff.haplo1.haplo2.txt ) - > 02_results/paml/single.copy.orthologs_cleaned
     else
         #ancestral genome not provided  
-        #./00_scripts/extract_singlecopy.sh -h1 "$haplo1" -h2 "$haplo2" -s "$scaffold"
         awk '{gsub("_","\t",$0) ; print $2"_"$3"\t"$5"_"$6}' 02_results/paml/single.copy.orthologs|\
             sort |\
             uniq -c|\
             awk '$1>4 ' \
            |sed -e 's/^    //g' -e 's/ /\t/g'  > 02_results/scaff.haplo1.haplo2.txt
 
-        #do a clean-up in case there is false positive single copy orthologs:  
-        #grep -Ff <(cut -f 2 02_results/scaff.haplo1.haplo2.txt ) 02_results/paml/single.copy.orthologs \
-        #    |grep -Ff <(cut -f3 02_results/scaff.haplo1.haplo2.txt ) - > 02_results/paml/single.copy.orthologs_cleaned
     fi
 fi
 
@@ -722,84 +707,6 @@ fi
 
 # --------------- step8 data processing for ideogram and circos-----------------#
 if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $options = "synteny_only" ]] ; then 
-    #if [[ $options != "Ds_only" ]] ; then 
-    #    pathN0="genespace/orthofinder/Results_*/Phylogenetic_Hierarchical_Orthogroups/N0.tsv"
-    #    sed -i -e "s/\r//g" $pathN0
-
-        #p1=$(awk -v hap="$haplo1" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
-        #p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) )
-        #size1=$(paste <(echo "$p1") |wc -l )
-        #size2=$(paste <(echo "$p2") |wc -l )
-        #
-        ##check size 
-        #paste <(echo "$p1") <(echo "$p2") |\
-        #        awk '{print "OG\t"$0}' > 02_results/paml/single.copy.orthologs 
-        #if [ ! -s "02_results/paml/single.copy.orthologs" ];then
-        #    echo "error! file 02_results/paml/single.copy.orthologs is empty"
-        #    echo "please check your single copy orthologs in N0.tsv"
-        #    echo "please check your input data as well"
-        #    exit 1
-        #fi 
-        #
-        #if [ -n "${ancestral_genome}" ]
-        #then
-        #    ancestral=$(head -n1 ancestral_sp/ancestral_sp.fa.fai \
-        #        |cut -f1 \
-        #        |awk '{gsub("_","\t",$0) ; print $1}')
-        #        
-        #    p_anc=$(awk -v hap="$ancestral" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |awk 'NF==6' ) ) 
-        #    size_anc=$(paste <(echo "$p_anc") |wc -l )
-        #    paste <(echo "$p_anc" ) <(echo "$p1") <(echo "$p2") |\
-        #        awk '{print "OG\t"$0}' > 02_results/paml/single.copy.orthologs 
-        #    if [ ! -s "02_results/paml/single.copy.orthologs" ];then
-        #        echo "error! file 02_results/paml/single.copy.orthologs is empty"
-        #        echo "please check your single copy orthologs in N0.tsv"
-        #        echo "please check your input data as well"
-        #        exit 1
-        #    fi 
-        #fi  
-        #create orthologues file:
-        #awk '{print "ortho1\tortho2\t"$0}' 02_results/paml/single.copy.orthologs > 02_results/orthologues
-        #echo "ancestral genome ID is $ancestral " 
-        #    if [[ $haplo1 == $haplo ]] ;
-        #    then
-        #        echo " " ;
-        #        awk -v var1="$haplo1" -v var2="$haplo2" -v var3="$ancestral" 'NF==6 && $4 ~ var1 && $5 ~ var2 && $6 ~ var3 ' $pathN0 \
-        #               | grep -Ff <(awk '{print $2}' "$scaffold") - > 02_results/orthologues
-        #        sed -i -e "s/\r//g" 02_results/orthologues
-        #     elif [[ $haplo2 == $haplo ]] ;
-        #     then
-        #         echo "not egal - reversing haplotype names to match columns"
-        #         echo "first column is $haplo"
-        #         awk -v var1="$haplo2" -v var2="$haplo1" -v var3="$ancestral" 'NF==6 && $4 ~ var1 && $5 ~ var2 && $6 ~ var3 ' $pathN0 \
-        #            | grep -Ff <(awk '{print $2}' "$scaffold") - |awk '{print $1"\t"$2"\t"$3"\t"$5"\t"$4"\t"$6}' > 02_results/orthologues
-        #         sed -i -e "s/\r//g" 02_results/orthologues
-        #     elif [[ ancestral_sp == $haplo ]] ;
-        #     then
-        #         echo "not egal - reversing haplotype names to match columns"
-        #         echo "first column is $haplo"
-        #         awk -v var1="$ancestral" -v var2="$haplo1" -v var3="$haplo2" 'NF==6 && $4 ~ var1 && $5 ~ var2 && $6 ~ var3 ' $pathN0 \
-        #              | grep -Ff <(awk '{print $2}' "$scaffold") - |awk '{print $1"\t"$2"\t"$3"\t"$5"\t"$6"\t"$4}' > 02_results/orthologues
-        #         sed -i -e "s/\r//g" 02_results/orthologues
-        #    fi
-        #else
-        #   #echo "assuming no ancestral species:" 
-        #   if [[ $haplo1 == $haplo ]] ;
-        #   then
-        #       echo " " ;
-        #       awk -v var1="$haplo1" -v var2="$haplo2" 'NF==5 && $4 ~ var1 && $5 ~ var2 ' $pathN0 \
-        #       | grep -Ff <(awk '{print $2}' "$scaffold") - > 02_results/orthologues
-        #       sed -i -e "s/\r//g" 02_results/orthologues
-        #   else
-        #       echo "not egal - reversing haplotype names to match columns"
-        #       awk -v var1="$haplo2" -v var2="$haplo1" 'NF==5 && $4 ~ var1 && $5 ~ var2 ' $pathN0 \
-        #       | grep -Ff <(awk '{print $2}' "$scaffold") - |awk '{print $1"\t"$2"\t"$3"\t"$5"\t"$4}' > 02_results/orthologues
-        #       sed -i -e "s/\r//g" 02_results/orthologues
-        #   fi
-        #fi
-        #creating different synteny table 
-
-    #fi
     if [ -n "${ancestral_genome}" ]
     then
         echo "inferring synteny with ancestral species: "
@@ -910,8 +817,6 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
          #ensuite on créer un fichier de syenteny additionnel et on concatène avec le fichier précédent.
          #join -1 4 -2 4 <(sort -k 4,4 all_orthologs_Mping) <(sort -k4,4 genespace/bed/MpingA1.bed ) |join -1 5 -2 4 <(sort -k 5,5 -) <(sort -k 4,4 genespace/bed/MpingA2.bed ) |awk '{print $3"\t"$4"\t"$5"\t"$7"\t"$2"\t"$8"\t"$9"\t"$10"\t"$1"\t"$11"\t"$12}'
          #then these must be added to the "scaffold.txt" file > synteny must be redone !!
-
-
     else
            sed 1d 02_results/synteny_"$haplo1"_"$haplo2".txt \
              |awk -v var1="$haplo1" -v var2="$haplo2"  '{print var1"\t"$4"\n"var2"\t"$8}' \
@@ -971,7 +876,6 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
     if [  -n "${ancestral_genome}" ] ; then
         echo -e "ancestral genome was provided for inference" 
         #we will make an ideogram with it 
-        #awk '{print $1"\t"$2"\t"$3}' 02_results/paml/single.copy.orthologs > 02_results/sco_anc	
         awk '{print $1"\t"$5"\t"$9}' 02_results/synteny_ancestral_sp_"$haplo1".txt |sed 1d > 02_results/sco_anc
 
         if [  -n "${links}" ] ; then    

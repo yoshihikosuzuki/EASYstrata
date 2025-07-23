@@ -166,8 +166,8 @@ newf1=${f1%.fa**}.nostopcodon.fasta
 newf2=${f2%.fa**}.nostopcodon.fasta
 
 ##1 ----- remove stop codon -------
-awk '{if($1 !~ /^>/) {if( substr($0, length($0)-2, length($0)) ~ /(TGA|TAG|TAA)/){ print substr($0, 1, length($0)-3)} else  {print $0 }}else{print $0}}' "${fasta1}" > "${newf1}" 
-awk '{if($1 !~ /^>/) {if( substr($0, length($0)-2, length($0)) ~ /(TGA|TAG|TAA)/){ print substr($0, 1, length($0)-3)} else  {print $0 }}else{print $0}}' "${fasta2}" > "${newf2}"
+awk '{if($1 !~ /^>/) {if( substr(toupper($0), length($0)-2, length($0)) ~ /(TGA|TAG|TAA)/){ print substr($0, 1, length($0)-3)} else  {print $0 }}else{print $0}}' "${fasta1}" > "${newf1}" 
+awk '{if($1 !~ /^>/) {if( substr(toupper($0), length($0)-2, length($0)) ~ /(TGA|TAG|TAA)/){ print substr($0, 1, length($0)-3)} else  {print $0 }}else{print $0}}' "${fasta2}" > "${newf2}"
 
 ##2 ------ split and cat pairwise sequence -------
 #split 
