@@ -1,6 +1,6 @@
 #!/bin/bash
 ##SBATCH --account=youraccount
-#SBATCH --time=09:00:00
+#SBATCH --time=19:00:00
 #SBATCH --job-name=geneSpace_and_co
 #SBATCH --output=log_geneSpace_and_co-%J.out
 #SBATCH --mem=99G
@@ -17,7 +17,6 @@ cd $SLURM_SUBMIT_DIR
 #source /local/env/envconda3.sh 
 mamba activate superannot/
 source config/config
-
 if [ -z "$haplotype1" ] ; then
     echo "error haplotype1 name not provided check your config file"
     exit 1
@@ -37,7 +36,6 @@ fi
 if [ -n "${ancestral_gtf}" ] ; then
     echo "ancestral_species is $ancestral_genome "
 fi
-
 
 ##  ------------------------ general parameters --------------------------------  ##
 while [ $# -gt 0 ] ; do
@@ -63,7 +61,7 @@ if [ ! -d "$LOG_FOLDER" ] ; then mkdir $LOG_FOLDER ; fi
 
 if [ -n "${ancestral_genome}" ] ; then
      echo "running analyses with ancestral genome"
-    ./00_scripts/11_run_GeneSpace_paml_ideogram.sh \
+    ./00_scripts/11_run_GeneSpace_and_firstplots.sh \
          -s1 "$haplotype1" \
          -s2 "$haplotype2" \
          -a "$ancestral_genome" \
@@ -73,7 +71,7 @@ if [ -n "${ancestral_genome}" ] ; then
         tee LOGS/log_GeneSpace_and_Co
 else
      echo "running analyses without ancestral genome"
-    ./00_scripts/11_run_GeneSpace_paml_ideogram.sh \
+    ./00_scripts/11_run_GeneSpace_and_firstplots.sh \
          -s1 "$haplotype1" \
          -s2 "$haplotype2" \
          -c "$scaffold" \

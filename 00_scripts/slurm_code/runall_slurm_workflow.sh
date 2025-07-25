@@ -146,7 +146,7 @@ fi
 if [ "$option" == 3 ] || [ "$option" == 4 ] || [ "$option" == 5 ]; then 
        echo -e "option number $option is required \n\n" 
        echo "run data preparation for these option"	
-       p15=$(sbatch "$SCRIPTPATH"/07_dataprep_opt3_opt4_opt5.sh |awk '{print $4}' )
+      # p15=$(sbatch "$SCRIPTPATH"/07_dataprep_opt3_opt4_opt5.sh |awk '{print $4}' )
 fi
 if [ "$option" == 3 ] ; then 
     echo "----------------------------------------------------------------"
@@ -155,14 +155,28 @@ if [ "$option" == 3 ] ; then
     echo "----------------------------------------------------------------" 
     opt="synteny_and_Ds"
     echo -e "option for genespace is $opt\n"
-    p16=$(sbatch "$DEPENDS"$p15 "$SCRIPTPATH"/08_submit_genespace_paml_and_plot.sh -o "$opt"  |awk '{print $4}' )
+    #p16=$(sbatch "$DEPENDS"$p15 "$SCRIPTPATH"/08_submit_genespace_paml_and_plot.sh -o "$opt"   |awk '{print $4}' )
+    #p16=$(sbatch "$DEPENDS"$p15 "$SCRIPTPATH"/08b_submit_genespace_and_first_plot.sh -o "$opt"  |awk '{print $4}' )
+    #p16=$(sbatch "$DEPENDS"$p15 "$SCRIPTPATH"/08_submit_genespace_and_first_plot_only.sh -o "$opt" |awk '{print $4}' )
+    p16=$(sbatch "$SCRIPTPATH"/08_submit_genespace_and_first_plot_only.sh -o "$opt" |awk '{print $4}' )
+    p17=$(sbatch "$DEPENDS"$p16 "$SCRIPTPATH"/09_paml_preparation_slurm.sh  |awk '{print $4}' )
+    p18=$(sbatch "$DEPENDS"$p17 "$SCRIPTPATH"/10_submit_paml_parallel.sh    |awk '{print $4}' )
+    p19=$(sbatch "$DEPENDS"$p18 "$SCRIPTPATH"/11_changepoint_only.sh        |awk '{print $4}' )
+    p20=$(sbatch "$DEPENDS"$p19 "$SCRIPTPATH"/12_ideogram_and_circos_after_changepoint.sh  -o "$opt" |awk '{print $4}' )
+    #p16=$(sbatch  "$SCRIPTPATH"/08_submit_genespace_paml_and_plot.sh -o "$opt"  |awk '{print $4}' )
+
 elif [ "$option" == 4 ] ; then 
     echo "----------------------------------------------------------------"
     echo "         only Ds + associated analyses will be launched         " 
     echo "               checking config files settings                   "
     echo "----------------------------------------------------------------"
     opt="Ds_only"
-    p16=$(sbatch "$DEPENDS"$p15 "$SCRIPTPATH"/08_submit_genespace_paml_and_plot.sh -o "$opt"  |awk '{print $4}' )
+    p17=$(sbatch "$DEPENDS"$p16 "$SCRIPTPATH"/09_paml_preparation_slurm.sh  |awk '{print $4}' )
+    p18=$(sbatch "$DEPENDS"$p17 "$SCRIPTPATH"/10_submit_parallel_paml.sh    |awk '{print $4}' )
+    p19=$(sbatch "$DEPENDS"$p18 "$SCRIPTPATH"/11_changepoint_only.sh        |awk '{print $4}' )
+    p20=$(sbatch "$DEPENDS"$p19 "$SCRIPTPATH"/12_ideogram_and_circos_after_changepoint.sh  "$opt"  |awk '{print $4}' )
+
+
 elif [ "$option" == 5 ] ; then 
     echo "----------------------------------------------------------------"
     echo "          only GeneSpace/Synteny  analyses will be launched     " 

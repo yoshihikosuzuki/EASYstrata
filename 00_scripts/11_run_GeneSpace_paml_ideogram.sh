@@ -589,7 +589,7 @@ if [ "$options" = "Ds_only" ] ; then
             echo "please check your single copy orthologs file"
         else 
             if [ -n "${ancestral_genome}" ]; then
-                p_anc=$(awk -v anc="$anc" '{for(i=1;i<=NF;++i)if($i ~ anc )print $i}' "$single_copy_file" )
+                p_anc=$(awk -v anc="$ancestral" '{for(i=1;i<=NF;++i)if($i ~ anc )print $i}' "$single_copy_file" )
                 size_anc=$(paste <(echo "$p_anc") |wc -l )
                 if [ "$size1" != "$size_anc" ] ; then 
                     echo "error! number of single copy orthologs in ancestral species is different from haplo1"
@@ -707,7 +707,7 @@ fi
 
 if [[ "$options" = "synteny_and_Ds" ]]  || [[ "$options" = "Ds_only" ]] || [[ "$options" = "plots" ]] ; then 
     source config/config
-    if [ "$ds_method" = "paml" ] ; then
+    if [ "$ds_method" = "yn00" ] ; then
         pamlsize=$(wc -l 02_results/paml/results_YN.txt |awk '{print $1}' ) 
     else
         pamlsize=$(wc -l 02_results/paml/results_codeml.txt |awk '{print $1}' )
@@ -791,7 +791,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $optio
                         <(sort -k4,4 "$bedhaplo1" ) \
             | sed 's/ /\t/g' \
             | join -1 6 -2 4 <(sort -k6,6 -) \
-                           <(sort -k4,4 "$bed$haplo2" )  \
+                           <(sort -k4,4 "$bedhaplo2" )  \
             |awk 'NR==1 {print "HOG\tOG\tN0\tchrom1\tGene1\tstart1\tend1\tchrom2\tGene2\tstart2\tend2"}
                     {print $3"\t"$4"\t"$5"\t"$7"\t"$2"\t"$8"\t"$9"\t"$10"\t"$1"\t"$11"\t"$12}' \
             > 02_results/synteny_"$haplo1"_"$haplo2".txt
