@@ -56,7 +56,7 @@ bamlist2="" #full path to a list of bam on genome2
 #ds method (choose between "yn00" or "codeml", default: codeml)
 ds_method="codeml"
 
-aln_method="macse" #default: macse - choose among "macee" or "muscle" 
+aln_method="macse" #default: macse - choose between "macse" or "muscle" 
 
 #max_ds threshold for changepoint :
 max_ds=0.5 #dS values above this threshold will be removed for the changepoint analysis (putative pseudogene, too divergent values)  

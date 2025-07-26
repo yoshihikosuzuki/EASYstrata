@@ -15,10 +15,21 @@ mamba activate superannot/
 
 source config/colors
 source config/config
+############################################################
+# ERROR TRACKING.                                          #
+############################################################
+set -eE -o functrace
+failure() {
+  local lineno=$1
+  local msg=$2
+   echo "command failed at line $lineno: $msg"
+}
+trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
+##################################################
 
 cd 02_results/paml || exit 1
 
-cat wanted_sequence | parallel -j 32 ./12_paml_parallel_version.sh {}
+cat wanted_sequence | parallel -j 32 ../../00_scripts/12_paml_parallel_version.sh {}
 
 #===============================================================================
 #then reshape a bit when all is good:

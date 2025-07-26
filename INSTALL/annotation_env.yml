@@ -26,6 +26,7 @@ dependencies:
   - bedtools=2.31.1
   - orthofinder=2.5.5
   - openjdk=23.0.2
+  - parallel=20250622
   - perl-app-cpanminus
   - perl-hash-merge
   - perl-parallel-forkmanager
