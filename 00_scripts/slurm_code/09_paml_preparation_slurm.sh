@@ -43,7 +43,8 @@ if [ "$ds_method" == "codeml" ] && [ -e 02_results/paml/results_codeml.txt ] && 
     if [ "$sizeseq" == "$sizecodeml" ]; then 
         echo "warning results from codeml already exist"
         echo "not overwriting, please check the file" 
-        exit 1 #or simply continue analysis 
+        echo "will continue analysis using extisting file"
+        #exit 1 #or simply continue analysis 
     fi
 elif [ "$ds_method" == "yn00" ] && [ -e 02_results/paml/results_YN.txt ] && [ -e 02_results/paml/wanted_sequence ] ; then
     sizecodeml=$(wc -l 02_results/paml/results_YN.txt |awk '{print $1}')
@@ -51,7 +52,8 @@ elif [ "$ds_method" == "yn00" ] && [ -e 02_results/paml/results_YN.txt ] && [ -e
     if [ "$sizeseq" == "$sizecodeml" ]; then 
         echo "warning results from codeml already exist"
         echo "not overwriting, please check the file" 
-        exit 1
+        echo "will continue analysis using extisting file"
+        #exit 1
     fi
 fi
 #------------------------------ step 1 prepare input files  -------------------------------------#

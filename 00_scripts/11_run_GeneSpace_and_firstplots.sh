@@ -165,13 +165,15 @@ elif [[ $options = "synteny_and_Ds" ]] ;
 then
     if [ ! -d genespace ] ; then  
        mkdir -p genespace/bed genespace/peptide 
-       mkdir -p  02_results/paml #02_results/plots 
     fi
+    if [ ! -d P2_results/paml ] ; then
+      mkdir -p  02_results/paml
+   fi
 elif [[ $options = "synteny_only" ]] ; 
 then
     if [ ! -d genespace ] ; then  
        mkdir -p genespace/bed genespace/peptide 
-       mkdir 02_results/paml
+       #mkdir 02_results/paml
     fi
 elif [[ $options == "changepoint" ]] ;
 then

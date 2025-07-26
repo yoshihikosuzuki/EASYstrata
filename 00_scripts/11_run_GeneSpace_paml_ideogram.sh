@@ -160,7 +160,6 @@ fi
 
 #----------- step 1 prepare bed file for each haplo ----------------------------#
 #
-
 #test options :
 if [[ $options = "Ds_only" ]] ;  
 then
@@ -172,8 +171,10 @@ elif [[ $options = "synteny_and_Ds" ]] ;
 then
     if [ ! -d genespace ] ; then #rm -rf genespace  ; fi  #02_results/plots  
        mkdir -p genespace/bed genespace/peptide 
-       mkdir -p  02_results/paml #02_results/plots 
     fi
+    if [ ! -d 02_results/paml ] ; then
+      mkdir -p  02_results/paml
+   fi
 elif [[ $options = "synteny_only" ]] ; 
 then
     if [ ! -d genespace ] ; then #rm -rf genespace  ; fi  #02_results/plots  
