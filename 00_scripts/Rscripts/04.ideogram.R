@@ -44,7 +44,7 @@ option_list <- list(
   make_option(c("-s","--scaffold_orientation"), type="character", default=NULL,
               help="OPTIONAL: a table of scaffold orientation: one scaffold per line and a string N/R for Normal or Reverse [default %default]",
               ),
-  make_option(c("-v", "--verbose"), action="store_true", default=TRUE,
+  make_option(c("-v", "--verbose"), action="store_true", default=FALSE,
               help="Print out all parameter settings [default]")
 )
 
@@ -122,7 +122,7 @@ install.packages(setdiff(packages, rownames(installed.packages())), repos="https
 invisible(lapply(packages, suppressWarnings(suppressMessages(suppressPackageStartupMessages(library))), character.only = TRUE))
 
 sco <- read.table(single_copy_ortho, sep = "\t") %>% select(-V1) 
-writeLines("sco ok")
+writeLines("single copy orthologs ok")
 
 if(!is.null(opt$links)) {
     writeLines("links provided in the links file will be displayed in colors\n")
@@ -226,7 +226,6 @@ if ("geneX" %in%  colnames(dsfile)) {
     set_colnames(., c("gene1", "gene2","Ds"))
 
 }
-    #print(head(dsfile0))
     writeLines(paste0("ds file size is :", nrow(dsfile0)))
     
     #create quantile for link:

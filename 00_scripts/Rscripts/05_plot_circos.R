@@ -67,7 +67,7 @@ option_list <- list(
   make_option(c("-d","--ds"), type="character", default=NULL,
               help="OPTIONAL: path to a ds file computed from previous steps [default %default]",
   ),
-  make_option(c("-v", "--verbose"), action="store_true", default=TRUE,
+  make_option(c("-v", "--verbose"), action="store_true", default=FALSE,
               help="Print out all parameter settings [default]")
 )
 
@@ -131,8 +131,6 @@ if(!is.null(opt$synteny_file)) {
         #ungroup %>%
         group_by(chrom2) %>% 
         filter(n()>4) %>% ungroup()
-
-    print(head(syn))
 } else {
     stop("synteny table is a compulsory parameter.\nto see script usage:
          \t./00_scripts/Rscripts/05_plot_circos.R --help")

@@ -78,6 +78,8 @@ else
         echo "scaffold file is set to '$scaffold'";
 fi
 
+echo option chosen is $options
+
 #replace space (multiple or not) by a single tab:
 sed -i 's/ \+/\t/g' "$scaffold"
 if [ ! -d 02_results ] ; then mkdir 02_results ; fi #ignore if already existent
@@ -163,17 +165,18 @@ then
     echo "only drawing plots" 
 elif [[ $options = "synteny_and_Ds" ]] ; 
 then
-    if [ ! -d genespace ] ; then  
+    if [ ! -d genespace ] ; then   
        mkdir -p genespace/bed genespace/peptide 
     fi
-    if [ ! -d P2_results/paml ] ; then
-      mkdir -p  02_results/paml
-   fi
+    if [ ! -d 02_results/paml ] ; then   
+       mkdir -p  02_results/paml  
+    fi
 elif [[ $options = "synteny_only" ]] ; 
 then
     if [ ! -d genespace ] ; then  
+
        mkdir -p genespace/bed genespace/peptide 
-       #mkdir 02_results/paml
+       mkdir 02_results/paml
     fi
 elif [[ $options == "changepoint" ]] ;
 then
@@ -345,8 +348,9 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
             #exit 2
         fi
     fi 
+#-- extract single copy orthologs from orthofinder for later use-----------#
+echo "#-- extract single copy orthologs from orthofinder for later use --#"
 
-echo -e "\n-- extract single copy orthologs from orthofinder for later use --\n"
         pathN0="genespace/orthofinder/Results_*/Phylogenetic_Hierarchical_Orthogroups/N0.tsv"
         sed -i -e "s/\r//g" $pathN0
         #check size 
@@ -361,9 +365,10 @@ echo -e "\n-- extract single copy orthologs from orthofinder for later use --\n"
             p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |grep -Ff <(awk '{print $2}' $scaffold) | awk 'NF==5' ) )
             size1=$(paste <(echo "$p1") |wc -l )
             size2=$(paste <(echo "$p2") |wc -l )
+	    echo " "
             echo "there is $size1 single copy orthologs in $haplo1 data"
             echo "there is $size2 single copy orthologs in $haplo2 data"
-
+           
             if [ "$size1" != "$size2" ] ; then 
                 echo "error! number of single copy orthologs in $haplo1 and $haplo2 are not identical" ; 
                 echo "please check your single copy orthologs file"
@@ -391,11 +396,10 @@ echo -e "\n-- extract single copy orthologs from orthofinder for later use --\n"
             p2=$(awk -v hap="$haplo2" '{for(i=1;i<=NF;++i)if($i ~ hap )print $i}' <(grep -v "," $pathN0 |grep -Ff <(awk '{print $2}' $scaffold) | awk 'NF==6' ) )
             size1=$(paste <(echo "$p1") |wc -l )
             size2=$(paste <(echo "$p2") |wc -l )
-            echo "there is $size1 single copy orthologs in $haplo1 data"
-            echo "there is $size2 single copy orthologs in $haplo2 data"
-
             if [ "$size1" != "$size2" ] ; then 
                 echo "error! number of single copy orthologs in $haplo1 and $haplo2 are not identical" ; 
+                echo "there is $size1 single copy orthologs in $haplo1 data"
+                echo "there is $size2 single copy orthologs in $haplo2 data"
                 echo "please check your single copy orthologs file"
                 exit 
             fi
@@ -423,8 +427,8 @@ echo -e "\n-- extract single copy orthologs from orthofinder for later use --\n"
         #create orthologues file:
         awk '{print "ortho1\tortho2\t"$0}' 02_results/paml/single.copy.orthologs > 02_results/orthologues
 #------------------- step 4 run minimap2 --------------------------------------#
-    echo -e "\n-----------------\n   perform whole genome synteny\n------------\n" 
-    echo -e "\n-----------------\n   running minimap\n-------------------------\n" 
+    echo -e "\n-----------------\n\tperform whole genome synteny\n------------------\n" 
+    echo -e "\n-----------------\n\trunning minimap\n------------------\n" 
     
     if [ ! -d "02_results/minimap_alns" ] ; then mkdir 02_results/minimap_alns/ ; fi
     if [ ! -s 02_results/minimap_alns/aln."$haplo1"_"$haplo2".paf ] ;

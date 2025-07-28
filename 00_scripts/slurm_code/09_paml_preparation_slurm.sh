@@ -44,6 +44,7 @@ if [ "$ds_method" == "codeml" ] && [ -e 02_results/paml/results_codeml.txt ] && 
         echo "warning results from codeml already exist"
         echo "not overwriting, please check the file" 
         echo "will continue analysis using extisting file"
+        exit 0
         #exit 1 #or simply continue analysis 
     fi
 elif [ "$ds_method" == "yn00" ] && [ -e 02_results/paml/results_YN.txt ] && [ -e 02_results/paml/wanted_sequence ] ; then
@@ -53,6 +54,7 @@ elif [ "$ds_method" == "yn00" ] && [ -e 02_results/paml/results_YN.txt ] && [ -e
         echo "warning results from codeml already exist"
         echo "not overwriting, please check the file" 
         echo "will continue analysis using extisting file"
+        exit 0
         #exit 1
     fi
 fi
@@ -169,4 +171,4 @@ if [ -s long_geneID.hap2 ] ; then
     grep ">"  "$newf2" > ID2
 fi
 paste ID1 ID2 |sed 's/>//g' > wanted_sequence
-mkdir 02_results/paml/sequence_files
+if [ ! -d  02_results/paml/sequence_files/ ] ; then mkdir -p 02_results/paml/sequence_files ; fi

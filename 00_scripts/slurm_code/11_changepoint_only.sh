@@ -22,7 +22,8 @@ source config/config
 if [[ -d 02_results/modelcomp ]]
 then
     echo -e "WARNING directory modelcomp already exists! check its content first"
-	exit 1
+    echo -e "will perform the next analysis from existing files"
+    exit 0
 else
     mkdir 02_results/modelcomp/
     if [ -n "${ancestral_genome}" ] ; then

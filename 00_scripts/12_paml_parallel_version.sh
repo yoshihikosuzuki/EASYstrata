@@ -14,16 +14,7 @@ failure() {
    echo "command failed at line $lineno: $msg"
 }
 trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
-###########################################################
-# --- verify haplotype are declared in config/config file ---
-if [ -z "$haplotype1" ] ; then
-    echo "error haplotype1 name not provided check your config file"
-    exit 1
-fi
-if [ -z "$haplotype2" ] ; then
-    echo "error haplotype2 name not provided check your config file"
-    exit 1
-fi
+##################################################
 ##---- recover the wanted sequences in the CDS file #
 wantedseq=$1 #wanted_sequence 
 line0=$(echo "$wantedseq" | awk '{print $1}' )
@@ -43,8 +34,9 @@ grep -w -A1 "${line1}"  "$newf2" >> sequence_files/tmp."${line0}".vs."${line1}"/
 cp ../../config/yn00_template.ctl sequence_files/tmp."${line0}".vs."${line1}"/
 cp ../../config/codeml.ctl sequence_files/tmp."${line0}".vs."${line1}"/
 
-#translatorx_vLocal.pl -i sequence_files/tmp."${line0}".vs."${line1}"/sequence.fasta \
-#            -o sequence_files/tmp."${line0}".vs."${line1}"/results 2>&1 |tee log.translator
+translatorx_vLocal.pl -i sequence_files/tmp."${line0}".vs."${line1}"/sequence.fasta \
+            -o sequence_files/tmp."${line0}".vs."${line1}"/results 2>&1 |tee log.translator
+   
 #sed -i 's/sequence_NT.fasta/results.nt_ali.fasta/g' sequence_files/tmp."${line0}".vs."${line1}"/yn00_template.ctl
 #sed -i 's/sequence_NT.fasta/results.nt_ali.fasta/g' sequence_files/tmp."${line0}".vs."${line1}"/codeml.ctl
 

@@ -10,8 +10,8 @@
 # Move to directory where job was submitted
 cd $SLURM_SUBMIT_DIR
 
-#source /local/env/envconda3.sh 
-mamba activate superannot
+source /local/env/envconda3.sh 
+conda activate /scratch/qrougemont/new_superannot/
 
 #Purpose:
 #master script to prepare bed files, laucnch GeneSpace, run paml and launch downstream Rscript 
@@ -32,15 +32,9 @@ Help()
    echo "Usage: $0 [-s1|-s2|-f|-a|-g|-h|]"
    echo "options:"
    echo " -h|--help: Print this Help."
-   echo " -s1|--haplo1: the name of the first  focal haplotype "
-#   echo " -s2|--haplo2: the name of the second focal haplotype "
-#   echo " -a|--ancestral_genome: the name of the ancestral haplo to infer orthology and plot gene order"
-#   echo " -g|--ancestral_gtf: the name of the ancestral gtf associated with the ancestral genome"
-#   echo " -f|--folderpath: the path to the global folder containing haplo1 and haplo 2"
-#   echo " -c|--chromosome: a tab separated txt file listing the name of the reference species (e.g sp1), the corresponding set of chromosomes (e.g.: chrX , supergene, etc) and the orientation of the chromosome (N: Normal, R: Reverse) if their is more than one"
    echo " -o|--options : the type of analysis to be performed: either 'synteny_and_Ds' (GeneSpace+Minimap2+Ds+changepoint), 'synteny_only' (GeneSpace+Minimap2), 'Ds_only' (paml and changepoint)"
    echo " "
-   echo "dependancies: orthofinder, mcscanx, GeneSpace, paml (yn00), Rideogram, translatorX minimap2"
+   echo "dependancies: R"
 }
 
 ############################################################
@@ -48,16 +42,6 @@ Help()
 ############################################################
 while [ $# -gt 0 ] ; do
   case $1 in
-#    -s1 | --haplo1) haplo1="$2" ; echo -e "haplotype 1 Name is ***${haplo1}*** \n" >&2;;
-#    -s2 | --haplo2) haplo2="$2" ; echo -e "haplotype 2 Name is ***${haplo2}*** \n" >&2;;
-#    -a  | --ancestral_genome) ancestral_genome="$2" ; 
-#        echo -e "ancestral haplo  Name is ***${ancestral_genome}*** \n" >&2;;
-#    -g  | --ancestral_gtf) ancestral_gtf="$2" ; 
-#        echo -e "ancestral gtf  Name is ***${ancestral_gtf}*** \n" >&2;;
-    #-f  | --folderpath  ) folderpath="$2"   ; 
-    #    echo -e "global folder is  ${folderpath} \n" >&2;;
-#    -c  | --chromosome )  chromosome="$2"   ; 
-#        echo -e "target chromosome are ${chromosome} \n" >&2 ;; 
     -o  | --options ) options="$2" ; 
         echo -e "options for computation are ***${options}*** \n" >&2 ;;
     -h  | --help ) Help ; exit 2 ;;
@@ -65,7 +49,7 @@ while [ $# -gt 0 ] ; do
    shift
 done 
 
-if [ -z "${haplotype1}" ] || [ -z "${haplotypr2}" ] || [ -z "${scaffold}" ] || [ -z "${options}" ]  ; then
+if [ -z "${haplotype1}" ] || [ -z "${haplotype2}" ] || [ -z "${scaffold}" ] || [ -z "${options}" ]  ; then
     Help
     exit 2
 fi
@@ -127,13 +111,132 @@ fi
 
 echo -e "annotateTE is set to $annotateTE"
 
-if [ -n "$ancestral_genome" ] ; then
+if [ -n "$ancestral_genome" ] ; then
     ancestral=$(head -n1 ancestral_sp/ancestral_sp.fa.fai \
     |cut -f1 \
     |awk '{gsub("_","\t",$0) ; print $1}')
 
 fi
+# --------------- step8 data processing for ideogram and circos-----------------#
+if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "Ds_only" ]] || [[ $options = "synteny_only" ]] ; then 
+    if [ -n "${ancestral_genome}" ]
+    then
+        echo "inferring synteny with ancestral species: "
+        join  -1 4 -2 4 <(sort -k4,4 02_results/orthologues)  \
+                        <(sort -k4,4 "$bedanc" ) \
+            | sed 's/ /\t/g' \
+            | join -1 5 -2 4 <(sort -k5,5 -) \
+                           <(sort -k4,4 "$bedhaplo1" )  \
+            |awk 'NR==1 {print "HOG\tOG\tN0\tchrom1\tGene1\tstart1\tend1\tchrom2\tGene2\tstart2\tend2"}
+                    {print $3"\t"$4"\t"$5"\t"$7"\t"$2"\t"$8"\t"$9"\t"$10"\t"$1"\t"$11"\t"$12}' \
+            > 02_results/synteny_ancestral_sp_"$haplotype1".txt
+       
+        if [ -s 02_results/synteny_ancestral_sp_"$haplotype1".txt ]
+        then
+            size1=$(wc -l   02_results/synteny_ancestral_sp_"$haplotype1".txt |awk '{print $1}')
+        else
+            echo "synteny file between ancestral species and $haplotype1 is empty"
+            echo "please check your data"
+            exit 1
+        fi
+    
+        join  -1 4 -2 4 <(sort -k4,4 02_results/orthologues)  \
+                <(sort -k4,4 "$bedanc" ) \
+                | sed 's/ /\t/g' \
+                |join -1 6 -2 4 <(sort -k6,6 -) \
+                                <(sort -k4,4 "$bedhaplo2" ) \
+                |awk 'NR==1 {print "HOG\tOG\tN0\tchrom1\tGene1\tstart1\tend1\tchrom2\tGene2\tstart2\tend2"}
+                    {print $3"\t"$4"\t"$5"\t"$7"\t"$2"\t"$8"\t"$9"\t"$10"\t"$1"\t"$11"\t"$12}' \
+                >  02_results/synteny_ancestral_sp_"$haplotype2".txt
+    
+         if [ -s 02_results/synteny_ancestral_sp_"$haplotype2".txt ]
+         then
+             size2=$(wc -l   02_results/synteny_ancestral_sp_"$haplotype2".txt |awk '{print $1}')
+         else
+             echo "synteny file between ancestral species and $haplotype2 is empty"
+             echo "please check your data"
+             exit 1
+         fi
+       
+           echo -e "number of lines in synteny file ancestral_sp vs $haplotype1 is $size1"
+           echo -e "number of lines in synteny file ancestral_sp vs $haplotype2 is $size2"
+     
+        join  -1 5 -2 4 <(sort -k5,5 02_results/orthologues)  \
+                        <(sort -k4,4 "$bedhaplo1" ) \
+            | sed 's/ /\t/g' \
+            | join -1 6 -2 4 <(sort -k6,6 -) \
+                           <(sort -k4,4 "$bed$haplotype2" )  \
+            |awk 'NR==1 {print "HOG\tOG\tN0\tchrom1\tGene1\tstart1\tend1\tchrom2\tGene2\tstart2\tend2"}
+                    {print $3"\t"$4"\t"$5"\t"$7"\t"$2"\t"$8"\t"$9"\t"$10"\t"$1"\t"$11"\t"$12}' \
+            > 02_results/synteny_"$haplotype1"_"$haplotype2".txt
+    
+         if [ -s 02_results/synteny_"$haplotype1"_"$haplotype2".txt ] ;
+         then
+             size3=$(wc -l   02_results/synteny_"$haplotype1"_"$haplotype2".txt |awk '{print $1}')
+         else
+             echo "synteny file between $haplotype1 and $haplotype2 is empty"
+             echo "please check your data"
+             exit 1
+         fi
+                   
+         echo -e "number of lines in synteny file $haplotype1 vs $haplotype2 is $size3"
 
+     else
+        echo "no ancestral species assumed "
+        echo "inferring synteny between $haplotype1 and $haplotype2"
+
+
+       join  -1 4 -2 4 <(sort -k4,4 02_results/orthologues)  \
+                       <(sort -k4,4 "$bedhaplo1" ) \
+            | sed 's/ /\t/g' \
+            | join -1 5 -2 4 <(sort -k5,5 -) \
+                           <(sort -k4,4 "$bedhaplo2" )  \
+            |awk 'NR==1 {print "HOG\tOG\tN0\tchrom1\tGene1\tstart1\tend1\tchrom2\tGene2\tstart2\tend2"}
+                    {print $3"\t"$4"\t"$5"\t"$6"\t"$2"\t"$7"\t"$8"\t"$9"\t"$1"\t"$10"\t"$11}'   \
+            > 02_results/synteny_"$haplotype1"_"$haplotype2".txt
+
+         if [ -s 02_results/synteny_"$haplotype1"_"$haplotype2".txt ] ;
+         then
+             size3=$(wc -l 02_results/synteny_"$haplotype1"_"$haplotype2".txt |awk '{print $1}')
+         else
+             echo "synteny file between $haplotype1 and $haplotype2 is empty"
+             echo "please check your data"
+             exit 1
+         fi
+                   
+         echo -e "number of lines in synteny file $haplotype1 vs $haplotype2 is $size3"
+
+    fi
+
+    #/!\ chromosomes should be reconstructed on the fly from the N0.tsv file
+    if [ -n "${ancestral_genome}" ]
+    then
+        cat <(sed 1d 02_results/synteny_"$haplotype1"_"$haplotype2".txt \
+             |awk -v var1="$haplotype1" -v var2="$haplotype2"  '{print var1"\t"$4"\n"var2"\t"$8}' \
+             |sort |uniq -c |awk '$1>0 {print $2"\t"$3}'  ) \
+             <(sed 1d 02_results/synteny_ancestral_sp_"$haplotype1".txt \
+             |awk -v var1="$ancestral" -v var2="$haplotype1"  '{print var1"\t"$4"\n"var2"\t"$8}' \
+             |sort |uniq -c |awk '$1>0 {print $2"\t"$3}' ) \
+
+    else
+           sed 1d 02_results/synteny_"$haplotype1"_"$haplotype2".txt \
+             |awk -v var1="$haplotype1" -v var2="$haplotype2"  '{print var1"\t"$4"\n"var2"\t"$8}' \
+             |sort |uniq -c |awk '$1>0 {print $2"\t"$3}' \
+             |sort |uniq > 02_results/chromosomes.txt
+
+    awk '{print $1"\t"$5"\t"$9}' 02_results/synteny_"$haplotype1"_"$haplotype2".txt |sed 1d > 02_results/sco
+
+
+    fi
+    chromosomes="02_results/chromosomes.txt"
+    awk '{print $0"\tN"}' $chromosomes > 02_results/chromosomes_orientation.txt
+    scafforientation="02_results/chromosomes_orientation.txt"
+
+    #test if previous step was successfull else plot or exit with high levels of pain
+    #take advantage of samtools to get length of genome
+    samtools faidx haplo1/03_genome/"$haplotype1".fa 
+    samtools faidx haplo2/03_genome/"$haplotype2".fa
+fi
 ########################################################################################################
 #	Data PLOTTING AFTER CHANGEPOINT
 #######################################################################################################

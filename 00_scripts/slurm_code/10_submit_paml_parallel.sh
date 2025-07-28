@@ -27,14 +27,41 @@ failure() {
 trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 ##################################################
 
-cd 02_results/paml || exit 1
-
-cat wanted_sequence | parallel -j 32 ../../00_scripts/12_paml_parallel_version.sh {}
+#check if results already exists:
+if [ "$ds_method" == "codeml" ] && [ -e 02_results/paml/results_codeml.txt ] && [ -e 02_results/paml/wanted_sequence ] ; then
+    sizecodeml=$(wc -l 02_results/paml/results_codeml.txt |awk '{print $1}')
+    sizeseq=$(wc -l 02_results/paml/wanted_sequence |awk '{print $1}')
+    if [ "$sizeseq" == "$sizecodeml" ]; then 
+        echo "warning results from codeml already exist"
+        echo "not overwriting, please check the file" 
+	    echo "will continue analysis from existing file"
+	    #exit 0
+    else
+       cd 02_results/paml || exit 1
+       cat wanted_sequence | parallel -j 32 ../../00_scripts/12_paml_parallel_version.sh {}
+       cd ../../
+    fi
+elif [ "$ds_method" == "yn00" ] && [ -e 02_results/paml/results_YN.txt ] && [ -e 02_results/paml/wanted_sequence ] ; then
+    sizecodeml=$(wc -l 02_results/paml/results_YN.txt |awk '{print $1}')
+    sizeseq=$(wc -l 02_results/paml/wanted_sequence |awk '{print $1}')
+    if [ "$sizeseq" == "$sizecodeml" ]; then 
+        echo "warning results from codeml already exist"
+        echo "not overwriting, please check the file" 
+	    echo "will continue analysis from existing file"
+     	#exit 0
+    else
+       cd 02_results/paml || exit 1
+       cat wanted_sequence | parallel -j 32 ../../00_scripts/12_paml_parallel_version.sh {}
+       cd ../../
+    fi
+fi
 
 #===============================================================================
 #then reshape a bit when all is good:
 #===============================================================================
 #we concatenate everyone to work with them in the next scripts:
+cd 02_results/paml || exit 1
+
 if [ -e results_YN.txt ] ; then rm results_YN.txt ; fi
 cat sequence_files/tmp.*/resultat_Yang_Nielsen_2000_method.orthogp.txt >> results_YN.txt
 cp results_YN.txt results_YN.txt.bkp
@@ -70,6 +97,7 @@ if [ -e correspondance.table.hap2.txt ] && [ ! -e correspondance.table.hap1.txt 
    mv tmp results_YN.txt
    mv tmp_cdml results_codeml.txt
 fi
+cd ../../
 
 #===============================================================================
 #conting:
@@ -82,6 +110,33 @@ scpo=$(wc -l 02_results/paml/single.copy.orthologs |awk '{print $1}' )
 echo -e "there is $pamlsize results for PAML \n"
 echo -e "there is $scpo single copy orthologs \n" 
 
+#===============================================================================
+#---------------------------- step 7 plot paml results  -----------------------#
+bedhaplo1="haplo1/08_best_run/"$haplotype1".v2.bed"
+bedhaplo2="haplo2/08_best_run/"$haplotype2".v2.bed"
+bedanc="ancestral_sp/ancestral_sp.bed"
+
+if [ ! -d Rlogs ]; then mkdir Rlogs ; fi
+    if [ -n "${ancestral_genome}" ]; then
+
+        echo "using ancestral genome"
+        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$ds_method" "$max_ds" \
+        "$haplotype1" "$haplotype2" "$scaffold" \
+        "$bedhaplo1" "$bedhaplo2" ancestral_sp "$bedanc" 2> Rlogs/Rlogs_plot_paml
+        then
+            echo -e "\nERROR plotting paml results failed\n"
+            echo -e "\nplease check input files and logs!!\n\n"
+            exit 1
+        fi
+    else
+        if ! Rscript ./00_scripts/Rscripts/03.plot_paml.R "$ds_method" "$max_ds" "$haplotype1" "$haplotype2" \
+        "$scaffold"  "$bedhaplo1" "$bedhaplo2" 2> Rlogs/Rlogs_plot_paml
+        then
+            echo -e "\nERROR plotting paml results failed\n"
+            echo -e "\nplease check input files and logs!!\n\n"
+            exit 1
+        fi
+    fi
 #===============================================================================
 #cleanup:
 fasta1=sorted."$haplotype1".wanted_cds.fa  
