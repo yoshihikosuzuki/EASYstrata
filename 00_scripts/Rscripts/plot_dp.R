@@ -39,7 +39,7 @@ write.table(m, paste0('mean_dp',input2,'.txt'), quote = F, row.names = F)
 #filter(m, dp > 10) %>% summarise( meanDP = mean(dp), medianDP = median(dp))
 
 p <- a %>%
-  filter(V3 <= quantile(a$V3,0.99) %>%
+  filter(V3 <= quantile(a$V3,0.99)) %>%
   ggplot(.) +
   geom_line(aes(x=V2,y=V3)) +
   facet_wrap_paginate(~ V1, ncol = 1, nrow = 8, scales = 'free') +
@@ -61,5 +61,5 @@ if (!dir.exists("02_results/RNA_depth")){
 for(i in 1:n_pages(p)){
   p_save <-  p +
     facet_wrap_paginate(~ V1, ncol = 1, nrow = 8, scales = 'free', page = i)
-  ggsave(plot = p_save, width = 16, height =16, filename = paste0('Depth/',input2, '_', i, '.pdf'))
+  ggsave(plot = p_save, width = 16, height =16, filename = paste0('02_results/RNA_depth/',input2, '_', i, '.pdf'))
 }
