@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --account=youraccount
+##SBATCH --account=youraccount
 #SBATCH --time=78:00:00
 #SBATCH --job-name=repeatmodeler
 #SBATCH --output=log_repeatmodeler-%J.out
@@ -12,10 +12,8 @@ cd $SLURM_SUBMIT_DIR
 
 #activate conda
 #source /local/env/envconda3.sh 
-
 #activate the env
-mamba activate repeatmodeler_env
-
+#mamba activate repeatmodeler_env
 #give expected number of arguments from config file:
 source config/config
 ##  ------------------------ general parameters --------------------------------  ##
@@ -46,6 +44,7 @@ fi
 if [ -z "$folder" ]; then
     folder=haplo1
     mkdir "$folder"
+    mkdir "$golder"/03_genome
     echo "warning, no folder path provided, the data will be located in haplo1"
 fi
 if [ -n "${genome}" ] ; 
@@ -64,6 +63,7 @@ if file --mime-type "$genome" | grep -q gzip$; then
    echo "$genome is gzipped"
    gunzip "$genome"
    genome=${genome%.gz}
+   if [ ! -e $folder/03_genome ] ; then mkdir $folder/03_genome ; fi
    cd "$folder"/03_genome || exit 1 
    if [ ! -s  "$haplotype".fa ]
    then
@@ -75,6 +75,7 @@ if file --mime-type "$genome" | grep -q gzip$; then
 else
    echo "$genome is not gzipped"
    genome=$genome
+   if [ ! -e $folder/03_genome ] ; then mkdir $folder/03_genome ; fi
    cd "$folder"/03_genome || exit 1 
    if [ ! -s  "$haplotype".fa ]
    then
@@ -100,7 +101,7 @@ else
     #remove any empty rm_file
     rm -rf $rm_file 
 
-    ../00_scripts/05_repeatmodeler.sh "$haplotype".fa "$haplotype" "$Mask" 2>&1 |tee LOGS/log_rm
+    ../00_scripts/05_repeatmodeler.sh 03_genome/"$haplotype".fa "$haplotype" "$Mask" 2>&1 |tee LOGS/log_rm
     if [[  "${PIPESTATUS[0]}" -ne 0 ]]
     then
         echo -e "${RED} ERROR: repeatmodeler failed.\n

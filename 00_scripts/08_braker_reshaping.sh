@@ -331,10 +331,10 @@ echo -e "there is $(wc -l "$gtf" |awk '{print $1}') lines in ""$gtf"" "
 
 cat <( grep -Ff <(grep ">" "$prot" \
     |sed 's/>//g' \
-    |sed 's/_1 CDS=.*//g'  ) "$gtf" ;
+    |sed 's/_1//g'  ) "$gtf" ;
  grep -f <(grep ">" "$prot" \
     |sed 's/>//g' \
-    |sed 's/_1 CDS=.*//g' \
+    |sed 's/_1//g' \
     |sed 's/.t[0-9]$//g' ) <(awk '$3=="gene" ' "$gtf" )) \
     |sort -k1,1 -k4,4n -k5,5n > "$haplo".longest_transcript.gtf
 

@@ -64,10 +64,10 @@ else
    rm -rf "${wd:?}"/*
    if [[ $fungus = "YES" ]]
    then
-       braker.pl --species="$species"_"$TIME"_round1  --genome="$genome" --threads="$NCPUS" \
+       braker.pl --species="$species"_"$TIME"_round"$round"  --genome="$genome" --threads="$NCPUS" \
            --softmasking --prot_seq=$relatProt --workingdir=$wd --fungus  
    else
-       braker.pl --species="$species"_"$TIME"_round1  --genome="$genome" --threads="$NCPUS" \
+       braker.pl --species="$species"_"$TIME"_round"$round"  --genome="$genome" --threads="$NCPUS" \
            --softmasking --prot_seq=$relatProt --workingdir=$wd 
    fi
 fi

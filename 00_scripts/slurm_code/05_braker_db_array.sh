@@ -12,9 +12,9 @@
 cd $SLURM_SUBMIT_DIR
 
 #activate conda
-#source /local/env/envconda3.sh 
+source /local/env/envconda3.sh 
 #activate the env
-mamba activate superannot/
+conda activate /scratch/qrougemont/new_superannot/
 
 #give expected number of arguments from config file:
 source config/config
@@ -143,22 +143,41 @@ else
             if [ -f "$file" ] 
             then
                 echo "warning file $target.fa already present "
+                if file --mime-type "$file" | grep -q gzip$; then
+                    gunzip "file"
+                fi
+
                 cd ..
-                if [ -s relatProt.fa ] ; then relatProt="relatProt.fa" ; fi
+                if [ -e relatProt.fa ] ; then 
+			relatProt="relatProt.fa" ; 
+		else
+	            if [ -z ${RelatedProt} ] ; then
+                        echo "no related protein provided in config file"
+                        echo "copying file"
+                        cp odb12/"${target}".fa  relatProt.fa
+                        relatProt="relatProt.fa"
+                        echo "compressing file"
+	            else
+                        echo "combining $RelatedProt with odb12 data" 
+                        cat "$RelatedProt"  odb12/"${target}".fa > relatProt.fa
+                        relatProt="relatProt.fa"
+                   fi
+		fi
+		
             else
                 echo "download partionned odb12 for $target lineage"
                 wget -q https://bioinf.uni-greifswald.de/bioinf/partitioned_odb12/"${target}".fa.gz
                 gunzip "${target}".fa.gz
                 cd ../ 
                 if [ -z ${RelatedProt} ] ; then
-                    echo "no related protein"
+                    echo "no related protein provided in config file"
                     echo "copying file"
                     cp odb12/"${target}".fa  relatProt.fa
                     relatProt="relatProt.fa"
                     echo "compressing file"
                     gzip odb12/"${target}".fa
                 else
-                    echo "combining $RelatedProt odb12 data" 
+                    echo "combining $RelatedProt with odb12 data" 
                     cat "$RelatedProt"  odb12/"${target}".fa > relatProt.fa
                     relatProt="relatProt.fa"
                 fi
@@ -175,6 +194,7 @@ else
     fi
 fi
 #prepare architecture:
+echo "prepare architecture"
 seq 1 5 > nb_round
 
 round=$(sed -n "${SLURM_ARRAY_TASK_ID}p" nb_round )
