@@ -477,7 +477,8 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
         awk '{gsub("_","\t",$0) ; print $2"_"$3"\t"$5"_"$6}' 02_results/paml/single.copy.orthologs|\
             sort |\
             uniq -c|\
-            awk '$1>10 '  > 02_results/scaff.anc.haplo1.txt
+            awk '$1>10 '\
+	        | sed -e 's/^ \+//g' -e 's/ /\t/g'   > 02_results/scaff.anc.haplo1.txt
         if [ ! -s 02_results/scaff.anc.haplo1.txt ] ; then 
             echo "WARNING FILE 02_results/scaff.anc.haplo1.txt is empty" 
             echo "this may cause problem later "
@@ -485,7 +486,8 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
         awk '{gsub("_","\t",$0) ; print $2"_"$3"\t"$8"_"$9}' 02_results/paml/single.copy.orthologs|\
             sort |\
             uniq -c\
-            |awk '$1>10 ' > 02_results/scaff.anc.haplo2.txt
+            |awk '$1>10 '\
+	        |sed -e 's/^ \+//g' -e 's/ /\t/g'  > 02_results/scaff.anc.haplo2.txt
         if [ ! -s 02_results/scaff.anc.haplo2.txt ] ; then 
             echo "WARNING FILE 02_results/scaff.anc.haplo2.txt is empty" 
             echo "this may cause problem later "
@@ -495,7 +497,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
             sort |\
             uniq -c|\
             awk '$1>10 ' \
-            |sed -e 's/^    //g' -e 's/ /\t/g'  > 02_results/scaff.haplo1.haplo2.txt
+            |sed -e 's/^ \+//g' -e 's/ /\t/g'  > 02_results/scaff.haplo1.haplo2.txt
         if [ ! -s 02_results/scaff.haplo1.haplo2.txt ] ; then 
             echo "WARNING FILE 02_results/scaff.haplo1.haplo2.txt is empty" 
             echo "this may cause problem later "
@@ -518,7 +520,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
             sort |\
             uniq -c|\
             awk '$1>10 ' \
-           |sed -e 's/^    //g' -e 's/ /\t/g'  > 02_results/scaff.haplo1.haplo2.txt
+            |sed -e 's/^ \+//g'  -e 's/ /\t/g'  > 02_results/scaff.haplo1.haplo2.txt
         if [ ! -d Rlogs ] ; then mkdir Rlogs ; fi 
         #then run pafr to generate a whole genome dotplot and eventually dotplot for some target scaffold:
         Rscript 00_scripts/Rscripts/dotplot_paf.R  02_results/minimap_alns/aln."$haplo1"_"$haplo2".paf 2> Rlogs/Rlogs_minimap1 
@@ -537,16 +539,18 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
         awk '{gsub("_","\t",$0) ; print $2"_"$3"_"$4"\t"$6"_"$7}' 02_results/paml/single.copy.orthologs|\
             sort |\
             uniq -c|\
-            awk '$1>4 '  > 02_results/scaff.anc.haplo1.txt
+            awk '$1>4 ' \
+	        |sed -e 's/^ \+//g' -e 's/ /\t/g'  > 02_results/scaff.anc.haplo1.txt
         awk '{gsub("_","\t",$0) ; print $2"_"$3"_"$4"\t"$9"_"$10}' 02_results/paml/single.copy.orthologs|\
             sort |\
             uniq -c\
-            |awk '$1>4 ' > 02_results/scaff.anc.haplo2.txt
+            |awk '$1>4 ' \
+	        |sed -e 's/^ \+//g' -e 's/ /\t/g'  > 02_results/scaff.anc.haplo2.txt
         awk '{gsub("_","\t",$0) ; print $6"_"$7"\t"$9"_"$10}' 02_results/paml/single.copy.orthologs|\
             sort |\
             uniq -c|\
             awk '$1>4 ' \
-            |sed -e 's/^    //g' -e 's/ /\t/g' > 02_results/scaff.haplo1.haplo2.txt
+            |sed -e 's/^ \+//g' -e 's/ /\t/g'  > 02_results/scaff.haplo1.haplo2.txt
 
     else
         #ancestral genome not provided  
@@ -554,7 +558,7 @@ if [[ $options = "synteny_and_Ds" ]]  || [[ $options = "synteny_only" ]] ; then
             sort |\
             uniq -c|\
             awk '$1>4 ' \
-           |sed -e 's/^    //g' -e 's/ /\t/g'  > 02_results/scaff.haplo1.haplo2.txt
+            |sed -e 's/^ \+//g' -e 's/ /\t/g'   > 02_results/scaff.haplo1.haplo2.txt
 
     fi
 fi
@@ -647,19 +651,19 @@ if [ "$options" = "Ds_only" ] ; then
 fi
 
 #------------------------------ step 6 run paml  -------------------------------#
-
+source config/config
 if [[ "$options" = "synteny_and_Ds" ]] || [[ "$options" = "Ds_only" ]] ; then 
     #echo haplo1 is "$haplo1"
     #echo haplo2 is "$haplo2"
-    
-    if [ "$ds_method" == "codeml" ] && [ -e 02_results/paml/results_codeml.txt ] && [ -e 02_results/paml/wanted_sequence ] ; then
+    if [ "$ds_method" = "codeml" ] && [ -e 02_results/paml/results_codeml.txt ] && [ -e 02_results/paml/wanted_sequence ] ; then
         sizecodeml=$(wc -l 02_results/paml/results_codeml.txt |awk '{print $1}')
         sizeseq=$(wc -l 02_results/paml/wanted_sequence |awk '{print $1}')
         if [ "$sizeseq" == "$sizecodeml" ]; then 
             echo "warning results from codeml already exist"
             echo "not overwriting, please check the file" 
             #exit 1 #or simply continue analysis 
-        else 
+	fi
+    elif [ "$ds_method" = "codeml" ] && [ ! -e 02_results/paml/results_codeml.txt ] && [ ! -e 02_results/paml/wanted_sequence ] ; then
            echo "running analysis" ; 
            echo -e "\n${BLU}----------------------\npreparing data for paml\n-----------------------${NC}\n"
            if [ -n "${ancestral_genome}" ]; then
@@ -676,16 +680,15 @@ if [[ "$options" = "synteny_and_Ds" ]] || [[ "$options" = "Ds_only" ]] ; then
               -h2 "$haplo2" \
               -s "$scaffold" || { echo -e "${RED} ERROR! paml failed - check your data\n${NC} " ; exit 1 ; }
            fi
-
-        fi
-    elif [ "$ds_method" == "yn00" ] && [ -e 02_results/paml/results_YN.txt ] && [ -e 02_results/paml/wanted_sequence ] ; then
+    elif [ "$ds_method" = "yn00" ] && [ -e 02_results/paml/results_YN.txt ] && [ -e 02_results/paml/wanted_sequence ] ; then
         sizecodeml=$(wc -l 02_results/paml/results_YN.txt |awk '{print $1}')
         sizeseq=$(wc -l 02_results/paml/wanted_sequence |awk '{print $1}')
         if [ "$sizeseq" == "$sizecodeml" ]; then 
             echo "warning results from codeml already exist"
             echo "not overwriting, please check the file" 
             #exit 1
-        else 
+	fi
+    elif [ "$ds_method" = "yn00" ] && [ ! -e 02_results/paml/results_YN.txt ] && [ ! -e 02_results/paml/wanted_sequence ] ; then
            echo -e "\n${BLU}----------------------\npreparing data for paml\n-----------------------${NC}\n"
            if [ -n "${ancestral_genome}" ]; then
               #ancestral genome exist
@@ -701,9 +704,9 @@ if [[ "$options" = "synteny_and_Ds" ]] || [[ "$options" = "Ds_only" ]] ; then
               -h2 "$haplo2" \
               -s "$scaffold" || { echo -e "${RED} ERROR! paml failed - check your data\n${NC} " ; exit 1 ; }
            fi
-        fi
     fi
 fi
+#fi
 
 
 if [[ "$options" = "synteny_and_Ds" ]]  || [[ "$options" = "Ds_only" ]] || [[ "$options" = "plots" ]] ; then 
