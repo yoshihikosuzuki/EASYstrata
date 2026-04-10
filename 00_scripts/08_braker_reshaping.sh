@@ -377,6 +377,7 @@ echo -e "-----------------------------------------------------------------\n"
 gffread -x "$haplo".spliced_cds.fa -g ../03_genome/genome.wholemask.fa "$gtf4" 
 echo "translate CDS into amino acid "
 gffread -y "$haplo"_prot.final.clean.fa -g ../03_genome/genome.wholemask.fa "$gtf4"
+sed -i '/^>/!s/\./*/g' "$haplo"_prot.final.clean.fa
 
 conda activate superannot
 
@@ -384,6 +385,7 @@ conda activate superannot
 #    -outseq "$haplo"_prot.final.fa
 transeq -clean -sequence "$haplo".spliced_cds.fa \
     -outseq "$haplo"_prot.final.fa #for interproscan and other pipelines
+sed -i '/^>/!s/\./*/g' "$haplo"_prot.final.fa
 
 echo -e "there is $( grep -c ">" "$haplo"_prot.final.fa |\
     awk '{print $1}' ) total protein corresponding to a single longest transcript in the final files"
