@@ -80,12 +80,12 @@ if (argv[1]=="-h" || length(argv)==0){
 
     #set a maximum ds value for trimming data for the changepoint analysis
     #genes with dS values above this threshold are considered pseudogenes
-    max_ds <- argv[2]
-    if(!exists("max_ds")){
-        max_ds=0.5
+    if (length(argv) >= 2 && !is.na(suppressWarnings(as.numeric(argv[2])))) {
+        max_ds <- as.numeric(argv[2])
     } else {
-       print(paste0("maximum value for filtering is:", max_ds)) 
+        max_ds <- 1.0
     }
+    print(paste0("maximum value for filtering is: ", max_ds))
 
 
     if (length(argv)<7) {
