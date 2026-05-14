@@ -231,11 +231,11 @@ p_b <- plot_data_b %>%
 combined <- p_a / p_b
 
 if (use_raw_data) {
-  output_file <- "02_results/dsplots/dS_with_PROHD_raw.pdf"
+  output_file <- "02_results/dsplots/ds_with_PR_HD_raw.pdf"
 } else if (max_ds == 1.0) {
-  output_file <- "02_results/dsplots/dS_with_PROHD.pdf"
+  output_file <- "02_results/dsplots/ds_with_PR_HD.pdf"
 } else {
-  output_file <- sprintf("02_results/dsplots/dS_with_PROHD_maxds%.1f.pdf", max_ds)
+  output_file <- sprintf("02_results/dsplots/ds_with_PR_HD_maxds%.1f.pdf", max_ds)
 }
 
 pdf(file = output_file, width = 14, height = 8)
